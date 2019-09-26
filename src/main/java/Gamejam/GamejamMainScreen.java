@@ -9,7 +9,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import view.TicTacToeControllerView;
 /**
  * The MainScreen view. 
  * Should be the first thing that pops up when loading the application
@@ -28,8 +27,7 @@ public class GamejamMainScreen extends BorderPane {
 	 */
 	private void init() {
 		this.setTop(_getTop());
-		gameselectonboxarea = _getCenter();
-		this.setCenter(gameselectonboxarea);
+		this.setCenter(_getCenter());
 	}
 	/**
 	 * Gets the item that is surposed to be the top most part of the application
@@ -64,27 +62,12 @@ public class GamejamMainScreen extends BorderPane {
 			Button gamebutton = new Button();
 			Image icon = new Image(getClass().getResourceAsStream(gamelist[x].getIconFilePath()));
 			gamebutton.setGraphic(new ImageView(icon));
-			gamebutton.setText(gamelist[x].getName());
 			gamebutton.setOnMouseClicked((click) -> {
-	           //System.out.println("Button Click!");
-	           Button but = (Button) click.getSource();
-	           gameButtonClick(but.getText());
+	           System.out.println("Button Click!");
 	        });
 			grid.add(gamebutton, x % 4, x / 4);
 		}
 		return grid;
-	}
-	/**
-	 * Mapping function, maps game button clicks to their respected game and inits it.
-	 * @param name The name feild of the button clicked, used to ID it.
-	 */
-	private void gameButtonClick(String name) {
-		if (name.equals("Tic-tac-toe")) {
-			init_tictactoe();
-		}
-	}
-	private void init_tictactoe() {
-		this.setCenter(new TicTacToeControllerView());
 	}
 	/**
 	 * Fetches all the games that are implemented
