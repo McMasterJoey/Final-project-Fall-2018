@@ -1,4 +1,4 @@
-package tests;
+package Gamejam;
 
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
