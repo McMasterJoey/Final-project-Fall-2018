@@ -1,10 +1,7 @@
 package Gamejam;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import model.TicTacToeModel;
-import view.TicTacToeControllerView;
 /**
  * Implementation of the Gamejam project. Acts as the Init class.
  * 

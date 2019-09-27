@@ -59,7 +59,7 @@ public class GamejamMainScreen extends BorderPane {
 		grid.getColumnConstraints().add(new ColumnConstraints(260));
 		grid.getColumnConstraints().add(new ColumnConstraints(260));
 		grid.getColumnConstraints().add(new ColumnConstraints(260));
-		gameiconitem[] gamelist = getGameList();
+		GameIconItem[] gamelist = getGameList();
 		for(int x = 0; x < gamelist.length; x++) {
 			Button gamebutton = new Button();
 			Image icon = new Image(getClass().getResourceAsStream(gamelist[x].getIconFilePath()));
@@ -89,33 +89,9 @@ public class GamejamMainScreen extends BorderPane {
 	/**
 	 * Fetches all the games that are implemented
 	 */
-	private gameiconitem[] getGameList() {
-		gameiconitem[] retval = new gameiconitem[1];
-		retval[0]  = new gameiconitem("Tic-tac-toe","/tictactoeicon.png",0);
+	private GameIconItem[] getGameList() {
+		GameIconItem[] retval = new GameIconItem[1];
+		retval[0]  = new GameIconItem("Tic-tac-toe","/tictactoeicon.png",0);
 		return retval;
-	}
-	/**
-	 * Private class, Holds needed data to produce each button that loads each game.
-	 * @author Joey McMaster
-	 *
-	 */
-	private class gameiconitem {
-		String gamename;
-		String iconfilepath;
-		int gameid;
-		public gameiconitem(String name, String iconfilepath, int gameid) {
-			this.gamename = name;
-			this.iconfilepath = iconfilepath;
-			this.gameid = gameid;
-		}
-		public String getName() {
-			return gamename;
-		}
-		public String getIconFilePath() {
-			return iconfilepath;
-		}
-		public int getGameID() {
-			return gameid;
-		}
 	}
 }
