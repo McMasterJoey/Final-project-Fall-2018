@@ -1,6 +1,3 @@
-/**
- ******************  Script Configuration ******************
- */
 buildscript {
   repositories {
     jcenter()
@@ -15,10 +12,9 @@ buildscript {
   }
 }
 
-
-/**
- ******************  Java Configuration ******************
- */
+/*
+* Java Build
+*/
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'com.google.osdetector'
@@ -43,63 +39,19 @@ dependencies {
     // Let gradle find mysql connector
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.15'
     runtime "mysql:mysql-connector-java:8.0.15.jar"
-    
-    
-    // Add your dependencies here, for example:
-    // compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.14'
-    
-    // We are not using Java 11:
-    /*
-    compile "org.openjfx:javafx-base:11:$platform"
-    compile "org.openjfx:javafx-graphics:11:$platform"
-    compile "org.openjfx:javafx-controls:11:$platform"
-    compile "org.openjfx:javafx-fxml:11:$platform"
-    compile "org.openjfx:javafx-media:11:$platform"
-    compile "org.openjfx:javafx-web:11:$platform"
-    */
 }
 
 
-/*
-compileJava {
-  doFirst {
-    options.compilerArgs = [
-           // Need Java 11 for --module
-            '--module-path', classpath.asPath,
-            '--add-modules', 'javafx.fxml,javafx.controls'
-    ]
-  }
-}
-
-
-run {
-  doFirst {
-    jvmArgs = [
-              // Need Java 11 for --module
- 
-           '--module-path', classpath.asPath,
-           '--add-modules', 'javafx.fxml,javafx.controls'
-    ]
-  }
-}
-*/
-
-
-/**
- ******************  jpro Configuration ******************
- */
 apply plugin: 'com.sandec.jpro'
 
+/*
+* Main Class Name
+*/
+mainClassName = 'Gamejam.Gamejam'
 
-/**
- * App Main Class
- */
-//mainClassName = 'com.jpro.hellojpro.HelloJPro'
-mainClassName = 'view.Spike1View'
-
-/**
- * jpro settings
- */
+/*
+* JPro build
+*/
 jpro {
   // for debugging
   // JVMArgs << '-agentlib:jdwp=transport=dt_socket,server=n,address=5006,suspend=y'
