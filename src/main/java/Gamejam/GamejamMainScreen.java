@@ -1,14 +1,17 @@
 package Gamejam;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import view.TicTacToeControllerView;
 /**
  * The MainScreen view. 
@@ -19,6 +22,8 @@ import view.TicTacToeControllerView;
  */
 public class GamejamMainScreen extends BorderPane {
 	private GridPane gameselectonboxarea;
+	private HBox initTopBar;
+	private VBox initLeftBar;
 	public GamejamMainScreen() {
 		super();
 		init();
@@ -27,8 +32,9 @@ public class GamejamMainScreen extends BorderPane {
 	 * Inits the Object
 	 */
 	private void init() {
-		this.setTop(_getTop());
-		gameselectonboxarea = _getCenter();
+		this.initTopBar = initTopBar();
+		this.setTop(this.initTopBar);
+		gameselectonboxarea = initGamePanel();
 		this.setCenter(gameselectonboxarea);
 	}
 	/**
@@ -36,24 +42,63 @@ public class GamejamMainScreen extends BorderPane {
 	 * This should be the clickable menus that allow the use to log in and adjust their account settings.
 	 * @return A Menubar with all the options already added to it.
 	 */
-	private MenuBar _getTop() {
-		MenuBar bar = new MenuBar();
-		Menu accountmenu =  new Menu("Accounts");
-		MenuItem loginopt = new MenuItem("Log in");
-		MenuItem logoutopt = new MenuItem("Log out");
-		MenuItem createaccountopt = new MenuItem("Create Account");
+	private HBox initTopBar() {
+		HBox retval = new HBox(); // General Box
+		retval.setAlignment(Pos.TOP_RIGHT); // Set it so it aligns on the right
+		HBox leftbox = new HBox();
+		// Create New Account Button
+		Button newacc = new Button("Create New Account");
+		newacc.setPrefWidth(144);
+		newacc.setPrefHeight(25);
+		newacc.setOnMouseClicked((click) -> { 
+			createNewAccountButtonClick();
+	    });
+		// Add to Left Hbox
+		leftbox.getChildren().add(newacc);
+		leftbox.setPrefWidth(758);
+		leftbox.setPrefHeight(25);
+		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
+		// Add to right hbox first to acheive correct look
+		retval.getChildren().add(leftbox);
 		
-		accountmenu.getItems().addAll(loginopt,logoutopt,createaccountopt);
-		Menu optionmenu = new Menu("Options");
-		bar.getMenus().addAll(accountmenu,optionmenu);
-		return bar;
+		TextField username = new TextField("Username");
+		username.setPrefWidth(280);
+		username.setPrefHeight(25);
+		TextField password = new TextField("Password");
+		password.setPrefWidth(165);
+		password.setPrefHeight(25);
+		//username.set
+		Button login = new Button("Login");
+		login.setPrefWidth(144);
+		login.setPrefHeight(25);
+		login.setTextFill(Color.RED);
+		login.setTextAlignment(TextAlignment.CENTER);
+		login.setOnMouseClicked((click) -> { 
+			loginButtonClick();
+	    });
+		retval.getChildren().addAll(username, password, login);
+		retval.setPrefWidth(600);
+		retval.setPrefHeight(25);
+		return retval;
+	}
+	/**
+	 * Handles the event were the Log in Button is Clicked
+	 */
+	private void loginButtonClick() {
+		
+	}
+	/**
+	 * Handles the event were the Create New Account Button is Clicked
+	 */
+	private void createNewAccountButtonClick() {
+		
 	}
 	/**
 	 * Gets the item that surposed to be in the center of the application.
 	 * In this case its the game selector menu.
 	 * @return A grid pane of all the buttons to lead to each game.
 	 */
-	private GridPane _getCenter() {
+	private GridPane initGamePanel() {
 		GridPane grid = new GridPane();
 		grid.getColumnConstraints().add(new ColumnConstraints(260));
 		grid.getColumnConstraints().add(new ColumnConstraints(260));
