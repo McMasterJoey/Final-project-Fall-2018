@@ -34,6 +34,8 @@ public class GamejamMainScreen extends BorderPane {
 	private AccountManager acctMgr;
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
+	
+	private boolean DEBUG_FakeDatabase = true; // REMOVE WHEN DONE
 	public GamejamMainScreen() {
 		super();
 		init();
@@ -171,13 +173,14 @@ public class GamejamMainScreen extends BorderPane {
 		});
 		// Add to Left Hbox
 		leftbox.getChildren().add(logout);
-		leftbox.setPrefWidth(758);
+		leftbox.setPrefWidth(1100);
 		leftbox.setPrefHeight(25);
 		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
 		// Add to right hbox first to acheive correct look
 		retval.getChildren().add(leftbox);
 
 		Label loggedinusername = new Label("Test User");
+		loggedinusername.setPrefWidth(400);
 		Button settings = new Button();
 		settings.setPrefWidth(25);
 		settings.setPrefHeight(25);
@@ -190,6 +193,15 @@ public class GamejamMainScreen extends BorderPane {
 		retval.setPrefWidth(600);
 		retval.setPrefHeight(25);
 		return retval;
+	}
+	/**
+	 * Updates all the GUI elements that use the username of the current user.
+	 */
+	private void UpdateLoggedInBarsWithUserNameOfCurrentUser() {
+		Label lo = (Label) this.initLoggedInBar.getChildren().get(1);
+		Label log = (Label) this.initLoggedInInGameBar.getChildren().get(1);
+		lo.setText(this.loggedinusername);
+		log.setText(this.loggedinusername);
 	}
 	/**
 	 * Generates the iteme that will be put in the top bar of the application while a user is in a game and logged in.
@@ -208,13 +220,14 @@ public class GamejamMainScreen extends BorderPane {
 		});
 		// Add to Left Hbox
 		leftbox.getChildren().add(logout);
-		leftbox.setPrefWidth(758);
+		leftbox.setPrefWidth(1100);
 		leftbox.setPrefHeight(25);
 		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
 		// Add to right hbox first to acheive correct look
 		retval.getChildren().add(leftbox);
 
 		Label loggedinusername = new Label("Test User");
+		loggedinusername.setPrefWidth(400);
 		Button settings = new Button();
 		settings.setPrefWidth(25);
 		settings.setPrefHeight(25);
@@ -245,6 +258,7 @@ public class GamejamMainScreen extends BorderPane {
 		// TODO: Implement Logout
 		userLoggedIn = false;
 		System.out.println("Logout!");
+		this.setTop(this.initTopBar);
 	}
 
 	/**
@@ -269,12 +283,11 @@ public class GamejamMainScreen extends BorderPane {
 			System.out.println("Login successful\n");
 			userLoggedIn = true;
 			this.loggedinusername = username.getText();
+			UpdateLoggedInBarsWithUserNameOfCurrentUser();
+			this.setTop(this.initLoggedInBar);
 		} else {
 			// TODO: Handle unsuccessful login
 			System.out.println("Invalid username or password\n");
-			// DEBUG REMOVE WHEN DONE
-			// Fuck this shit, I'm debugging
-			DEBUG_PretendImLoggedIn();
 		}
 	}
 
@@ -286,8 +299,11 @@ public class GamejamMainScreen extends BorderPane {
 	 */
 	private boolean doLogin(String username, String password) {
 		System.out.println("username = '" + username + "' password = '" + password + "'");
-
-		return this.acctMgr.login(username, password);
+		if (this.DEBUG_FakeDatabase) {
+			return true;
+		} else {
+			return this.acctMgr.login(username, password);
+		}
 	}
 
 	/**
@@ -340,10 +356,7 @@ public class GamejamMainScreen extends BorderPane {
 		int status = doCreateNewAccount(username.getText(), password.getText());
 		// TODO: Change the UI to reflect the status returned.
 
-		// Temporary, change back to normal starting GUI
-		if (status == 0) {
-			this.setCenter(this.initGameselectonboxarea);
-		} else if (status == 1) {
+		if (status == 1 || status == 0) {
 			userLoggedIn = true;
 			this.loggedinusername = username.getText();
 			button.setTextFill(Color.BLACK);
@@ -351,7 +364,7 @@ public class GamejamMainScreen extends BorderPane {
 		} else if (status == 2) {
 			System.out.println("Username already in use");
 			// TODO: Handle username already in use
-			info.setText("User name: '" + username + "' already in use. Try a diffrent one.");
+			info.setText("User name: '" + username.getText() + "' already in use. Try a diffrent one.");
 			button.setTextFill(Color.RED);
 		} else if (status == 3) {
 			System.err.println("Other error encounted on account creation");
@@ -360,13 +373,12 @@ public class GamejamMainScreen extends BorderPane {
 			button.setTextFill(Color.RED);
 		}
 	}
-
 	/**
 	 * Updates the GUI after a new account is made succesfuly,
 	 */
 	private void doGUIUpdateOnCreateAccountSuccess() {
 		System.out.println("Account creation successful");
-
+		UpdateLoggedInBarsWithUserNameOfCurrentUser();
 		this.setTop(this.initLoggedInBar);
 		this.setCenter(this.initGameselectonboxarea);
 	}
@@ -381,8 +393,11 @@ public class GamejamMainScreen extends BorderPane {
 	 */
 	private int doCreateNewAccount(String username, String password) {
 		System.out.println("username = '" + username + "' password = '" + password + "'");
-
-		return this.acctMgr.createAccount(username, password);
+		if (this.DEBUG_FakeDatabase) {
+			return 1;
+		} else {
+			return this.acctMgr.createAccount(username, password);
+		}
 	}
 
 	/**
