@@ -1,10 +1,7 @@
 package Gamejam;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import model.TicTacToeModel;
-import view.TicTacToeControllerView;
 /**
  * Implementation of the Gamejam project. Acts as the Init class.
  * 
@@ -23,7 +20,7 @@ public class Gamejam extends Application {
 	public void start(Stage stage) throws Exception {
 		stage.setTitle("Game Jam");
 		GamejamMainScreen screen = new GamejamMainScreen();
-		Scene scene = new Scene(screen, 800, 800);
+		Scene scene = new Scene(screen, 1280, 720);
 		stage.setScene(scene);
 		stage.show();
 		
