@@ -95,6 +95,22 @@ public class AccountManager extends Observable {
 		return 1;
 	}
 	
+	// Attempt to delete an account
+	// Return codes:
+	// 1: Success
+	// 2: No such user 
+	//
+	public int deleteAccount(String username) {
+
+		try {
+			conn.execute("DELETE from accounts where username = '"+ username + "'");
+		} catch (SQLException se) {
+			
+		}
+
+		return 1;
+	}
+	
 	//---
 	// Getters for account information
 	
