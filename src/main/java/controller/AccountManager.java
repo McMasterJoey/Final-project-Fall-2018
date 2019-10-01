@@ -75,6 +75,26 @@ public class AccountManager extends Observable {
 		notifyObservers();
 	}
 	
+	// Attempt to create an account.
+	// Return codes:
+	// 1: Success
+	// 2: Username already in use
+	// 3: Other unknown error
+	public int createAccount(String username, String password) {
+		
+		try {
+			conn.execute("INSERT INTO accounts(username, password) VALUES(?, ?)", username, password);
+		} catch (SQLException se) {
+			if (se.getErrorCode() == 1062) { // 1062 indicates username is already in the db
+				return 2;
+			} else {
+				return 3;
+			}
+		}
+		
+		return 1;
+	}
+	
 	//---
 	// Getters for account information
 	

@@ -1,5 +1,6 @@
 package Gamejam;
 
+import controller.AccountManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -27,10 +28,13 @@ public class GamejamMainScreen extends BorderPane {
 	private HBox initTopBar;
 	private VBox initLeftBar;
 	private VBox initCreateAccountMenu;
+	private AccountManager acctMgr;
+	
 	public GamejamMainScreen() {
 		super();
 		init();
 	}
+	
 	/**
 	 * Inits the Object
 	 */
@@ -43,7 +47,9 @@ public class GamejamMainScreen extends BorderPane {
 		this.setLeft(this.initLeftBar);
 		// Not in user parts that can be used later
 		this.initCreateAccountMenu = initCreateAccountScreen();
+		acctMgr = AccountManager.getInstance();
 	}
+	
 	private VBox initLeftBar() {
 		VBox retval = new VBox();
 		retval.setPrefWidth(145);
@@ -54,6 +60,7 @@ public class GamejamMainScreen extends BorderPane {
 		retval.getChildren().addAll(loginmsg,stats);
 		return retval;
 	}
+	
 	/**
 	 * Gets the item that is surposed to be the top most part of the application
 	 * This should be the clickable menus that allow the use to log in and adjust their account settings.
@@ -98,6 +105,7 @@ public class GamejamMainScreen extends BorderPane {
 		retval.setPrefHeight(25);
 		return retval;
 	}
+	
 	/**
 	 * Handles the event were the Log in Button is Clicked
 	 */
@@ -105,26 +113,35 @@ public class GamejamMainScreen extends BorderPane {
 		// Ever time I change initTopBar is changed, update this function
 		TextField username = (TextField) initTopBar.getChildren().get(1);
 		TextField password = (TextField) initTopBar.getChildren().get(2);
-		int result = doLogin(username.getText(), password.getText());
-		// TODO: Need speifics on how to deal with valid and invalid input
+		boolean successful = doLogin(username.getText(), password.getText());
+		if (successful) {
+			// TODO: Update the Left with statistics
+			System.out.println("Login successful\n");
+		} else {
+			// TODO: Handle unsuccessful login
+			System.out.println("Invalid username or password\n");
+		}
 	}
+	
 	/**
 	 * Carries out the login.
 	 * Returns postive if it was successful
 	 * Returns negative if it wasn't successful
 	 * @return The result code of the attempted login
 	 */
-	private int doLogin(String username, String password) {
-		// TODO: Implement the log in, will need to access data base!
+	private boolean doLogin(String username, String password) {
 		System.out.println("username = '" + username + "' password = '" + password + "'");
-		return 0;
+		
+		return acctMgr.login(username, password);
 	}
+	
 	/**
 	 * Handles the event were the Create New Account Button is Clicked
 	 */
 	private void createNewAccountButtonClick() {
 		this.setCenter(this.initCreateAccountMenu);
 	}
+	
 	/**
 	 * Creates the Create Account Center Pane Screen
 	 * @return The VBox containing the elements of the screen.
@@ -147,6 +164,7 @@ public class GamejamMainScreen extends BorderPane {
 		retval.setPrefHeight(600);
 		return retval;
 	}
+	
 	/**
 	 * Handles the act of creating an account.
 	 */
@@ -161,8 +179,18 @@ public class GamejamMainScreen extends BorderPane {
 		// Temporary, change back to normal starting GUI
 		if (status == 0) {
 			this.setCenter(this.initGameselectonboxarea);
+		} else if (status == 1) {
+			// TODO: Handle successful account creation
+			System.out.println("Account creation successful");
+		} else if (status == 2) {
+			// TODO: Handle username already in use
+			System.out.println("Username already in use");
+		} else if (status == 3) {
+			// TODO: Handle other error in creation
+			System.err.println("Other error encounted on account creation");
 		}
 	}
+	
 	/**
 	 * Creates a new account in the system with the provided info
 	 * Returns positive on success, returns negative on failure
@@ -171,10 +199,11 @@ public class GamejamMainScreen extends BorderPane {
 	 * @return Status code of the result.
 	 */
 	private int doCreateNewAccount(String username, String password) {
-		// TODO: Implement the create account, will need to access database
 		System.out.println("username = '" + username + "' password = '" + password + "'");
-		return 0;
+		
+		return acctMgr.createAccount(username, password);
 	}
+	
 	/**
 	 * Gets the item that surposed to be in the center of the application.
 	 * In this case its the game selector menu.
@@ -200,6 +229,7 @@ public class GamejamMainScreen extends BorderPane {
 		}
 		return grid;
 	}
+	
 	/**
 	 * Mapping function, maps game button clicks to their respected game and inits it.
 	 * @param name The name feild of the button clicked, used to ID it.
@@ -209,12 +239,14 @@ public class GamejamMainScreen extends BorderPane {
 			init_tictactoe();
 		}
 	}
+	
 	/**
 	 * Inits tictactoe and sets its accordingly
 	 */
 	private void init_tictactoe() {
 		this.setCenter(new TicTacToeControllerView());
 	}
+	
 	/**
 	 * Fetches all the games that are implemented
 	 */
