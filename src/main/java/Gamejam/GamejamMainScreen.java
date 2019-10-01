@@ -39,9 +39,20 @@ public class GamejamMainScreen extends BorderPane {
 		this.setTop(this.initTopBar);
 		this.initGameselectonboxarea = initGamePanel();
 		this.setCenter(this.initGameselectonboxarea);
-		
+		this.initLeftBar = initLeftBar();
+		this.setLeft(this.initLeftBar);
 		// Not in user parts that can be used later
 		this.initCreateAccountMenu = initCreateAccountScreen();
+	}
+	private VBox initLeftBar() {
+		VBox retval = new VBox();
+		retval.setPrefWidth(145);
+		retval.setPrefHeight(578);
+		
+		Label loginmsg = new Label("You are not logged in. \nLog in to see your \ngame stats and access \nyour game saves!");
+		Label stats = new Label("\n\n\n\n\n\nPlace holder stats msg");
+		retval.getChildren().addAll(loginmsg,stats);
+		return retval;
 	}
 	/**
 	 * Gets the item that is surposed to be the top most part of the application
@@ -182,7 +193,6 @@ public class GamejamMainScreen extends BorderPane {
 			gamebutton.setGraphic(new ImageView(icon));
 			gamebutton.setText(gamelist[x].getName());
 			gamebutton.setOnMouseClicked((click) -> {
-	           //System.out.println("Button Click!");
 	           Button but = (Button) click.getSource();
 	           gameButtonClick(but.getText());
 	        });
@@ -199,6 +209,9 @@ public class GamejamMainScreen extends BorderPane {
 			init_tictactoe();
 		}
 	}
+	/**
+	 * Inits tictactoe and sets its accordingly
+	 */
 	private void init_tictactoe() {
 		this.setCenter(new TicTacToeControllerView());
 	}
