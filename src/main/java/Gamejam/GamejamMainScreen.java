@@ -2,6 +2,7 @@ package Gamejam;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -9,6 +10,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
@@ -21,9 +23,10 @@ import view.TicTacToeControllerView;
  *
  */
 public class GamejamMainScreen extends BorderPane {
-	private GridPane gameselectonboxarea;
+	private GridPane initGameselectonboxarea;
 	private HBox initTopBar;
 	private VBox initLeftBar;
+	private VBox initCreateAccountMenu;
 	public GamejamMainScreen() {
 		super();
 		init();
@@ -34,8 +37,11 @@ public class GamejamMainScreen extends BorderPane {
 	private void init() {
 		this.initTopBar = initTopBar();
 		this.setTop(this.initTopBar);
-		gameselectonboxarea = initGamePanel();
-		this.setCenter(gameselectonboxarea);
+		this.initGameselectonboxarea = initGamePanel();
+		this.setCenter(this.initGameselectonboxarea);
+		
+		// Not in user parts that can be used later
+		this.initCreateAccountMenu = initCreateAccountScreen();
 	}
 	/**
 	 * Gets the item that is surposed to be the top most part of the application
@@ -88,20 +94,75 @@ public class GamejamMainScreen extends BorderPane {
 		// Ever time I change initTopBar is changed, update this function
 		TextField username = (TextField) initTopBar.getChildren().get(1);
 		TextField password = (TextField) initTopBar.getChildren().get(2);
-		doLogin(username.getText(), password.getText());
+		int result = doLogin(username.getText(), password.getText());
+		// TODO: Need speifics on how to deal with valid and invalid input
 	}
 	/**
-	 * TODO: Who ever is taking user input and loging in with it, this is where your work begins
+	 * Carries out the login.
+	 * Returns postive if it was successful
+	 * Returns negative if it wasn't successful
+	 * @return The result code of the attempted login
 	 */
-	private void doLogin(String username, String password) {
+	private int doLogin(String username, String password) {
 		// TODO: Implement the log in, will need to access data base!
-		System.out.println("username = " + username + " password = " + password);
+		System.out.println("username = '" + username + "' password = '" + password + "'");
+		return 0;
 	}
 	/**
 	 * Handles the event were the Create New Account Button is Clicked
 	 */
 	private void createNewAccountButtonClick() {
+		this.setCenter(this.initCreateAccountMenu);
+	}
+	/**
+	 * Creates the Create Account Center Pane Screen
+	 * @return The VBox containing the elements of the screen.
+	 */
+	private VBox initCreateAccountScreen() {
+		VBox retval = new VBox();
+		Label info = new Label("Type in your Username and Password, then click the Create Account Button");
+		TextField username = new TextField("Username");
+		username.setPrefWidth(300);
+		username.setPrefHeight(25);
+		TextField password = new TextField("Password");
+		password.setPrefWidth(300);
+		password.setPrefHeight(25);
+		Button makeaccount = new Button("Create Account");
+		makeaccount.setOnMouseClicked((click) -> { 
+			createNewAccountButtonOnFinishedClick();
+	    });
+		retval.getChildren().addAll(info,username,password,makeaccount);
+		retval.setPrefWidth(600);
+		retval.setPrefHeight(600);
+		return retval;
+	}
+	/**
+	 * Handles the act of creating an account.
+	 */
+	private void createNewAccountButtonOnFinishedClick() {
+		// Ever time I change initCreateAccountScreen, I need to update this function
+		//Label info = (Label) initCreateAccountMenu.getChildren().get(0);
+		TextField username = (TextField) initCreateAccountMenu.getChildren().get(1);
+		TextField password = (TextField) initCreateAccountMenu.getChildren().get(2);
+		int status = doCreateNewAccount(username.getText(), password.getText());
+		// TODO: Change the UI to reflect the status returned.
 		
+		// Temporary, change back to normal starting GUI
+		if (status == 0) {
+			this.setCenter(this.initGameselectonboxarea);
+		}
+	}
+	/**
+	 * Creates a new account in the system with the provided info
+	 * Returns positive on success, returns negative on failure
+	 * @param username The username of the account to be created
+	 * @param password The password of the account to be created
+	 * @return Status code of the result.
+	 */
+	private int doCreateNewAccount(String username, String password) {
+		// TODO: Implement the create account, will need to access database
+		System.out.println("username = '" + username + "' password = '" + password + "'");
+		return 0;
 	}
 	/**
 	 * Gets the item that surposed to be in the center of the application.
