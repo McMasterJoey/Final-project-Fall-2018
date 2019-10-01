@@ -35,7 +35,7 @@ public class GamejamMainScreen extends BorderPane {
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
 	
-	private boolean DEBUG_FakeDatabase = true; // REMOVE WHEN DONE
+	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
 	public GamejamMainScreen() {
 		super();
 		init();
