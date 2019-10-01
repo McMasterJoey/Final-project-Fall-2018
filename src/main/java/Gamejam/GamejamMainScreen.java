@@ -33,7 +33,7 @@ public class GamejamMainScreen extends BorderPane {
 	private VBox initCreateAccountMenu;
 	private AccountManager acctMgr;
 	private String loggedinusername;
-	private boolean userLoggedIn;
+	private boolean userLoggedIn = false;
 	public GamejamMainScreen() {
 		super();
 		init();
@@ -53,6 +53,7 @@ public class GamejamMainScreen extends BorderPane {
 		this.initCreateAccountMenu = initCreateAccountScreen();
 		this.initLoggedInBar = initLoggedInBar();
 		this.initCreateAccountMenuBar = initCreateAccountMenuBar();
+		this.initLoggedInInGameBar = initLoggedInInGameBar();
 		// Get the reference to the AccountManager
 		this.acctMgr = AccountManager.getInstance();
 	}
@@ -83,7 +84,6 @@ public class GamejamMainScreen extends BorderPane {
 	 */
 	private HBox initCreateAccountMenuBar() {
 		HBox leftbox = new HBox();
-		// Create New Account Button
 		Button mainmenu = new Button("Back To Main Menu");
 		mainmenu.setPrefWidth(144);
 		mainmenu.setPrefHeight(25);
@@ -243,6 +243,7 @@ public class GamejamMainScreen extends BorderPane {
 	 */
 	private void logoutButtonClick() {
 		// TODO: Implement Logout
+		userLoggedIn = false;
 		System.out.println("Logout!");
 	}
 
@@ -266,10 +267,14 @@ public class GamejamMainScreen extends BorderPane {
 		if (successful) {
 			// TODO: Update the Left with statistics
 			System.out.println("Login successful\n");
+			userLoggedIn = true;
 			this.loggedinusername = username.getText();
 		} else {
 			// TODO: Handle unsuccessful login
 			System.out.println("Invalid username or password\n");
+			// DEBUG REMOVE WHEN DONE
+			// Fuck this shit, I'm debugging
+			DEBUG_PretendImLoggedIn();
 		}
 	}
 
@@ -295,6 +300,7 @@ public class GamejamMainScreen extends BorderPane {
 		info.setText("Type in your Username and Password, then click the Create Account Button.");
 		button.setTextFill(Color.BLACK);
 		// Set it
+		this.setTop(initCreateAccountMenuBar);
 		this.setCenter(this.initCreateAccountMenu);
 	}
 
@@ -338,6 +344,7 @@ public class GamejamMainScreen extends BorderPane {
 		if (status == 0) {
 			this.setCenter(this.initGameselectonboxarea);
 		} else if (status == 1) {
+			userLoggedIn = true;
 			this.loggedinusername = username.getText();
 			button.setTextFill(Color.BLACK);
 			doGUIUpdateOnCreateAccountSuccess();
@@ -418,6 +425,11 @@ public class GamejamMainScreen extends BorderPane {
 	 */
 	private void gameButtonClick(String name) {
 		if (name.equals("Tic-tac-toe")) {
+			if (userLoggedIn) {
+				this.setTop(this.initLoggedInInGameBar);
+			} else {
+				this.setTop(initCreateAccountMenuBar);
+			}
 			init_tictactoe();
 		}
 	}
@@ -436,5 +448,11 @@ public class GamejamMainScreen extends BorderPane {
 		GameIconItem[] retval = new GameIconItem[1];
 		retval[0] = new GameIconItem("Tic-tac-toe", "/tictactoeicon.png", 0);
 		return retval;
+	}
+	// REMOVE WHEN DONE
+	// Used for debugging
+	private void DEBUG_PretendImLoggedIn() {
+		userLoggedIn = true;
+		loggedinusername = "Nothingbutbread is Awesome!";
 	}
 }
