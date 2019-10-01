@@ -8,6 +8,7 @@ import java.awt.Point;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import model.EasyAI;
 import model.TicTacToeModel;
@@ -26,6 +27,10 @@ public class TicTacToeControllerView extends Canvas implements Observer {
     public static final int HEIGHT = 600;
     private GraphicsContext gc;
     private Image xImage, yImage;
+    private AudioClip moveSound;
+    private AudioClip winSound;
+    private AudioClip loseSound;
+    private AudioClip tieSound;
 
     public TicTacToeControllerView() {
         gameModel = new TicTacToeModel();
@@ -64,6 +69,10 @@ public class TicTacToeControllerView extends Canvas implements Observer {
     private void setupResources() {
         xImage = new Image(TicTacToeControllerView.class.getResource("/letterX.png").toString());
         yImage = new Image(TicTacToeControllerView.class.getResource("/letterO.png").toString());
+        moveSound = new AudioClip(TicTacToeControllerView.class.getResource("/ticTacToeMove.mp3").toString());
+        winSound = new AudioClip(TicTacToeControllerView.class.getResource("/ticTacToeWin.mp3").toString());
+        loseSound = new AudioClip(TicTacToeControllerView.class.getResource("/ticTacToeLose.mp3").toString());
+        tieSound = new AudioClip(TicTacToeControllerView.class.getResource("/ticTacToeTie.mp3").toString());
     }
 
     /**
@@ -119,7 +128,7 @@ public class TicTacToeControllerView extends Canvas implements Observer {
             int y = (int) click.getY() / 200;
             if(gameModel.available(y, x)) {
                 gameModel.humanMove(y, x, false);
-                //add sound effect
+                moveSound.play();
             }
         });
     }
@@ -133,7 +142,16 @@ public class TicTacToeControllerView extends Canvas implements Observer {
         gc.clearRect(0, 0, WIDTH, HEIGHT);
         drawBoard();
         System.out.println(gameModel.toString());
+        if(gameModel.tied()) {
+            tieSound.play();
+        }
         if (gameModel.won('X') || gameModel.won('O')) {
+            if(gameModel.won('X')) {
+                winSound.play();
+            }
+            else {
+                loseSound.play();
+            }
             String winningDirection = gameModel.getWinningDirection();
             Point[] winningSquares = gameModel.getWinningSquares(winningDirection);
             gc.setStroke(Color.BLUE);
