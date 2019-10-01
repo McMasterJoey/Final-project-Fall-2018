@@ -85,7 +85,17 @@ public class GamejamMainScreen extends BorderPane {
 	 * Handles the event were the Log in Button is Clicked
 	 */
 	private void loginButtonClick() {
-		
+		// Ever time I change initTopBar is changed, update this function
+		TextField username = (TextField) initTopBar.getChildren().get(1);
+		TextField password = (TextField) initTopBar.getChildren().get(2);
+		doLogin(username.getText(), password.getText());
+	}
+	/**
+	 * TODO: Who ever is taking user input and loging in with it, this is where your work begins
+	 */
+	private void doLogin(String username, String password) {
+		// TODO: Implement the log in, will need to access data base!
+		System.out.println("username = " + username + " password = " + password);
 	}
 	/**
 	 * Handles the event were the Create New Account Button is Clicked
