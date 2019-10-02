@@ -4,6 +4,7 @@ import controller.AccountManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -132,10 +133,12 @@ public class GamejamMainScreen extends BorderPane {
 		// Add to right hbox first to acheive correct look
 		retval.getChildren().add(leftbox);
 
-		TextField username = new TextField("Username");
+		TextField username = new TextField();
+		username.setPromptText("username");
 		username.setPrefWidth(280);
 		username.setPrefHeight(25);
-		TextField password = new TextField("Password");
+		PasswordField password = new PasswordField();
+		password.setPromptText("password");
 		password.setPrefWidth(165);
 		password.setPrefHeight(25);
 		// username.set
@@ -276,7 +279,7 @@ public class GamejamMainScreen extends BorderPane {
 	private void loginButtonClick() {
 		// Ever time the initTopBar is changed, update this function
 		TextField username = (TextField) this.initTopBar.getChildren().get(1);
-		TextField password = (TextField) this.initTopBar.getChildren().get(2);
+		PasswordField password = (PasswordField) this.initTopBar.getChildren().get(2);
 		boolean successful = doLogin(username.getText(), password.getText());
 		if (successful) {
 			// TODO: Update the Left with statistics
@@ -328,10 +331,12 @@ public class GamejamMainScreen extends BorderPane {
 	private VBox initCreateAccountScreen() {
 		VBox retval = new VBox();
 		Label info = new Label("Type in your Username and Password, then click the Create Account Button.");
-		TextField username = new TextField("Username");
+		TextField username = new TextField();
+		username.setPromptText("username");
 		username.setPrefWidth(300);
 		username.setPrefHeight(25);
-		TextField password = new TextField("Password");
+		PasswordField password = new PasswordField();
+		password.setPromptText("password");
 		password.setPrefWidth(300);
 		password.setPrefHeight(25);
 		Button makeaccount = new Button("Create Account");
@@ -351,7 +356,7 @@ public class GamejamMainScreen extends BorderPane {
 		// Ever time I change initCreateAccountScreen, I need to update this function
 		Label info = (Label) initCreateAccountMenu.getChildren().get(0);
 		TextField username = (TextField) this.initCreateAccountMenu.getChildren().get(1);
-		TextField password = (TextField) this.initCreateAccountMenu.getChildren().get(2);
+		PasswordField password = (PasswordField) this.initCreateAccountMenu.getChildren().get(2);
 		Button button = (Button) this.initCreateAccountMenu.getChildren().get(3);
 		int status = doCreateNewAccount(username.getText(), password.getText());
 		// TODO: Change the UI to reflect the status returned.
