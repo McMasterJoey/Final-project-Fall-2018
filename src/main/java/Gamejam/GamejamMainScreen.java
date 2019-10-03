@@ -1,5 +1,7 @@
 package Gamejam;
 
+import java.util.Observer;
+import java.util.Observable;
 import controller.AccountManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -24,13 +26,15 @@ import view.TicTacToeControllerView;
  * @author Joey McMaster
  *
  */
-public class GamejamMainScreen extends BorderPane {
+public class GamejamMainScreen extends BorderPane implements Observer {
 	private GridPane initGameselectonboxarea;
 	private HBox initTopBar;
 	private HBox initLoggedInBar;
 	private HBox initCreateAccountMenuBar;
 	private HBox initLoggedInInGameBar;
 	private VBox initLeftBar;
+	private Label leftBarMsg;
+	private Label leftBarStats;
 	private VBox initCreateAccountMenu;
 	private AccountManager acctMgr;
 	private String loggedinusername;
@@ -59,6 +63,7 @@ public class GamejamMainScreen extends BorderPane {
 		this.initLoggedInInGameBar = initLoggedInInGameBar();
 		// Get the reference to the AccountManager
 		this.acctMgr = AccountManager.getInstance();
+		acctMgr.addObserver(this);
 	}
 
 	/**
@@ -71,10 +76,12 @@ public class GamejamMainScreen extends BorderPane {
 		retval.setPrefWidth(145);
 		retval.setPrefHeight(578);
 
-		Label loginmsg = new Label(
-				"You are not logged in. \nLog in to see your \ngame stats and access \nyour game saves!");
-		Label stats = new Label("\n\n\n\n\n\nPlace holder stats msg");
-		retval.getChildren().addAll(loginmsg, stats);
+		leftBarMsg = new Label();
+		leftBarMsg.setWrapText(true);
+		leftBarStats = new Label();
+		setGuestMessage();
+		
+		retval.getChildren().addAll(leftBarMsg, leftBarStats);
 		return retval;
 	}
 
@@ -259,9 +266,11 @@ public class GamejamMainScreen extends BorderPane {
 	 */
 	private void logoutButtonClick() {
 		// TODO: Implement Logout
+		acctMgr.logout();
 		userLoggedIn = false;
 		System.out.println("Logout!");
 		this.setTop(this.initTopBar);
+		//updateLeftPane();
 	}
 
 	/**
@@ -292,6 +301,8 @@ public class GamejamMainScreen extends BorderPane {
 			// TODO: Handle unsuccessful login
 			System.out.println("Invalid username or password\n");
 		}
+		
+		//updateLeftPane();
 	}
 
 	/**
@@ -469,6 +480,29 @@ public class GamejamMainScreen extends BorderPane {
 		retval[0] = new GameIconItem("Tic-tac-toe", "/tictactoeicon.png", 0);
 		return retval;
 	}
+	
+	private void setGuestMessage() {
+		leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in, you could see your stats!");
+		leftBarStats.setText("\n\nLevel: 0\nExp: 0");
+	}
+	
+	@Override
+	public void update(Observable o, Object obj) {
+		updateLeftPane();
+	}
+	
+	private void updateLeftPane() {
+				if (acctMgr.isGuest() == true) {
+			setGuestMessage();
+		} else if (acctMgr.isAdmin() == true) {
+			leftBarMsg.setText("Administrator Account");
+			leftBarStats.setText("");
+		} else {
+			leftBarMsg.setText("Welcome to Gamejam, " + acctMgr.getCurUsername());
+			leftBarStats.setText("\n\nLevel: " + acctMgr.getLevel() + "\nExp: " + acctMgr.getExp());
+		}
+	}
+	
 	// REMOVE WHEN DONE
 	// Used for debugging
 	private void DEBUG_PretendImLoggedIn() {
