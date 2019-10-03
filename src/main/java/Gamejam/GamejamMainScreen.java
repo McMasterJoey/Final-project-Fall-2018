@@ -43,13 +43,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private TicTacToeControllerView tictactoegameview;
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
+	private boolean userisAdmin = false;
 	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
 	public GamejamMainScreen() {
 		super();
 		init();
-		init_gameviews();
 	}
-
+////////////////////////View Init Functions go here /////////////////////////////////////////////
 	/**
 	 * Inits the Object
 	 */
@@ -59,25 +59,25 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.acctMgr = AccountManager.getInstance();
 		this.acctMgr.addObserver(this);
 		this._dbgameconnections = GameJamViewDatabaseInteractionManager.getInstance();
+		
 		// Set up GUI Elements
 		this.initTopBar = initTopBar();
-		this.setTop(this.initTopBar);
 		this.initGameselectonboxarea = initGamePanel();
-		this.setCenter(this.initGameselectonboxarea);
 		this.initLeftBar = initLeftBar();
-		this.setLeft(this.initLeftBar);
+		
 		// Not in user parts that can be used later
 		this.initCreateAccountMenu = initCreateAccountScreen();
 		this.initLoggedInBar = initLoggedInBar();
 		this.initCreateAccountMenuBar = initCreateAccountMenuBar();
 		this.initLoggedInInGameBar = initLoggedInInGameBar();
-	}
-//////////////////////// View Init Functions go here /////////////////////////////////////////////
-	/**
-	 * Inits each game view
-	 */
-	private void init_gameviews() {
+		
+		// Set up Game Views
 		this.tictactoegameview = new TicTacToeControllerView();
+		
+		// Set currently in user views
+		this.setTop(this.initTopBar);
+		this.setCenter(this.initGameselectonboxarea);
+		this.setLeft(this.initLeftBar);
 	}
 	/**
 	 * Generates the control structure that will exist the left bar.
@@ -476,6 +476,11 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * Fetches all the games that are implemented
 	 */
 	private GameIconItem[] getGameList() {
+		if (this.DEBUG_FakeDatabase) {
+			GameIconItem[] retval = new GameIconItem[1];
+			retval[0] = new GameIconItem("Tic-Tac-Toe", "/tictactoeicon.png", 0);
+			return retval;
+		}
 		GameIconItem[] retval = this._dbgameconnections.fetchAllGameSetUpInfo();
 		for(int x = 0; x < retval.length; x++) {
 			retval[x].setGameID(x);
