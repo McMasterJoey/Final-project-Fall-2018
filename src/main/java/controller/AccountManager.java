@@ -47,11 +47,13 @@ public class AccountManager extends Observable {
 				if (password.equals(rs.getString("password"))) {
 					curUsername = username;
 					isAdmin = rs.getBoolean("admin");
-					isGuest = false;
+					isGuest = rs.getBoolean("guest");
 					exp = rs.getInt("exp");
 					level = rs.getInt("level");
 					
-					this.setChanged();
+					System.out.println("Login: " + curUsername + " " + isAdmin + " " + isGuest);
+					
+					setChanged();
 					notifyObservers();
 					return true;
 				}
@@ -71,7 +73,7 @@ public class AccountManager extends Observable {
 		exp = 0;
 		level = 1;
 
-		this.setChanged();
+		setChanged();
 		notifyObservers();
 	}
 	
