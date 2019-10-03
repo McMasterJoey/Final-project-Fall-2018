@@ -51,6 +51,7 @@ public class GamejamMainScreen extends BorderPane {
 	 */
 	private void init() {
 		// Get the references to the database connector classes
+		// KEEP THESE AT TOP OR YOU WILL HAVE FUN WITH NULL POINTER EXECPTIONS!
 		this.acctMgr = AccountManager.getInstance();
 		this._dbgameconnections = GameJamViewDatabaseInteractionManager.getInstance();
 		// Set up GUI Elements
@@ -269,10 +270,12 @@ public class GamejamMainScreen extends BorderPane {
 	 * already logged in.
 	 */
 	private void logoutButtonClick() {
+		acctMgr.logout();
 		// TODO: Implement Logout
 		userLoggedIn = false;
 		System.out.println("Logout!");
 		this.setTop(this.initTopBar);
+		
 	}
 
 	/**
