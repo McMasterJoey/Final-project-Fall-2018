@@ -14,14 +14,32 @@ public class GameIconItem {
 		this.iconfilepath = iconfilepath;
 		this.gameid = gameid;
 	}
+	/**
+	 * Fets the game of the game icon item.
+	 * @return
+	 */
 	public String getName() {
 		return gamename;
 	}
+	/**
+	 * Gets the icon file path associated with this object.
+	 * @return
+	 */
 	public String getIconFilePath() {
 		return iconfilepath;
 	}
-
+	/**
+	 * Gets the gameid associated with this object.
+	 * @return
+	 */
 	public int getGameID() {
 		return gameid;
+	}
+	/**
+	 * Sets the game id Field.
+	 * @param gameid The id to be set to.
+	 */
+	public void setGameID(int gameid) {
+		this.gameid = gameid;
 	}
 }
