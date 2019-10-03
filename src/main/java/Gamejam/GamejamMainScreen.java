@@ -3,6 +3,7 @@ package Gamejam;
 import java.util.Observer;
 import java.util.Observable;
 import controller.AccountManager;
+import controller.GameJamViewDatabaseInteractionManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,6 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
+import model.SanityCheckFailedException;
 import view.TicTacToeControllerView;
 
 /**
@@ -37,19 +39,26 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private Label leftBarStats;
 	private VBox initCreateAccountMenu;
 	private AccountManager acctMgr;
+	private GameJamViewDatabaseInteractionManager _dbgameconnections;
+	private TicTacToeControllerView tictactoegameview;
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
-	
 	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
 	public GamejamMainScreen() {
 		super();
 		init();
+		init_gameviews();
 	}
 
 	/**
 	 * Inits the Object
 	 */
 	private void init() {
+		// Get the references to the database connector classes
+		// KEEP THESE AT TOP OR YOU WILL HAVE FUN WITH NULL POINTER EXECPTIONS!
+		this.acctMgr = AccountManager.getInstance();
+		this._dbgameconnections = GameJamViewDatabaseInteractionManager.getInstance();
+		// Set up GUI Elements
 		this.initTopBar = initTopBar();
 		this.setTop(this.initTopBar);
 		this.initGameselectonboxarea = initGamePanel();
@@ -61,11 +70,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initLoggedInBar = initLoggedInBar();
 		this.initCreateAccountMenuBar = initCreateAccountMenuBar();
 		this.initLoggedInInGameBar = initLoggedInInGameBar();
-		// Get the reference to the AccountManager
-		this.acctMgr = AccountManager.getInstance();
 		acctMgr.addObserver(this);
 	}
-
+	/**
+	 * Inits each game view
+	 */
+	private void init_gameviews() {
+		this.tictactoegameview = new TicTacToeControllerView();
+	}
 	/**
 	 * Generates the control structure that will exist the left bar.
 	 * 
@@ -265,7 +277,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * already logged in.
 	 */
 	private void logoutButtonClick() {
-		// TODO: Implement Logout
 		acctMgr.logout();
 		userLoggedIn = false;
 		System.out.println("Logout!");
@@ -370,8 +381,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		PasswordField password = (PasswordField) this.initCreateAccountMenu.getChildren().get(2);
 		Button button = (Button) this.initCreateAccountMenu.getChildren().get(3);
 		int status = doCreateNewAccount(username.getText(), password.getText());
-		// TODO: Change the UI to reflect the status returned.
-
 		if (status == 1 || status == 0) {
 			userLoggedIn = true;
 			this.loggedinusername = username.getText();
@@ -430,13 +439,18 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		grid.getColumnConstraints().add(new ColumnConstraints(260));
 		GameIconItem[] gamelist = getGameList();
 		for (int x = 0; x < gamelist.length; x++) {
-			Button gamebutton = new Button();
+			// Sanity check
+			if (gamelist[x].getGameID() < 0 || gamelist[x].getGameID() > 11) {
+				throw new SanityCheckFailedException("When adding game icons, one of the games had id that was out of range!");
+			}
+			//
+			GameButton gamebutton = new GameButton();
 			Image icon = new Image(getClass().getResourceAsStream(gamelist[x].getIconFilePath()));
 			gamebutton.setGraphic(new ImageView(icon));
-			gamebutton.setText(gamelist[x].getName());
+			gamebutton.setMetaDataString(gamelist[x].getName());
 			gamebutton.setOnMouseClicked((click) -> {
-				Button but = (Button) click.getSource();
-				gameButtonClick(but.getText());
+				GameButton but = (GameButton) click.getSource();
+				gameButtonClick(but.getMetaDataString());
 			});
 			grid.add(gamebutton, x % 4, x / 4);
 		}
@@ -455,29 +469,24 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * @param name The name field of the button clicked, used to ID it.
 	 */
 	private void gameButtonClick(String name) {
-		if (name.equals("Tic-tac-toe")) {
+		if (name.equals("Tic-Tac-Toe")) {
 			if (userLoggedIn) {
 				this.setTop(this.initLoggedInInGameBar);
 			} else {
 				this.setTop(initCreateAccountMenuBar);
 			}
-			init_tictactoe();
+			this.setCenter(this.tictactoegameview);
 		}
-	}
-
-	/**
-	 * Inits tictactoe and sets its accordingly
-	 */
-	private void init_tictactoe() {
-		this.setCenter(new TicTacToeControllerView());
 	}
 
 	/**
 	 * Fetches all the games that are implemented
 	 */
 	private GameIconItem[] getGameList() {
-		GameIconItem[] retval = new GameIconItem[1];
-		retval[0] = new GameIconItem("Tic-tac-toe", "/tictactoeicon.png", 0);
+		GameIconItem[] retval = this._dbgameconnections.fetchAllGameSetUpInfo();
+		for(int x = 0; x < retval.length; x++) {
+			retval[x].setGameID(x);
+		}
 		return retval;
 	}
 	
