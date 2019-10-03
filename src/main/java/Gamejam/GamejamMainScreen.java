@@ -36,12 +36,14 @@ public class GamejamMainScreen extends BorderPane {
 	private VBox initCreateAccountMenu;
 	private AccountManager acctMgr;
 	private GameJamViewDatabaseInteractionManager _dbgameconnections;
+	private TicTacToeControllerView tictactoegameview;
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
 	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
 	public GamejamMainScreen() {
 		super();
 		init();
+		init_gameviews();
 	}
 
 	/**
@@ -64,7 +66,12 @@ public class GamejamMainScreen extends BorderPane {
 		this.initCreateAccountMenuBar = initCreateAccountMenuBar();
 		this.initLoggedInInGameBar = initLoggedInInGameBar();
 	}
-
+	/**
+	 * Inits each game view
+	 */
+	private void init_gameviews() {
+		this.tictactoegameview = new TicTacToeControllerView();
+	}
 	/**
 	 * Generates the control structure that will exist the left bar.
 	 * 
@@ -363,8 +370,6 @@ public class GamejamMainScreen extends BorderPane {
 		PasswordField password = (PasswordField) this.initCreateAccountMenu.getChildren().get(2);
 		Button button = (Button) this.initCreateAccountMenu.getChildren().get(3);
 		int status = doCreateNewAccount(username.getText(), password.getText());
-		// TODO: Change the UI to reflect the status returned.
-
 		if (status == 1 || status == 0) {
 			userLoggedIn = true;
 			this.loggedinusername = username.getText();
@@ -428,13 +433,13 @@ public class GamejamMainScreen extends BorderPane {
 				throw new SanityCheckFailedException("When adding game icons, one of the games had id that was out of range!");
 			}
 			//
-			Button gamebutton = new Button();
+			GameButton gamebutton = new GameButton();
 			Image icon = new Image(getClass().getResourceAsStream(gamelist[x].getIconFilePath()));
 			gamebutton.setGraphic(new ImageView(icon));
-			gamebutton.setText(gamelist[x].getName());
+			gamebutton.setMetaDataString(gamelist[x].getName());
 			gamebutton.setOnMouseClicked((click) -> {
-				Button but = (Button) click.getSource();
-				gameButtonClick(but.getText());
+				GameButton but = (GameButton) click.getSource();
+				gameButtonClick(but.getMetaDataString());
 			});
 			grid.add(gamebutton, x % 4, x / 4);
 		}
@@ -453,21 +458,14 @@ public class GamejamMainScreen extends BorderPane {
 	 * @param name The name field of the button clicked, used to ID it.
 	 */
 	private void gameButtonClick(String name) {
-		if (name.equals("Tic-tac-toe")) {
+		if (name.equals("Tic-Tac-Toe")) {
 			if (userLoggedIn) {
 				this.setTop(this.initLoggedInInGameBar);
 			} else {
 				this.setTop(initCreateAccountMenuBar);
 			}
-			init_tictactoe();
+			this.setCenter(this.tictactoegameview);
 		}
-	}
-
-	/**
-	 * Inits tictactoe and sets its accordingly
-	 */
-	private void init_tictactoe() {
-		this.setCenter(new TicTacToeControllerView());
 	}
 
 	/**

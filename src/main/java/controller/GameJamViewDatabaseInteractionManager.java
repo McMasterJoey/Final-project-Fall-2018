@@ -45,8 +45,8 @@ public class GameJamViewDatabaseInteractionManager {
 				dataset.add(game);
 			}
 		} catch (SQLException se) {
-			//se.printStackTrace();
-			System.err.println("Dataset had nothing in it!");
+			se.printStackTrace();
+			System.err.println("Dataset fetch error!");
 			return null;
 		}
 		// Take the resulting set and return an array.
