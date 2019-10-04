@@ -225,7 +225,7 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 2, 1);
 			tieSound.play();
 		}
-		if (gameModel.won('X') || gameModel.won('O')) {
+		else if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
 				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 0, 1);
 				winSound.play();
@@ -241,16 +241,10 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 			case "horizontal":
 				// gc.strokeLine(0, winningSquares[0].x*200+100, 600,
 				// winningSquares[2].x*200+100);
-				System.out.println("horizontal " + winningSquares[0].toString());
-				System.out.println(winningSquares[1].toString());
-				System.out.println(winningSquares[2].toString());
 				break;
 			case "vertical":
 				// gc.strokeLine(winningSquares[0].y*200+100, 0, winningSquares[2].y*200+100,
 				// 600);
-				System.out.println("vertical " + winningSquares[0].toString());
-				System.out.println(winningSquares[1].toString());
-				System.out.println(winningSquares[2].toString());
 				break;
 			case "diagonal":
 				if (winningSquares[0].x == 0) {

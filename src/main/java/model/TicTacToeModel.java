@@ -90,12 +90,13 @@ public class TicTacToeModel extends Observable implements Serializable {
             return;
         }
         board[row][col] = 'X';
+        setChanged();
+        notifyObservers();
         if (!test && this.isStillRunning()) {
             Point move = computer.nextMove(this);
             computerMove(move.x, move.y);
         }
-        setChanged();
-        notifyObservers();
+        
     }
 
     /**
