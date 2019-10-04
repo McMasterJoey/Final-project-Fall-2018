@@ -3,6 +3,8 @@ package view;
 import java.util.Observable;
 import java.util.Observer;
 
+import controller.AccountManager;
+
 import java.awt.Point;
 
 import javafx.geometry.Pos;
@@ -34,11 +36,12 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 	private AudioClip loseSound;
 	private AudioClip tieSound;
 	private BorderPane[][] placeholder;
-
+	private AccountManager accountmanager;
 	public TicTacToeControllerView() {
 		gameModel = new TicTacToeModel();
 		gameModel.setAIStrategy(new EasyAI());
 		initializeGame();
+		accountmanager = AccountManager.getInstance();
 	}
 
 	/**
@@ -219,12 +222,15 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 		}
 		System.out.println(gameModel.toString());
 		if (gameModel.tied()) {
+			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 2, 1);
 			tieSound.play();
 		}
 		if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
+				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 0, 1);
 				winSound.play();
 			} else {
+				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 1, 1);
 				loseSound.play();
 			}
 			String winningDirection = gameModel.getWinningDirection();

@@ -98,15 +98,16 @@ public class AccountManager extends Observable {
 				int gameid = rs.getInt("gameid");
 				int accountid = rs.getInt("accountid");
 				int statsid = rs.getInt("statsid");
-				int time = (int) rs.getTime("timeplayed").getTime() * 1000;
-				int[] dv = new int[]{rs.getInt("wins"), rs.getInt("losses"), rs.getInt("ties"), rs.getInt("incomplete"), rs.getInt("timeplayed")};
+				int time = (int) rs.getTime("timeplayed").getTime();
+				time = 0; //
+				int[] dv = new int[]{rs.getInt("wins"), rs.getInt("losses"), rs.getInt("ties"), rs.getInt("incomplete"), time};
 				System.out.println(time);
 				if (mode) {
 					dv[stattype] += value;
 				} else {
 					dv[stattype] = value;
 				}
-				conn.execute("update statistics set wins = ?, set losses = ?, set ties = ?, set incomplete = ?, set timeplayed = ? where accountid = ?",dv[0],dv[1],dv[2],dv[3],dv[4], accountid);
+				conn.execute("update statistics set wins = ?, losses = ?, ties = ?, incomplete = ?, timeplayed = ? where statsid = ?", dv[0],dv[1],dv[2],dv[3],dv[4], statsid);
 				if (rs.next()) {
 					throw new SanityCheckFailedException("SQL query to fetch global stats returned more than 1 row.");
 				}
@@ -116,7 +117,13 @@ public class AccountManager extends Observable {
 				int[] dv = new int[5];
 				dv[stattype] = value;
 				try {
-					conn.execute("INSERT INTO statistics(wins, losses, ties, incomplete, timeplayed) VALUES(?, ?, ?, ?, ?)", dv[0],dv[1],dv[2],dv[3],dv[4]);
+					rs = conn.executeQuery("select accountid from accounts where accounts.username = ?", this.curUsername);
+					rs.next();
+					int accountid = rs.getInt("accountid");
+					rs = conn.executeQuery("select gameid from games where name = ?", game);
+					rs.next();
+					int gameid = rs.getInt("gameid");
+					conn.execute("INSERT INTO statistics(accountid, gameid, wins, losses, ties, incomplete, timeplayed) VALUES(?, ?, ?, ?, ?, ?, ?)", accountid, gameid, dv[0],dv[1],dv[2],dv[3],dv[4]);
 				} catch (SQLException se) {
 					se.printStackTrace();
 				}
