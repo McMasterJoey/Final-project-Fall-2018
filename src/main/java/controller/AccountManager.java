@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Observable;
 
+import model.SanityCheckFailedException;
+
 public class AccountManager extends Observable {
 
 	private String curUsername;
@@ -64,7 +66,73 @@ public class AccountManager extends Observable {
 		
 		return false;
 	}
-	
+	/**
+	 * Logs a stat for the logged in user
+	 * stattype: 
+	 * 0 = wins
+	 * 1 = losses
+	 * 2 = ties
+	 * 3 = incomplete
+	 * 4 = time played (in seconds)
+	 * @param mode Set to true if adding the value to the pre existing value, set to false if setting. 
+	 * @param game The name of the game whose stats are being set
+	 * @param stattype The id of the stat type (refer to the enum LogStatType)
+	 * @param value The value to be added/set 
+	 */
+	public void logGlobalStat(boolean mode, String game, int stattype, int value) {
+		// Arg Check
+		if (stattype < 0 || stattype > 4 || value < 0) {
+			throw new IllegalArgumentException("Invalid stattype was out of range or value was below 0.");
+		}
+		if (this.isGuest) {
+			// Do nothing if this is a guest account.
+			return;
+		}
+		// Insert into stat table 
+		ResultSet rs = null;
+
+		try {
+			rs = conn.executeQuery("select g.gameid, a.accountid, s.statsid, s.wins, s.losses,s.ties,s.incomplete,s.timeplayed from games g join statistics s on g.gameid = s.gameid and g.name = ? join accounts a on a.accountid = s.accountid and a.username = ?", game, this.curUsername);
+			if (rs.next()) {
+				// Should only get 1 row.
+				//int gameid = rs.getInt("gameid");
+				//int accountid = rs.getInt("accountid");
+				int statsid = rs.getInt("statsid");
+				// Need to fix ...
+				int time = (int) rs.getTime("timeplayed").getTime();
+				time = 0; // Set to 0 as of now so we only have valid values.
+				
+				int[] dv = new int[]{rs.getInt("wins"), rs.getInt("losses"), rs.getInt("ties"), rs.getInt("incomplete"), time};
+				System.out.println(time);
+				if (mode) {
+					dv[stattype] += value;
+				} else {
+					dv[stattype] = value;
+				}
+				conn.execute("update statistics set wins = ?, losses = ?, ties = ?, incomplete = ?, timeplayed = ? where statsid = ?", dv[0],dv[1],dv[2],dv[3],dv[4], statsid);
+				if (rs.next()) {
+					throw new SanityCheckFailedException("SQL query to fetch global stats returned more than 1 row.");
+				}
+			} else {
+				// We are missing a stat, create one
+				int[] dv = new int[5];
+				dv[stattype] = value;
+				try {
+					rs = conn.executeQuery("select accountid from accounts where accounts.username = ?", this.curUsername);
+					rs.next();
+					int accountid = rs.getInt("accountid");
+					rs = conn.executeQuery("select gameid from games where name = ?", game);
+					rs.next();
+					int gameid = rs.getInt("gameid");
+					conn.execute("INSERT INTO statistics(accountid, gameid, wins, losses, ties, incomplete, timeplayed) VALUES(?, ?, ?, ?, ?, ?, ?)", accountid, gameid, dv[0],dv[1],dv[2],dv[3],dv[4]);
+				} catch (SQLException se) {
+					se.printStackTrace();
+				}
+			}
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+	}
 	// logout, ie switch to the guest account
 	public void logout() {
 		curUsername = "guest";

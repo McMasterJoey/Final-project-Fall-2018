@@ -43,13 +43,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private TicTacToeControllerView tictactoegameview;
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
+	private boolean userisAdmin = false;
 	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
 	public GamejamMainScreen() {
 		super();
 		init();
-		init_gameviews();
 	}
-
+////////////////////////View Init Functions go here /////////////////////////////////////////////
 	/**
 	 * Inits the Object
 	 */
@@ -57,26 +57,27 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Get the references to the database connector classes
 		// KEEP THESE AT TOP OR YOU WILL HAVE FUN WITH NULL POINTER EXECPTIONS!
 		this.acctMgr = AccountManager.getInstance();
+		this.acctMgr.addObserver(this);
 		this._dbgameconnections = GameJamViewDatabaseInteractionManager.getInstance();
+		
 		// Set up GUI Elements
 		this.initTopBar = initTopBar();
-		this.setTop(this.initTopBar);
 		this.initGameselectonboxarea = initGamePanel();
-		this.setCenter(this.initGameselectonboxarea);
 		this.initLeftBar = initLeftBar();
-		this.setLeft(this.initLeftBar);
+		
 		// Not in user parts that can be used later
 		this.initCreateAccountMenu = initCreateAccountScreen();
 		this.initLoggedInBar = initLoggedInBar();
 		this.initCreateAccountMenuBar = initCreateAccountMenuBar();
 		this.initLoggedInInGameBar = initLoggedInInGameBar();
-		acctMgr.addObserver(this);
-	}
-	/**
-	 * Inits each game view
-	 */
-	private void init_gameviews() {
+		
+		// Set up Game Views
 		this.tictactoegameview = new TicTacToeControllerView();
+		
+		// Set currently in user views
+		this.setTop(this.initTopBar);
+		this.setCenter(this.initGameselectonboxarea);
+		this.setLeft(this.initLeftBar);
 	}
 	/**
 	 * Generates the control structure that will exist the left bar.
@@ -118,13 +119,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		leftbox.setPrefHeight(25);
 		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
 		return leftbox;
-	}
-	/**
-	 * Handles when a user wants to exit the create account screen without creating an account.
-	 */
-	private void doBackToMainMenuButtonClickInCreateAccountMenuBar() {
-		this.setTop(this.initTopBar);
-		this.setCenter(this.initGameselectonboxarea);
 	}
 	/**
 	 * Gets the item that is surposed to be the top most part of the application
@@ -217,15 +211,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		return retval;
 	}
 	/**
-	 * Updates all the GUI elements that use the username of the current user.
-	 */
-	private void UpdateLoggedInBarsWithUserNameOfCurrentUser() {
-		Label lo = (Label) this.initLoggedInBar.getChildren().get(1);
-		Label log = (Label) this.initLoggedInInGameBar.getChildren().get(1);
-		lo.setText(this.loggedinusername);
-		log.setText(this.loggedinusername);
-	}
-	/**
 	 * Generates the iteme that will be put in the top bar of the application while a user is in a game and logged in.
 	 * @return An HBox with the control structures to act as the top bar of the application.
 	 */
@@ -262,6 +247,71 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		retval.setPrefWidth(600);
 		retval.setPrefHeight(25);
 		return retval;
+	}
+
+	/**
+	 * Creates the Create Account Center Pane Screen
+	 * 
+	 * @return The VBox containing the elements of the screen.
+	 */
+	private VBox initCreateAccountScreen() {
+		VBox retval = new VBox();
+		Label info = new Label("Type in your Username and Password, then click the Create Account Button.");
+		TextField username = new TextField();
+		username.setPromptText("username");
+		username.setPrefWidth(300);
+		username.setPrefHeight(25);
+		PasswordField password = new PasswordField();
+		password.setPromptText("password");
+		password.setPrefWidth(300);
+		password.setPrefHeight(25);
+		Button makeaccount = new Button("Create Account");
+		makeaccount.setOnMouseClicked((click) -> {
+			createNewAccountButtonOnFinishedClick();
+		});
+		retval.getChildren().addAll(info, username, password, makeaccount);
+		retval.setPrefWidth(600);
+		retval.setPrefHeight(600);
+		return retval;
+	}
+	/**
+	 * Gets the item that surposed to be in the center of the application. In this
+	 * case its the game selector menu.
+	 * 
+	 * @return A grid pane of all the buttons to lead to each game.
+	 */
+	private GridPane initGamePanel() {
+		GridPane grid = new GridPane();
+		grid.getColumnConstraints().add(new ColumnConstraints(260));
+		grid.getColumnConstraints().add(new ColumnConstraints(260));
+		grid.getColumnConstraints().add(new ColumnConstraints(260));
+		grid.getColumnConstraints().add(new ColumnConstraints(260));
+		GameIconItem[] gamelist = getGameList();
+		for (int x = 0; x < gamelist.length; x++) {
+			// Sanity check
+			if (gamelist[x].getGameID() < 0 || gamelist[x].getGameID() > 11) {
+				throw new SanityCheckFailedException("When adding game icons, one of the games had id that was out of range!");
+			}
+			//
+			GameButton gamebutton = new GameButton();
+			Image icon = new Image(getClass().getResourceAsStream(gamelist[x].getIconFilePath()));
+			gamebutton.setGraphic(new ImageView(icon));
+			gamebutton.setMetaDataString(gamelist[x].getName());
+			gamebutton.setOnMouseClicked((click) -> {
+				GameButton but = (GameButton) click.getSource();
+				gameButtonClick(but.getMetaDataString());
+			});
+			grid.add(gamebutton, x % 4, x / 4);
+		}
+		return grid;
+	}
+//////////////////////// Button Click Handlers go here  /////////////////////////////////////////////
+	/**
+	 * Handles when a user wants to exit the create account screen without creating an account.
+	 */
+	private void doBackToMainMenuButtonClickInCreateAccountMenuBar() {
+		this.setTop(this.initTopBar);
+		this.setCenter(this.initGameselectonboxarea);
 	}
 	/**
 	 * Handles the event were the user is logged in and is in a game and wants to go back to the main menu.
@@ -315,22 +365,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		
 		//updateLeftPane();
 	}
-
-	/**
-	 * Carries out the login. Returns postive if it was successful Returns negative
-	 * if it wasn't successful
-	 * 
-	 * @return The result code of the attempted login
-	 */
-	private boolean doLogin(String username, String password) {
-		System.out.println("username = '" + username + "' password = '" + password + "'");
-		if (this.DEBUG_FakeDatabase) {
-			return true;
-		} else {
-			return this.acctMgr.login(username, password);
-		}
-	}
-
 	/**
 	 * Handles the event were the Create New Account Button is Clicked
 	 */
@@ -343,32 +377,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Set it
 		this.setTop(initCreateAccountMenuBar);
 		this.setCenter(this.initCreateAccountMenu);
-	}
-
-	/**
-	 * Creates the Create Account Center Pane Screen
-	 * 
-	 * @return The VBox containing the elements of the screen.
-	 */
-	private VBox initCreateAccountScreen() {
-		VBox retval = new VBox();
-		Label info = new Label("Type in your Username and Password, then click the Create Account Button.");
-		TextField username = new TextField();
-		username.setPromptText("username");
-		username.setPrefWidth(300);
-		username.setPrefHeight(25);
-		PasswordField password = new PasswordField();
-		password.setPromptText("password");
-		password.setPrefWidth(300);
-		password.setPrefHeight(25);
-		Button makeaccount = new Button("Create Account");
-		makeaccount.setOnMouseClicked((click) -> {
-			createNewAccountButtonOnFinishedClick();
-		});
-		retval.getChildren().addAll(info, username, password, makeaccount);
-		retval.setPrefWidth(600);
-		retval.setPrefHeight(600);
-		return retval;
 	}
 
 	/**
@@ -399,6 +407,24 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		}
 	}
 	/**
+	 * Mapping function, maps game button clicks to their respected game and inits
+	 * it.
+	 * 
+	 * @param name The name field of the button clicked, used to ID it.
+	 */
+	private void gameButtonClick(String name) {
+		if (name.equals("Tic-Tac-Toe")) {
+			if (userLoggedIn) {
+				this.setTop(this.initLoggedInInGameBar);
+			} else {
+				this.setTop(this.initCreateAccountMenuBar);
+			}
+			this.setCenter(this.tictactoegameview);
+		}
+	}
+/////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
+
+	/**
 	 * Updates the GUI after a new account is made succesfuly,
 	 */
 	private void doGUIUpdateOnCreateAccountSuccess() {
@@ -407,7 +433,60 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.setTop(this.initLoggedInBar);
 		this.setCenter(this.initGameselectonboxarea);
 	}
-
+	/**
+	 * Sets the message to the left panel.
+	 * Assumes the user is a guest.
+	 */
+	private void setGuestMessage() {
+		this.leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in, you could see your stats!");
+		this.leftBarStats.setText("\n\nLevel: 0\nExp: 0");
+	}
+	/**
+	 * Updates the object when the objects it observes changes.
+	 */
+	@Override
+	public void update(Observable o, Object obj) {
+		updateLeftPane();
+	}
+	/**
+	 * Updates left pane
+	 */
+	private void updateLeftPane() {
+		if (this.acctMgr.isGuest()) {
+			setGuestMessage();
+		} else if (acctMgr.isAdmin()) {
+			this.leftBarMsg.setText("Administrator Account");
+			this.leftBarStats.setText("");
+		} else {
+			this.leftBarMsg.setText("Welcome to Gamejam, " + this.acctMgr.getCurUsername());
+			this.leftBarStats.setText("\n\nLevel: " + this.acctMgr.getLevel() + "\nExp: " + this.acctMgr.getExp());
+		}
+	}
+	/**
+	 * Updates all the GUI elements that use the username of the current user.
+	 */
+	private void UpdateLoggedInBarsWithUserNameOfCurrentUser() {
+		Label lo = (Label) this.initLoggedInBar.getChildren().get(1);
+		Label log = (Label) this.initLoggedInInGameBar.getChildren().get(1);
+		lo.setText(this.loggedinusername);
+		log.setText(this.loggedinusername);
+	}
+//////////////////////// Data base interaction functions go here  ////////////////////////////////////////////////////
+	/**
+	 * Fetches all the games that are implemented
+	 */
+	private GameIconItem[] getGameList() {
+		if (this.DEBUG_FakeDatabase) {
+			GameIconItem[] retval = new GameIconItem[1];
+			retval[0] = new GameIconItem("Tic-Tac-Toe", "/tictactoeicon.png", 0);
+			return retval;
+		}
+		GameIconItem[] retval = this._dbgameconnections.fetchAllGameSetUpInfo();
+		for(int x = 0; x < retval.length; x++) {
+			retval[x].setGameID(x);
+		}
+		return retval;
+	}
 	/**
 	 * Creates a new account in the system with the provided info Returns positive
 	 * on success, returns negative on failure
@@ -424,98 +503,31 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			return this.acctMgr.createAccount(username, password);
 		}
 	}
-
 	/**
-	 * Gets the item that surposed to be in the center of the application. In this
-	 * case its the game selector menu.
+	 * Carries out the login. Returns postive if it was successful Returns negative
+	 * if it wasn't successful
 	 * 
-	 * @return A grid pane of all the buttons to lead to each game.
+	 * @return The result code of the attempted login
 	 */
-	private GridPane initGamePanel() {
-		GridPane grid = new GridPane();
-		grid.getColumnConstraints().add(new ColumnConstraints(260));
-		grid.getColumnConstraints().add(new ColumnConstraints(260));
-		grid.getColumnConstraints().add(new ColumnConstraints(260));
-		grid.getColumnConstraints().add(new ColumnConstraints(260));
-		GameIconItem[] gamelist = getGameList();
-		for (int x = 0; x < gamelist.length; x++) {
-			// Sanity check
-			if (gamelist[x].getGameID() < 0 || gamelist[x].getGameID() > 11) {
-				throw new SanityCheckFailedException("When adding game icons, one of the games had id that was out of range!");
-			}
-			//
-			GameButton gamebutton = new GameButton();
-			Image icon = new Image(getClass().getResourceAsStream(gamelist[x].getIconFilePath()));
-			gamebutton.setGraphic(new ImageView(icon));
-			gamebutton.setMetaDataString(gamelist[x].getName());
-			gamebutton.setOnMouseClicked((click) -> {
-				GameButton but = (GameButton) click.getSource();
-				gameButtonClick(but.getMetaDataString());
-			});
-			grid.add(gamebutton, x % 4, x / 4);
+	private boolean doLogin(String username, String password) {
+		System.out.println("username = '" + username + "' password = '" + password + "'");
+		if (this.DEBUG_FakeDatabase) {
+			return true;
+		} else {
+			return this.acctMgr.login(username, password);
 		}
-		return grid;
 	}
+////////////////////////Other function types go here ////////////////////////////////////////////////////
 	/**
 	 * Stops and saves the current game so the user can go back the main menu.
 	 */
 	private void stopAndSaveCurrentGame() {
 		// TODO: Implement Me!
 	}
-	/**
-	 * Mapping function, maps game button clicks to their respected game and inits
-	 * it.
-	 * 
-	 * @param name The name field of the button clicked, used to ID it.
-	 */
-	private void gameButtonClick(String name) {
-		if (name.equals("Tic-Tac-Toe")) {
-			if (userLoggedIn) {
-				this.setTop(this.initLoggedInInGameBar);
-			} else {
-				this.setTop(initCreateAccountMenuBar);
-			}
-			this.setCenter(this.tictactoegameview);
-		}
-	}
-
-	/**
-	 * Fetches all the games that are implemented
-	 */
-	private GameIconItem[] getGameList() {
-		GameIconItem[] retval = this._dbgameconnections.fetchAllGameSetUpInfo();
-		for(int x = 0; x < retval.length; x++) {
-			retval[x].setGameID(x);
-		}
-		return retval;
-	}
-	
-	private void setGuestMessage() {
-		leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in, you could see your stats!");
-		leftBarStats.setText("\n\nLevel: 0\nExp: 0");
-	}
-	
-	@Override
-	public void update(Observable o, Object obj) {
-		updateLeftPane();
-	}
-	
-	private void updateLeftPane() {
-				if (acctMgr.isGuest() == true) {
-			setGuestMessage();
-		} else if (acctMgr.isAdmin() == true) {
-			leftBarMsg.setText("Administrator Account");
-			leftBarStats.setText("");
-		} else {
-			leftBarMsg.setText("Welcome to Gamejam, " + acctMgr.getCurUsername());
-			leftBarStats.setText("\n\nLevel: " + acctMgr.getLevel() + "\nExp: " + acctMgr.getExp());
-		}
-	}
-	
 	// REMOVE WHEN DONE
 	// Used for debugging
 	private void DEBUG_PretendImLoggedIn() {
-		userLoggedIn = true;
-		loggedinusername = "Nothingbutbread is Awesome!";
+		this.userLoggedIn = true;
+		this.loggedinusername = "Nothingbutbread is Awesome!";
 	}
 }
