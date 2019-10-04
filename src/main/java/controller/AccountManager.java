@@ -95,11 +95,13 @@ public class AccountManager extends Observable {
 			rs = conn.executeQuery("select g.gameid, a.accountid, s.statsid, s.wins, s.losses,s.ties,s.incomplete,s.timeplayed from games g join statistics s on g.gameid = s.gameid and g.name = ? join accounts a on a.accountid = s.accountid and a.username = ?", game, this.curUsername);
 			if (rs.next()) {
 				// Should only get 1 row.
-				int gameid = rs.getInt("gameid");
-				int accountid = rs.getInt("accountid");
+				//int gameid = rs.getInt("gameid");
+				//int accountid = rs.getInt("accountid");
 				int statsid = rs.getInt("statsid");
+				// Need to fix ...
 				int time = (int) rs.getTime("timeplayed").getTime();
-				time = 0; //
+				time = 0; // Set to 0 as of now so we only have valid values.
+				
 				int[] dv = new int[]{rs.getInt("wins"), rs.getInt("losses"), rs.getInt("ties"), rs.getInt("incomplete"), time};
 				System.out.println(time);
 				if (mode) {
@@ -112,7 +114,6 @@ public class AccountManager extends Observable {
 					throw new SanityCheckFailedException("SQL query to fetch global stats returned more than 1 row.");
 				}
 			} else {
-				System.out.println("Possible error: Query to find the users global stats table for the inputed game was non existant.");
 				// We are missing a stat, create one
 				int[] dv = new int[5];
 				dv[stattype] = value;
