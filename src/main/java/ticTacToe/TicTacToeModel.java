@@ -1,4 +1,4 @@
-package model;
+package ticTacToe;
 
 import java.awt.Point;
 import java.io.Serializable;
@@ -348,4 +348,13 @@ public class TicTacToeModel extends Observable implements Serializable {
         }
         return result;
     }
+
+	public void clearBoard() {
+		for(int i=0; i<3; i++) {
+			for(int j=0; j<3; j++) {
+				board[i][j] = '_';
+			}
+		}
+		
+	}
 }

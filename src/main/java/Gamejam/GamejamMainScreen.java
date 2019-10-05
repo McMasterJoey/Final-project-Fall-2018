@@ -19,7 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import model.SanityCheckFailedException;
-import view.TicTacToeControllerView;
+import ticTacToe.TicTacToeControllerView;
 
 /**
  * The MainScreen view. Should be the first thing that pops up when loading the
