@@ -81,6 +81,7 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 			double offset = this.getChildren().get(0).getLayoutX();
 			int col = ((int) ((click.getX() - offset) / 100));
 			if(col >= 0 && col < 7 && gameModel.available(col)) {
+				//TODO change to non testing when strategy is implemented.
 				gameModel.humanMove(col, true);
 			}
 		});
