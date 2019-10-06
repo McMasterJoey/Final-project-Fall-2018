@@ -223,14 +223,17 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 		System.out.println(gameModel.toString());
 		if (gameModel.tied()) {
 			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 2, 1);
+			accountmanager.logGameStat("Tic-Tac-Toe", 0, 2);
 			tieSound.play();
 		}
 		else if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
 				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 0, 1);
+				accountmanager.logGameStat("Tic-Tac-Toe", 0, 1);
 				winSound.play();
 			} else {
 				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 1, 1);
+				accountmanager.logGameStat("Tic-Tac-Toe", 0, 3);
 				loseSound.play();
 			}
 			String winningDirection = gameModel.getWinningDirection();
