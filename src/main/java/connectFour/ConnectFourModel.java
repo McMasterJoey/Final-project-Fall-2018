@@ -190,7 +190,7 @@ public class ConnectFourModel extends Observable implements Serializable {
 		 x x x _ _ _ _
 		 x x _ _ _ _ _		 
 		 */
-		for(int i=width; i > 2; i--) {
+		for(int i=width-1; i > 2; i--) {
 			int numSame = 0;
 			int row = 0;
 			int col = i;
@@ -219,7 +219,7 @@ public class ConnectFourModel extends Observable implements Serializable {
 		for(int i=0; i < height-3; i++) {
 			int numSame = 0;
 			int row = i;
-			int col = width;
+			int col = width-1;
 			while(col > 0 && row < height) {
 				if(board[row][col] == c) {
 					numSame++;
@@ -246,8 +246,8 @@ public class ConnectFourModel extends Observable implements Serializable {
 	 */
 	private boolean wonHorizontally(char c) {
 		for (int row = 0; row < height; row++) {
+			int numSame = 0;
 			for (int col = 0; col < width; col++) {
-				int numSame = 0;
 				if (board[row][col] == c) {
 					numSame++;
 				} else {
@@ -351,7 +351,7 @@ public class ConnectFourModel extends Observable implements Serializable {
 			for (int c = 0; c < width; c++) {
 				result += " " + board[r][c] + " ";
 			}
-			if (r == 0 || r == 1)
+			if (r < height)
 				result += "\n";
 		}
 		return result;
