@@ -109,6 +109,7 @@ public class AccountManager extends Observable {
 				} else {
 					dv[stattype] = value;
 				}
+				//System.out.println(rs.getInt("losses"));
 				conn.execute("update statistics set wins = ?, losses = ?, ties = ?, incomplete = ?, timeplayed = ? where statsid = ?", dv[0],dv[1],dv[2],dv[3],dv[4], statsid);
 				if (rs.next()) {
 					throw new SanityCheckFailedException("SQL query to fetch global stats returned more than 1 row.");

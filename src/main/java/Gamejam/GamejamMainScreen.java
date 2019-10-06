@@ -18,6 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
+import model.GameJamGameInterface;
 import model.SanityCheckFailedException;
 import view.TicTacToeControllerView;
 
@@ -41,6 +42,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private AccountManager acctMgr;
 	private GameJamViewDatabaseInteractionManager _dbgameconnections;
 	private TicTacToeControllerView tictactoegameview;
+	private int gameInUseIndex = -1;
+	private GameIconItem[] initgamelist;
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
 	private boolean userisAdmin = false;
@@ -286,17 +289,17 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		grid.getColumnConstraints().add(new ColumnConstraints(260));
 		grid.getColumnConstraints().add(new ColumnConstraints(260));
 		grid.getColumnConstraints().add(new ColumnConstraints(260));
-		GameIconItem[] gamelist = getGameList();
-		for (int x = 0; x < gamelist.length; x++) {
+		this.initgamelist = getGameList();
+		for (int x = 0; x < this.initgamelist.length; x++) {
 			// Sanity check
-			if (gamelist[x].getGameID() < 0 || gamelist[x].getGameID() > 11) {
+			if (this.initgamelist[x].getGameID() < 0 || this.initgamelist[x].getGameID() > 11) {
 				throw new SanityCheckFailedException("When adding game icons, one of the games had id that was out of range!");
 			}
 			//
 			GameButton gamebutton = new GameButton();
-			Image icon = new Image(getClass().getResourceAsStream(gamelist[x].getIconFilePath()));
+			Image icon = new Image(getClass().getResourceAsStream(this.initgamelist[x].getIconFilePath()));
 			gamebutton.setGraphic(new ImageView(icon));
-			gamebutton.setMetaDataString(gamelist[x].getName());
+			gamebutton.setMetaDataString(this.initgamelist[x].getName());
 			gamebutton.setOnMouseClicked((click) -> {
 				GameButton but = (GameButton) click.getSource();
 				gameButtonClick(but.getMetaDataString());
@@ -414,6 +417,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private void gameButtonClick(String name) {
 		if (name.equals("Tic-Tac-Toe")) {
+			this.gameInUseIndex = 0;
 			if (userLoggedIn) {
 				this.setTop(this.initLoggedInInGameBar);
 			} else {
@@ -421,6 +425,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			}
 			this.setCenter(this.tictactoegameview);
 		}
+		this.gameInUseIndex = -1;
 	}
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
 
@@ -522,12 +527,25 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * Stops and saves the current game so the user can go back the main menu.
 	 */
 	private void stopAndSaveCurrentGame() {
-		// TODO: Implement Me!
+		GameJamGameInterface game = getLoaddedGame();
+		if (game == null) {
+			return;
+			// Will swap out once intergrated with Wes's code.
+			//throw new SanityCheckFailedException("getLoaddedGame returned null when stoping and saving current game!");
+		}
+		String path = "/userdata/" + acctMgr.getCurUsername();
+		game.saveGame(path);
+		game.pauseGame();
 	}
-	// REMOVE WHEN DONE
-	// Used for debugging
-	private void DEBUG_PretendImLoggedIn() {
-		this.userLoggedIn = true;
-		this.loggedinusername = "Nothingbutbread is Awesome!";
+	/**
+	 * Returns the view of the loaded game in interface form.
+	 * @return The view of the loaded game, returns null if no game is loaded.
+	 */
+	private GameJamGameInterface getLoaddedGame() {
+		if (this.gameInUseIndex == 0) {
+			//return this.tictactoegameview;
+			return null;
+		}
+		return null;
 	}
 }
