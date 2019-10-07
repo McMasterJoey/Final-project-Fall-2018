@@ -88,7 +88,7 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	}
 	
 	private void disableListeners() {
-		// TODO for(listener) listener.setOnMouseClicked(()->{});
+		this.setOnMouseClicked((click)->{});
 	}
 	
 	@Override

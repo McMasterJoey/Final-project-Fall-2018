@@ -39,7 +39,7 @@ public class GameJamViewDatabaseInteractionManager {
 		ResultSet rs = null;
 		try {
 			rs = DBconnection.executeQuery("SELECT name, iconpath FROM games");
-			if (rs.next()) {
+			while (rs.next()) {
 				GameIconItem game = new GameIconItem(rs.getString("name"), rs.getString("iconpath"), -1);
 				dataset.add(game);
 			}
