@@ -51,7 +51,7 @@ public class TicTacToeControllerView extends GridPane implements Observer, GameJ
 	private void initializeGame() {
 		if (gameModel == null) {
 			gameModel = new TicTacToeModel();
-			gameModel.setAIStrategy(new EasyAI());
+			gameModel.setAIStrategy(new IntermediateAI());
 			gameModel.addObserver(this);
 		} else {
 			gameModel.clearBoard();

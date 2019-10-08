@@ -19,7 +19,7 @@ public class ConnectFourModel extends Observable implements Serializable {
 		initializeBoard();
 		computer = new ConnectFourAI();
 		// TODO fill name in here
-		// computer.setStrategy(/*new EasyAI()*/);
+		 computer.setStrategy(new ConnectFourEasyAI());
 		setChanged();
 		notifyObservers();
 	}

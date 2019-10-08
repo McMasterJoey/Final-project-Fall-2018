@@ -56,7 +56,7 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	private void initializeGame() {
 		if (gameModel == null) {
 			gameModel = new ConnectFourModel();
-			// TODO gameModel.setAIStrategy(AINAME);
+			gameModel.setAIStrategy(new ConnectFourEasyAI());
 			gameModel.addObserver(this);
 		} else {
 			gameModel.clearBoard();
