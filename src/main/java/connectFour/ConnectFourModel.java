@@ -68,10 +68,10 @@ public class ConnectFourModel extends Observable implements Serializable {
 			return;
 		}
 		int row = 0;
-		while(row < height && board[row][col] == '_') {
+		while (row < height && board[row][col] == '_') {
 			row++;
 		}
-		board[row-1][col] = 'R';
+		board[row - 1][col] = 'R';
 		setChanged();
 		notifyObservers();
 		if (!test && this.isStillRunning()) {
@@ -92,10 +92,10 @@ public class ConnectFourModel extends Observable implements Serializable {
 			return;
 		}
 		int row = 0;
-		while(row < height && board[row][col] == '_') {
+		while (row < height && board[row][col] == '_') {
 			row++;
 		}
-		board[row-1][col] = 'Y';
+		board[row - 1][col] = 'Y';
 		setChanged();
 		notifyObservers();
 	}
@@ -127,106 +127,90 @@ public class ConnectFourModel extends Observable implements Serializable {
 	 */
 	private boolean wonDiagonally(char c) {
 		// check top left to bottom right diagonals
-		
-		/*this loop checks these spots
-		 x _ _ _ _ _ _
-		 x x _ _ _ _ _
-		 x x x _ _ _ _
-		 _ x x x _ _ _
-		 _ _ x x x _ _
-		 _ _ _ x x x _
-		*/
-		for(int i=0; i<height-3; i++) {
+
+		/*
+		 * this loop checks these spots x _ _ _ _ _ _ x x _ _ _ _ _ x x x _ _ _ _ _ x x
+		 * x _ _ _ _ _ x x x _ _ _ _ _ x x x _
+		 */
+		for (int i = 0; i < height - 3; i++) {
 			int numSame = 0;
 			int row = i;
 			int col = 0;
-			while(col < width && row < height) {
-				if(board[row][col] == c) {
+			while (col < width && row < height) {
+				if (board[row][col] == c) {
 					numSame++;
 				} else {
 					numSame = 0;
 				}
-				if(numSame == 4) {
+				if (numSame == 4) {
 					return true;
 				}
 				row++;
 				col++;
 			}
 		}
-		
-		/* this loop checks these spots
-		 x x x x _ _ _
-		 _ x x x x _ _
-		 _ _ x x x x _
-		 _ _ _ x x x x
-		 _ _ _ _ x x x
-		 _ _ _ _ _ x x		 
-		 */		
-		for(int i=0; i<width-3; i++) {
-			int numSame = 0;
-			int row = 0;
-			int col = i;
-			while(col < width && row < height) {
-				if(board[row][col] == c) {
-					numSame++;
-				} else {
-					numSame = 0;
-				}
-				if(numSame == 4) {
-					return true;
-				}
-				row++;
-				col++;
-			}
-		}
-		
-		// now check on the bottom left to top right diagonals
-		
-		/* This loop checks these spots
-		 _ _ _ x x x x
-		 _ _ x x x x _
-		 _ x x x x _ _
-		 x x x x _ _ _
-		 x x x _ _ _ _
-		 x x _ _ _ _ _		 
+
+		/*
+		 * this loop checks these spots x x x x _ _ _ _ x x x x _ _ _ _ x x x x _ _ _ _
+		 * x x x x _ _ _ _ x x x _ _ _ _ _ x x
 		 */
-		for(int i=width-1; i > 2; i--) {
+		for (int i = 0; i < width - 3; i++) {
 			int numSame = 0;
 			int row = 0;
 			int col = i;
-			while(col > 0 && row < height) {
-				if(board[row][col] == c) {
+			while (col < width && row < height) {
+				if (board[row][col] == c) {
 					numSame++;
 				} else {
 					numSame = 0;
 				}
-				if(numSame == 4) {
+				if (numSame == 4) {
+					return true;
+				}
+				row++;
+				col++;
+			}
+		}
+
+		// now check on the bottom left to top right diagonals
+
+		/*
+		 * This loop checks these spots _ _ _ x x x x _ _ x x x x _ _ x x x x _ _ x x x
+		 * x _ _ _ x x x _ _ _ _ x x _ _ _ _ _
+		 */
+		for (int i = width - 1; i > 2; i--) {
+			int numSame = 0;
+			int row = 0;
+			int col = i;
+			while (col > 0 && row < height) {
+				if (board[row][col] == c) {
+					numSame++;
+				} else {
+					numSame = 0;
+				}
+				if (numSame == 4) {
 					return true;
 				}
 				row++;
 				col--;
 			}
 		}
-		
-		/* This loop checks these spots
-		 _ _ _ _ _ _ x
-		 _ _ _ _ _ x x
-		 _ _ _ _ x x x
-		 _ _ _ x x x _
-		 _ _ x x x _ _
-		 _ x x x _ _ _		 
+
+		/*
+		 * This loop checks these spots _ _ _ _ _ _ x _ _ _ _ _ x x _ _ _ _ x x x _ _ _
+		 * x x x _ _ _ x x x _ _ _ x x x _ _ _
 		 */
-		for(int i=0; i < height-3; i++) {
+		for (int i = 0; i < height - 3; i++) {
 			int numSame = 0;
 			int row = i;
-			int col = width-1;
-			while(col > 0 && row < height) {
-				if(board[row][col] == c) {
+			int col = width - 1;
+			while (col > 0 && row < height) {
+				if (board[row][col] == c) {
 					numSame++;
 				} else {
 					numSame = 0;
 				}
-				if(numSame == 4) {
+				if (numSame == 4) {
 					return true;
 				}
 				row++;
@@ -253,7 +237,7 @@ public class ConnectFourModel extends Observable implements Serializable {
 				} else {
 					numSame = 0;
 				}
-				if(numSame == 4) {
+				if (numSame == 4) {
 					return true;
 				}
 			}
@@ -313,7 +297,7 @@ public class ConnectFourModel extends Observable implements Serializable {
 		int numberMoves = 0;
 		for (int col = 0; col < width; col++) {
 			int row = 0;
-			while(row < height && board[row][col] == '_') {
+			while (row < height && board[row][col] == '_') {
 				row++;
 			}
 			numberMoves += row;
@@ -343,7 +327,7 @@ public class ConnectFourModel extends Observable implements Serializable {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * clears the board
 	 */

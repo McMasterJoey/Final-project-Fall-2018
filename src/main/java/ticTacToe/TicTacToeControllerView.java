@@ -65,10 +65,10 @@ public class TicTacToeControllerView extends GridPane implements Observer, GameJ
 	private void setupResources() {
 		xImage = new Image(TicTacToeControllerView.class.getResource("/letterX.png").toString());
 		yImage = new Image(TicTacToeControllerView.class.getResource("/letterO.png").toString());
-		moveSound = new AudioClip(TicTacToeControllerView.class.getResource("/ticTacToeMove.mp3").toString());
-		winSound = new AudioClip(TicTacToeControllerView.class.getResource("/ticTacToeWin.mp3").toString());
-		loseSound = new AudioClip(TicTacToeControllerView.class.getResource("/ticTacToeLose.mp3").toString());
-		tieSound = new AudioClip(TicTacToeControllerView.class.getResource("/ticTacToeTie.mp3").toString());
+		moveSound = new AudioClip(TicTacToeControllerView.class.getResource("/moveSound.mp3").toString());
+		winSound = new AudioClip(TicTacToeControllerView.class.getResource("/winSound.mp3").toString());
+		loseSound = new AudioClip(TicTacToeControllerView.class.getResource("/loseSound.mp3").toString());
+		tieSound = new AudioClip(TicTacToeControllerView.class.getResource("/tieSound.mp3").toString());
 	}
 
 	/**
