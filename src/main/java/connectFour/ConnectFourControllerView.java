@@ -17,6 +17,14 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import model.GameJamGameInterface;
 
+/**
+ * Combined Controller and View of the MVC design pattern.
+ * This class exists to manipulate its counterpart ConnectFourModel object
+ * and to display that on the screen as an extension of GridPane. Implements GameJameGameInterface
+ * to provide methods for controlling the game in a meta sense, saving/loading, new game, etc.
+ * @author Wes Rodgers
+ *
+ */
 public class ConnectFourControllerView extends GridPane implements Observer, GameJamGameInterface{
 	private ConnectFourModel gameModel;
 	public static final int WIDTH = 600;
@@ -41,6 +49,10 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 		this.setHeight(HEIGHT);
 	}
 	
+	/**
+	 * Initializes the game by setting up the board and creating the
+	 * model if necessary.
+	 */
 	private void initializeGame() {
 		if (gameModel == null) {
 			gameModel = new ConnectFourModel();
@@ -53,11 +65,18 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 		
 	}
 
+	/**
+	 * intializes the proper soundfx resources for this game.
+	 */
 	private void setupResources() {
 		// TODO Find clips, init them here
 		
 	}
 
+	/**
+	 * Draws the correct squares and circles to represent an empty connect Four
+	 * board to the screen
+	 */
 	private void setupBoard() {
 		placeholder = new StackPane[7][6];
 		for(int row=0; row < 6; row++) {
@@ -76,8 +95,16 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 		setupListeners();
 	}
 
+	/**
+	 * sets up the listener that determines where the player is trying to make
+	 * a move
+	 */
 	private void setupListeners() {
 		this.setOnMouseClicked((click)->{			
+			//this finds the offset of the top left corner of the top
+			//left grid so we can accurately determine clicks no matter
+			//how the game is resized without having to write a listener for
+			//each of the columns.
 			double offset = this.getChildren().get(0).getLayoutX();
 			int col = ((int) ((click.getX() - offset) / 100));
 			if(col >= 0 && col < 7 && gameModel.available(col)) {
@@ -87,23 +114,40 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 		});
 	}
 	
+	/**
+	 * disables the listeners
+	 */
 	private void disableListeners() {
 		this.setOnMouseClicked((click)->{});
 	}
 	
 	@Override
+	/**
+	 * saves the game to the given filepath
+	 * @param filepath the name of the file we want to save
+	 * @return true if the save was succesful, false otherwise
+	 */
 	public boolean saveGame(String filepath) {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
+
 	@Override
+	/**
+	 * loads a saved game from the given filepath
+	 * @param filepath the location from which to load the game
+	 * @return true if the load was succesful, false otherwise
+	 */
 	public boolean loadSaveGame(String filepath) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 	
 	@Override
+	/**
+	 * pauses the game
+	 * @return true if the pause is successful, false otherwise
+	 */
 	public boolean pauseGame() {
 		try {
 			disableListeners();
@@ -114,6 +158,10 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	}	
 
 	@Override
+	/**
+	 * unpauses the game
+	 * @return true if the unpause was successful, false otherwise
+	 */
 	public boolean unPauseGame() {
 		try {
 			setupListeners();
@@ -124,6 +172,10 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	}
 
 	@Override
+	/**
+	 * creates a new game
+	 * @return true if the new game was started succesfully, false otherwise
+	 */
 	public boolean newGame() {
 		try {
 			initializeGame();
@@ -133,6 +185,7 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 		return true;
 	}
 
+	
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		System.out.println("--------------");

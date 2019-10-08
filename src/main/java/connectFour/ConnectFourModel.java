@@ -331,19 +331,6 @@ public class ConnectFourModel extends Observable implements Serializable {
 		return board[0][col] == '_';
 	}
 
-	/*//////////Old code used to determine winning direction, still in place
-	  //////////in case we need to implement that functionality again later.
-	public String getWinningDirection() {
-		if (wonHorizontally('R') || wonHorizontally('Y')) {
-			return "horizontal";
-		} else if (wonVertically('R') || wonVertically('Y')) {
-			return "vertical";
-		} else {
-			return "diagonal";
-		}
-	}
-	*/
-
 	@Override
 	public String toString() {
 		String result = "";
@@ -356,7 +343,10 @@ public class ConnectFourModel extends Observable implements Serializable {
 		}
 		return result;
 	}
-
+	
+	/**
+	 * clears the board
+	 */
 	public void clearBoard() {
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
