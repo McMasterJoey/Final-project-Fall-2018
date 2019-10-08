@@ -59,7 +59,6 @@ public class ConnectFourModel extends Observable implements Serializable {
 	 * Subsequently calls code to have the AI choose their next move and makes that
 	 * move as well, unless testing is enabled.
 	 * 
-	 * @param row  the row value, 0-5
 	 * @param col  the column value, 0-6
 	 * @param test true when we don't want the computer to make a move after
 	 */
