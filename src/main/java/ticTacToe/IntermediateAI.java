@@ -1,7 +1,9 @@
-package model;
+package ticTacToe;
 
 import java.awt.Point;
 import java.util.Random;
+
+import model.IGotNoWhereToGoException;
 
 /**
  * This TTT strategy tries to prevent the opponent from winning by checking for

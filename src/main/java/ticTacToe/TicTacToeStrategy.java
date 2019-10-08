@@ -1,4 +1,4 @@
-package model;
+package ticTacToe;
 
 /**
   * Classes that implement this interface allow the ComputerPlayer 

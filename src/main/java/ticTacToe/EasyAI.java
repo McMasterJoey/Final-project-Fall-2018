@@ -1,7 +1,9 @@
-package model;
+package ticTacToe;
 
 import java.awt.Point;
 import java.util.Random;
+
+import model.IGotNoWhereToGoException;
 
 /**
  * This strategy selects the first available move at random. It is easy to beat.

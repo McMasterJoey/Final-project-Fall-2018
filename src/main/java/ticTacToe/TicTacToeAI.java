@@ -1,4 +1,4 @@
-package model;
+package ticTacToe;
 
 import java.awt.Point;
 

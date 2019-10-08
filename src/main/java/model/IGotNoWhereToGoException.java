@@ -9,7 +9,12 @@ package model;
  */
 public class IGotNoWhereToGoException extends RuntimeException {
 
-  public IGotNoWhereToGoException(String message) {
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+public IGotNoWhereToGoException(String message) {
     super(message);
   }
 }

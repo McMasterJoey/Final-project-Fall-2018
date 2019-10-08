@@ -5,7 +5,12 @@ package model;
  *
  */
 public class SanityCheckFailedException extends RuntimeException {
-	  public SanityCheckFailedException(String message) {
+	  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public SanityCheckFailedException(String message) {
 	    super(message);
 	  }
 }
