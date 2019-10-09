@@ -49,7 +49,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
 	private boolean userisAdmin = false;
-	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
+	private boolean DEBUG_FakeDatabase = true; // REMOVE WHEN DONE
 	public GamejamMainScreen() {
 		super();
 		init();
