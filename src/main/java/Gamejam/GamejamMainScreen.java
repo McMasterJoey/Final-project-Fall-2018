@@ -4,6 +4,7 @@ import java.util.Observer;
 
 import connectFour.ConnectFourControllerView;
 
+import java.util.ArrayList;
 import java.util.Observable;
 import controller.AccountManager;
 import controller.GameJamViewDatabaseInteractionManager;
@@ -52,7 +53,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
 	private boolean userisAdmin = false;
-	private boolean DEBUG_FakeDatabase = true; // REMOVE WHEN DONE
+	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
 	public GamejamMainScreen() {
 		super();
 		init();
@@ -291,10 +292,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private GridPane initGamePanel() {
 		GridPane grid = new GridPane();
-		grid.getColumnConstraints().add(new ColumnConstraints(260));
-		grid.getColumnConstraints().add(new ColumnConstraints(260));
-		grid.getColumnConstraints().add(new ColumnConstraints(260));
-		grid.getColumnConstraints().add(new ColumnConstraints(260));
+		grid.getColumnConstraints().add(new ColumnConstraints(272));
+		grid.getColumnConstraints().add(new ColumnConstraints(272));
+		grid.getColumnConstraints().add(new ColumnConstraints(272));
+		grid.getColumnConstraints().add(new ColumnConstraints(272));
 		this.initgamelist = getGameList();
 		for (int x = 0; x < this.initgamelist.length; x++) {
 			// Sanity check
@@ -361,15 +362,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		PasswordField password = (PasswordField) this.initTopBar.getChildren().get(2);
 		boolean successful = doLogin(username.getText(), password.getText());
 		if (successful) {
-			// TODO: Update the Left with statistics
-			System.out.println("Login successful\n");
-			userLoggedIn = true;
+			this.userLoggedIn = true;
 			this.loggedinusername = username.getText();
 			UpdateLoggedInBarsWithUserNameOfCurrentUser();
 			this.setTop(this.initLoggedInBar);
 		} else {
-			// TODO: Handle unsuccessful login
-			System.out.println("Invalid username or password\n");
+			username.setPromptText("Invalid username or password");
+			username.setText("");
+			password.setText("");
 		}
 		
 		//updateLeftPane();
@@ -439,7 +439,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 				this.setTop(this.initCreateAccountMenuBar);
 			}
 			this.setCenter(this.connectFourGameView);
-			connectFourGameView.setAlignment(Pos.CENTER);
+			//connectFourGameView.setAlignment(Pos.CENTER);
 		}
 	}
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
@@ -502,10 +502,11 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			retval[1] = new GameIconItem("Connect-Four", "/connectFourIcon.png", 1);
 			return retval;
 		}
-		GameIconItem[] retval = this._dbgameconnections.fetchAllGameSetUpInfo();
+		ArrayList<GameIconItem> allgames = this._dbgameconnections.fetchAllGameSetUpInfo();
+		GameIconItem[] retval = new GameIconItem[allgames.size()];
 		for(int x = 0; x < retval.length; x++) {
-			System.out.println("gamelist length = " + x);
-			retval[x].setGameID(x);
+			retval[x] = allgames.get(x); // Transfer the arraylist content to the array
+			retval[x].setGameID(x);      // Set the gameid of the value.
 		}
 		return retval;
 	}
@@ -560,8 +561,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private GameJamGameInterface getLoaddedGame() {
 		if (this.gameInUseIndex == 0) {
-			//return this.tictactoegameview;
-			return null;
+			return (GameJamGameInterface) this.tictactoegameview;
+		} else if (this.gameInUseIndex == 1) {
+			return (GameJamGameInterface) this.connectFourGameView;
 		}
 		return null;
 	}

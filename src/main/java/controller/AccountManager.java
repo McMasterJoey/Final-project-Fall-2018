@@ -53,11 +53,11 @@ public class AccountManager extends Observable {
 			if (rs.next()) {
 				
 				if (password.equals(rs.getString("password"))) {
-					curUsername = username;
-					isAdmin = rs.getBoolean("admin");
-					isGuest = rs.getBoolean("guest");
-					exp = rs.getInt("exp");
-					level = rs.getInt("level");
+					this.curUsername = username;
+					this.isAdmin = rs.getBoolean("admin");
+					this.isGuest = rs.getBoolean("guest");
+					this.exp = rs.getInt("exp");
+					this.level = rs.getInt("level");
 					
 					System.out.println("Login: " + curUsername + " " + isAdmin + " " + isGuest);
 					
@@ -89,13 +89,14 @@ public class AccountManager extends Observable {
 			throw new IllegalArgumentException("Invalid stattype was out of range or value was below 0.");
 		}
 		if (this.isGuest) {
+			System.out.println("\nWe are a guest!!");
 			// Do nothing if this is a guest account.
 			return;
 		}
-		// Insert into stat table 
-		ResultSet rs = null;
 		try {
+			System.out.println("\nFetching game from a string!");
 			int gameid = getGameIdFromString(game);
+			System.out.println(gameid);
 			conn.execute("insert into gamelog(accountid,gameid,result) values(?,?,?)", this.dataBaseUserId, gameid, stattype);
 			
 		} catch (SQLException se) {
@@ -187,6 +188,7 @@ public class AccountManager extends Observable {
 			rs = conn.executeQuery("select accountid from accounts where accounts.username = ?", this.curUsername);
 			rs.next();
 			this.dataBaseUserId = rs.getInt("accountid");
+			this.isGuest = false;
 			
 		} catch (SQLException se) {
 			if (se.getErrorCode() == 1062) { // 1062 indicates username is already in the db
@@ -256,11 +258,17 @@ public class AccountManager extends Observable {
 			rs = conn.executeQuery("select gameid from games where name = ?", game);
 			rs.next();
 			gameid = rs.getInt("gameid");
+			if (gameid < 0) {
+				throw new SanityCheckFailedException("getGameIdFromString fetched a gameid of " + gameid + " from the query!");
+			}
 			// Add it to Hashmap so we can quickly fetch it.
 			this.databaseGameid.put(game,gameid);
 		} catch (SQLException se) {
 			se.printStackTrace();
 			throw new SanityCheckFailedException("getGameIdFromString threw an SQL execption when adding a game to the cache.");
+		}
+		if (gameid < 0) {
+			throw new SanityCheckFailedException("getGameIdFromString tired to return gameid = " + gameid);
 		}
 		return gameid;
 	}
