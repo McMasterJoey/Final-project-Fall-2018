@@ -3,6 +3,8 @@ package ticTacToe;
 import java.util.Observable;
 import java.util.Observer;
 
+import connectFour.ConnectFourEasyAI;
+import connectFour.ConnectFourHardAI;
 import controller.AccountManager;
 import controller.logStatType;
 
@@ -317,6 +319,8 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 		MenuBar bar = new MenuBar();
 		Menu optmenu = new Menu("Tic-Tac-Toe Options");
 		MenuItem newgame = new MenuItem("Start New Game");
+		MenuItem diffinter = new MenuItem("Set diffuclty to Intermediate");
+		MenuItem diffeasy = new MenuItem("Set diffuclty to Easy");
 		newgame.setOnAction((event) -> { 
 			if (!(gameModel.won('X') || gameModel.won('O')) && gameModel.maxMovesRemaining() > 0) {
 				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
@@ -327,7 +331,13 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 				System.err.println("ERROR on trying to set new tic-tac-toe game!");
 			}
 		});
-		optmenu.getItems().addAll(newgame);
+		diffinter.setOnAction((event) -> { 
+			gameModel.setAIStrategy(new IntermediateAI());
+		});
+		diffeasy.setOnAction((event) -> { 
+			gameModel.setAIStrategy(new EasyAI());
+		});
+		optmenu.getItems().addAll(newgame,diffeasy,diffinter);
 		bar.getMenus().addAll(optmenu);
 		return bar;
 	}
