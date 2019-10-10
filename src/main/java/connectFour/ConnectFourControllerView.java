@@ -56,7 +56,7 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	private void initializeGame() {
 		if (gameModel == null) {
 			gameModel = new ConnectFourModel();
-			// TODO gameModel.setAIStrategy(AINAME);
+			gameModel.setAIStrategy(new ConnectFourHardAI());
 			gameModel.addObserver(this);
 		} else {
 			gameModel.clearBoard();
@@ -112,7 +112,7 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 			int col = ((int) ((click.getX() - offset) / 100));
 			if (col >= 0 && col < 7 && gameModel.available(col)) {
 				// TODO change to non testing when strategy is implemented.
-				gameModel.humanMove(col, true);
+				gameModel.humanMove(col, false);
 			}
 		});
 	}

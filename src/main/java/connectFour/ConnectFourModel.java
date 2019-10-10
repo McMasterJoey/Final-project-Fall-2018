@@ -294,7 +294,7 @@ public class ConnectFourModel extends Observable implements Serializable {
 	 * @return a boolean, true if the game is a draw, false otherwise
 	 */
 	public boolean tied() {
-		return maxMovesRemaining() == 0 && !won('X') && !won('O');
+		return maxMovesRemaining() == 0 && !won('Y') && !won('R');
 	}
 
 	/**
@@ -357,5 +357,228 @@ public class ConnectFourModel extends Observable implements Serializable {
 			}
 		}
 
+	}
+	
+	/*********************************************************************************
+	 * *******************************************************************************
+	 * Everything belows are used for Hard strategies
+	 */
+
+	
+	
+	public boolean available(int col, char[][] testBoard) {
+		return testBoard[0][col] == '_';
+	}
+
+	/*
+	 * test computer moves
+	 */
+	public void computerMove(int col, char[][] testBoard) {
+		int row = 0;
+		while (row < height && testBoard[row][col] == '_') {
+			row++;
+		}
+		testBoard[row - 1][col] = 'Y';
+		
+	}
+
+	public boolean isStillRunning(char[][] testBoard) {
+		return !tied(testBoard) && !won('R',testBoard) && !won('Y',testBoard);
+	}
+
+	public boolean won(char c, char[][] testBoard) {
+		return wonVertically(c,testBoard) || wonHorizontally(c, testBoard) || wonDiagonally(c, testBoard);
+	}
+
+
+
+	private boolean tied(char[][] testBoard) {
+		return maxMovesRemaining(testBoard) == 0 && !won('Y', testBoard) && !won('R', testBoard);
+	}
+	
+	private int maxMovesRemaining(char[][] testBoard) {
+		int numberMoves = 0;
+		for (int col = 0; col < width; col++) {
+			int row = 0;
+			while (row < height && testBoard[row][col] == '_') {
+				row++;
+			}
+			numberMoves += row;
+		}
+		return numberMoves;
+	}
+
+	/**
+	 * checks to see if the player won on a column
+	 * 
+	 * @param c the player's move, R or Y
+	 * @return true if the player with move C won on a horizontal, false otherwise
+	 */
+	private boolean wonVertically(char c, char[][] testBoard) {
+		for (int col = 0; col < width; col++) {
+			int numSame = 0;
+			for (int row = 0; row < height; row++) {
+				if (testBoard[row][col] == c) {
+					numSame++;
+				} else {
+					numSame = 0;
+				}
+				if (numSame == 4) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	private boolean wonHorizontally(char c, char[][] testBoard) {
+		for (int row = 0; row < height; row++) {
+			int numSame = 0;
+			for (int col = 0; col < width; col++) {
+				if (testBoard[row][col] == c) {
+					numSame++;
+				} else {
+					numSame = 0;
+				}
+				if (numSame == 4) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private boolean wonDiagonally(char c, char[][] testBoard) {
+		// check top left to bottom right diagonals
+
+				/*
+				 * this loop checks these spots x _ _ _ _ _ _ x x _ _ _ _ _ x x x _ _ _ _ _ x x
+				 * x _ _ _ _ _ x x x _ _ _ _ _ x x x _
+				 */
+				for (int i = 0; i < height - 3; i++) {
+					int numSame = 0;
+					int row = i;
+					int col = 0;
+					while (col < width && row < height) {
+						if (testBoard[row][col] == c) {
+							numSame++;
+						} else {
+							numSame = 0;
+						}
+						if (numSame == 4) {
+							return true;
+						}
+						row++;
+						col++;
+					}
+				}
+
+				/*
+				 * this loop checks these spots x x x x _ _ _ _ x x x x _ _ _ _ x x x x _ _ _ _
+				 * x x x x _ _ _ _ x x x _ _ _ _ _ x x
+				 */
+				for (int i = 0; i < width - 3; i++) {
+					int numSame = 0;
+					int row = 0;
+					int col = i;
+					while (col < width && row < height) {
+						if (testBoard[row][col] == c) {
+							numSame++;
+						} else {
+							numSame = 0;
+						}
+						if (numSame == 4) {
+							return true;
+						}
+						row++;
+						col++;
+					}
+				}
+
+				// now check on the bottom left to top right diagonals
+
+				/*
+				 * This loop checks these spots _ _ _ x x x x _ _ x x x x _ _ x x x x _ _ x x x
+				 * x _ _ _ x x x _ _ _ _ x x _ _ _ _ _
+				 */
+				for (int i = width - 1; i > 2; i--) {
+					int numSame = 0;
+					int row = 0;
+					int col = i;
+					while (col > 0 && row < height) {
+						if (testBoard[row][col] == c) {
+							numSame++;
+						} else {
+							numSame = 0;
+						}
+						if (numSame == 4) {
+							return true;
+						}
+						row++;
+						col--;
+					}
+				}
+
+				/*
+				 * This loop checks these spots _ _ _ _ _ _ x _ _ _ _ _ x x _ _ _ _ x x x _ _ _
+				 * x x x _ _ _ x x x _ _ _ x x x _ _ _
+				 */
+				for (int i = 0; i < height - 3; i++) {
+					int numSame = 0;
+					int row = i;
+					int col = width - 1;
+					while (col > 0 && row < height) {
+						if (testBoard[row][col] == c) {
+							numSame++;
+						} else {
+							numSame = 0;
+						}
+						if (numSame == 4) {
+							return true;
+						}
+						row++;
+						col--;
+					}
+				}
+
+				// No win on either diagonal
+				return false;
+	}
+
+	/*
+	 * test human move
+	 */
+	public void humanMove(int col, char[][] testBoard) {
+		int row = 0;
+		while (row < height && testBoard[row][col] == '_') {
+			row++;
+		}
+		testBoard[row - 1][col] = 'R';
+		
+	}
+
+	/*
+	 * retrieve the previous computer move on the board
+	 */
+	public void computerCounterMove(int col, char[][] testBoard) {
+		int row = 0;
+		while (row < height && testBoard[row][col] != 'Y') {
+			row++;
+		}
+		testBoard[row][col] = '_';
+		
+	}
+	
+	/*
+	 * retrieve the previous human move on the board
+	 */
+	public void humanCounterMove(int col, char[][] testBoard) {
+		int row = 0;
+		while (row < height && testBoard[row][col] != 'R') {
+			row++;
+		}
+		testBoard[row][col] = '_';
+		
 	}
 }
