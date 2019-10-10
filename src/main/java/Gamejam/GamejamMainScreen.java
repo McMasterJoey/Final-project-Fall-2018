@@ -46,12 +46,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private AccountManager acctMgr;
 	private GameJamViewDatabaseInteractionManager _dbgameconnections;
 	private TicTacToeControllerView tictactoegameview;
-<<<<<<< HEAD
 	private int gameInUseIndex = -1;
 	private GameIconItem[] initgamelist;
-=======
 	private ConnectFourControllerView connectFourGameView;
->>>>>>> bf0bad94f215cc693a081f33ce58c26084bc28d6
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
 	private boolean userisAdmin = false;
@@ -425,6 +422,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * @param name The name field of the button clicked, used to ID it.
 	 */
 	private void gameButtonClick(String name) {
+		this.gameInUseIndex = -1;
 		if (name.equals("Tic-Tac-Toe")) {
 			this.gameInUseIndex = 0;
 			if (userLoggedIn) {
@@ -434,9 +432,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			}
 			this.setCenter(this.tictactoegameview);
 		}
-<<<<<<< HEAD
-		this.gameInUseIndex = -1;
-=======
 		if (name.equals("Connect-Four")) {
 			if(userLoggedIn) {
 				this.setTop(this.initLoggedInInGameBar);
@@ -446,7 +441,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.setCenter(this.connectFourGameView);
 			connectFourGameView.setAlignment(Pos.CENTER);
 		}
->>>>>>> bf0bad94f215cc693a081f33ce58c26084bc28d6
 	}
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
 
