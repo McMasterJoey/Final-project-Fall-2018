@@ -4,6 +4,7 @@ import java.util.Observer;
 
 import connectFour.ConnectFourControllerView;
 
+import java.util.ArrayList;
 import java.util.Observable;
 import controller.AccountManager;
 import controller.GameJamViewDatabaseInteractionManager;
@@ -503,10 +504,11 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			retval[1] = new GameIconItem("Connect-Four", "/connectFourIcon.png", 1);
 			return retval;
 		}
-		GameIconItem[] retval = this._dbgameconnections.fetchAllGameSetUpInfo();
+		ArrayList<GameIconItem> allgames = this._dbgameconnections.fetchAllGameSetUpInfo();
+		GameIconItem[] retval = new GameIconItem[allgames.size()];
 		for(int x = 0; x < retval.length; x++) {
-			System.out.println("gamelist length = " + x);
-			retval[x].setGameID(x);
+			retval[x] = allgames.get(x); // Transfer the arraylist content to the array
+			retval[x].setGameID(x);      // Set the gameid of the value.
 		}
 		return retval;
 	}
@@ -561,8 +563,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private GameJamGameInterface getLoaddedGame() {
 		if (this.gameInUseIndex == 0) {
-			//return this.tictactoegameview;
-			return null;
+			return (GameJamGameInterface) this.tictactoegameview;
+		} else if (this.gameInUseIndex == 1) {
+			return (GameJamGameInterface) this.connectFourGameView;
 		}
 		return null;
 	}

@@ -1,14 +1,16 @@
 package Gamejam;
+
+
 /**
  * Public class, Holds needed data to produce each button that loads each game.
  * 
  * @author Joey McMaster
  *
  */
-public class GameIconItem {
+public class GameIconItem implements Comparable<GameIconItem> {
 	String gamename;
 	String iconfilepath;
-	int gameid;
+	Integer gameid;
 	public GameIconItem(String name, String iconfilepath, int gameid) {
 		this.gamename = name;
 		this.iconfilepath = iconfilepath;
@@ -41,5 +43,14 @@ public class GameIconItem {
 	 */
 	public void setGameID(int gameid) {
 		this.gameid = gameid;
+	}
+	/**
+	 * Allows this object to be sorted using pre-existing Java collections implementations
+	 * @param item, The item to be compared to
+	 * @return The result of the compareTo
+	 */
+	@Override
+	public int compareTo(GameIconItem item) {
+		return gameid.compareTo(item.getGameID());
 	}
 }
