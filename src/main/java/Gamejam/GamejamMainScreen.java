@@ -439,7 +439,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 				this.setTop(this.initCreateAccountMenuBar);
 			}
 			this.setCenter(this.connectFourGameView);
-			connectFourGameView.setAlignment(Pos.CENTER);
+			//connectFourGameView.setAlignment(Pos.CENTER);
 		}
 	}
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////

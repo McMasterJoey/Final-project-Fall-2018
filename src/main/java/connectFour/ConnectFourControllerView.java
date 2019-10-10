@@ -6,8 +6,12 @@ import java.util.Observer;
 import controller.AccountManager;
 import controller.logStatType;
 import javafx.geometry.Pos;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -29,25 +33,32 @@ import ticTacToe.TicTacToeControllerView;
  * @author Wes Rodgers
  *
  */
-public class ConnectFourControllerView extends GridPane implements Observer, GameJamGameInterface {
+public class ConnectFourControllerView extends BorderPane implements Observer, GameJamGameInterface {
 	private ConnectFourModel gameModel;
 	public static final int WIDTH = 600;
 	public static final int HEIGHT = 600;
 	private AudioClip moveSound, winSound, loseSound, tieSound;
 	private AccountManager accountmanager;
 	private StackPane[][] placeholder;
-
+	
+	// Original implemention by Wes has the object extending gridpane, this that grid pane.
+	// Updated version uses a border pane with original grid pane set to its center to add game speific options
+	// Should look and play the exact same way as before.
+	private GridPane _primarypane;
 	/**
 	 * Constructor for the Connect 4 controller-view sets up the board and various
 	 * listeners
 	 */
 	public ConnectFourControllerView() {
+		this.setTop(setUpMenuBar());
 		initializeGame();
 		setupResources();
 		accountmanager = AccountManager.getInstance();
 
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
+		_primarypane.setPrefHeight(HEIGHT);
+		_primarypane.setPrefWidth(WIDTH);
 	}
 
 	/**
@@ -81,6 +92,7 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	 * board to the screen
 	 */
 	private void setupBoard() {
+		_primarypane = new GridPane();
 		placeholder = new StackPane[7][6];
 		for (int row = 0; row < 6; row++) {
 			for (int col = 0; col < 7; col++) {
@@ -90,11 +102,11 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 				circ.setStrokeWidth(1);
 				StackPane spane = new StackPane();
 				spane.getChildren().addAll(rect, circ);
-				this.add(spane, col, row);
+				_primarypane.add(spane, col, row);
 				placeholder[col][row] = spane;
 			}
 		}
-
+		this.setCenter(_primarypane);
 		setupListeners();
 	}
 
@@ -103,13 +115,13 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	 * move
 	 */
 	private void setupListeners() {
-		this.setOnMouseClicked((click) -> {
+		_primarypane.setOnMouseClicked((click) -> {
 			// this finds the offset of the top left corner of the top
 			// left grid so we can accurately determine clicks no matter
 			// how the game is resized without having to write a listener for
 			// each of the columns.
 			moveSound.play();
-			double offset = this.getChildren().get(0).getLayoutX();
+			double offset = _primarypane.getChildren().get(0).getLayoutX();
 			int col = ((int) ((click.getX() - offset) / 100));
 			if (col >= 0 && col < 7 && gameModel.available(col)) {
 				// TODO change to non testing when strategy is implemented.
@@ -122,7 +134,7 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	 * disables the listeners
 	 */
 	private void disableListeners() {
-		this.setOnMouseClicked((click) -> {
+		_primarypane.setOnMouseClicked((click) -> {
 		});
 	}
 
@@ -188,7 +200,11 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	 */
 	public boolean newGame() {
 		try {
-			initializeGame();
+			gameModel.clearBoard();
+			_primarypane = new GridPane();
+			setupBoard();
+			_primarypane.setPrefWidth(WIDTH);
+			_primarypane.setPrefHeight(HEIGHT);
 		} catch (Exception ex) {
 			return false;
 		}
@@ -229,5 +245,34 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 			}
 		}
 	}
-
+	/**
+	 * Sets up the Menubar for the game Tic-tac-toe
+	 * @return The menu bar to be placed at the top of the game's UI.
+	 */
+	private MenuBar setUpMenuBar() {
+		MenuBar bar = new MenuBar();
+		Menu optmenu = new Menu("Connect Four Options");
+		MenuItem newgame = new MenuItem("Start New Game");
+		MenuItem diffhard = new MenuItem("Set diffuclty to Hard");
+		MenuItem diffeasy = new MenuItem("Set diffuclty to Easy");
+		newgame.setOnAction((event) -> { 
+			if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
+				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 1);
+				accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
+			}
+			boolean result = newGame();
+			if (!result) {
+				System.err.println("ERROR on trying to set new Connect 4 game!");
+			}
+		});
+		diffhard.setOnAction((event) -> { 
+			gameModel.setAIStrategy(new ConnectFourHardAI());
+		});
+		diffeasy.setOnAction((event) -> { 
+			gameModel.setAIStrategy(new ConnectFourEasyAI());
+		});
+		optmenu.getItems().addAll(newgame,diffeasy,diffhard);
+		bar.getMenus().addAll(optmenu);
+		return bar;
+	}
 }
