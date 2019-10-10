@@ -1,6 +1,5 @@
 package controller;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -40,7 +39,7 @@ public class GameJamViewDatabaseInteractionManager {
 		ResultSet rs = null;
 		try {
 			rs = DBconnection.executeQuery("SELECT name, iconpath FROM games");
-			if (rs.next()) {
+			while (rs.next()) {
 				GameIconItem game = new GameIconItem(rs.getString("name"), rs.getString("iconpath"), -1);
 				dataset.add(game);
 			}

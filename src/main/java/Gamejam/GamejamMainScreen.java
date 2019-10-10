@@ -1,6 +1,9 @@
 package Gamejam;
 
 import java.util.Observer;
+
+import connectFour.ConnectFourControllerView;
+
 import java.util.Observable;
 import controller.AccountManager;
 import controller.GameJamViewDatabaseInteractionManager;
@@ -20,13 +23,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import model.GameJamGameInterface;
 import model.SanityCheckFailedException;
-import view.TicTacToeControllerView;
+import ticTacToe.TicTacToeControllerView;
 
 /**
  * The MainScreen view. Should be the first thing that pops up when loading the
  * application Should be what is returned to after closing a game.
  * 
  * @author Joey McMaster
+ * @author Wes Rodgers
  *
  */
 public class GamejamMainScreen extends BorderPane implements Observer {
@@ -42,12 +46,16 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private AccountManager acctMgr;
 	private GameJamViewDatabaseInteractionManager _dbgameconnections;
 	private TicTacToeControllerView tictactoegameview;
+<<<<<<< HEAD
 	private int gameInUseIndex = -1;
 	private GameIconItem[] initgamelist;
+=======
+	private ConnectFourControllerView connectFourGameView;
+>>>>>>> bf0bad94f215cc693a081f33ce58c26084bc28d6
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
 	private boolean userisAdmin = false;
-	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
+	private boolean DEBUG_FakeDatabase = true; // REMOVE WHEN DONE
 	public GamejamMainScreen() {
 		super();
 		init();
@@ -76,6 +84,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		
 		// Set up Game Views
 		this.tictactoegameview = new TicTacToeControllerView();
+		this.connectFourGameView = new ConnectFourControllerView();
 		
 		// Set currently in user views
 		this.setTop(this.initTopBar);
@@ -425,7 +434,19 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			}
 			this.setCenter(this.tictactoegameview);
 		}
+<<<<<<< HEAD
 		this.gameInUseIndex = -1;
+=======
+		if (name.equals("Connect-Four")) {
+			if(userLoggedIn) {
+				this.setTop(this.initLoggedInInGameBar);
+			} else {
+				this.setTop(this.initCreateAccountMenuBar);
+			}
+			this.setCenter(this.connectFourGameView);
+			connectFourGameView.setAlignment(Pos.CENTER);
+		}
+>>>>>>> bf0bad94f215cc693a081f33ce58c26084bc28d6
 	}
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
 
@@ -482,12 +503,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private GameIconItem[] getGameList() {
 		if (this.DEBUG_FakeDatabase) {
-			GameIconItem[] retval = new GameIconItem[1];
+			GameIconItem[] retval = new GameIconItem[2];
 			retval[0] = new GameIconItem("Tic-Tac-Toe", "/tictactoeicon.png", 0);
+			retval[1] = new GameIconItem("Connect-Four", "/connectFourIcon.png", 1);
 			return retval;
 		}
 		GameIconItem[] retval = this._dbgameconnections.fetchAllGameSetUpInfo();
 		for(int x = 0; x < retval.length; x++) {
+			System.out.println("gamelist length = " + x);
 			retval[x].setGameID(x);
 		}
 		return retval;

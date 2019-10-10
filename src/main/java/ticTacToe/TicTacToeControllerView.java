@@ -1,12 +1,10 @@
-package view;
+package ticTacToe;
 
 import java.util.Observable;
 import java.util.Observer;
 
 import controller.AccountManager;
 import controller.logStatType;
-
-import java.awt.Point;
 
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
@@ -15,8 +13,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.AudioClip;
-import model.EasyAI;
-import model.TicTacToeModel;
+import model.GameJamGameInterface;
 
 /**
  * Provides a GUI view and the listeners required for players to make Tic Tac
@@ -25,7 +22,7 @@ import model.TicTacToeModel;
  * @author Wes Rodgers
  *
  */
-public class TicTacToeControllerView extends GridPane implements Observer {
+public class TicTacToeControllerView extends GridPane implements Observer, GameJamGameInterface {
 
 	private TicTacToeModel gameModel;
 	public static final int WIDTH = 600;
@@ -38,22 +35,14 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 	private AudioClip tieSound;
 	private BorderPane[][] placeholder;
 	private AccountManager accountmanager;
+
 	public TicTacToeControllerView() {
-		gameModel = new TicTacToeModel();
-		gameModel.setAIStrategy(new EasyAI());
 		initializeGame();
+		setupResources();
 		accountmanager = AccountManager.getInstance();
-	}
 
-	/**
-	 * Overridden constructor for loading specific models into the controller view
-	 * 
-	 * @param ticTacToeModel the model of the game that we want to load
-	 */
-	public TicTacToeControllerView(TicTacToeModel ticTacToeModel) {
-		// TODO stub for loading game from a particular model
-		initializeGame();
-
+		this.setWidth(WIDTH);
+		this.setHeight(HEIGHT);
 	}
 
 	/**
@@ -61,10 +50,13 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 	 * listeners.
 	 */
 	private void initializeGame() {
-		gameModel.addObserver(this);
-		this.setWidth(WIDTH);
-		this.setHeight(HEIGHT);
-		setupResources();
+		if (gameModel == null) {
+			gameModel = new TicTacToeModel();
+			gameModel.setAIStrategy(new IntermediateAI());
+			gameModel.addObserver(this);
+		} else {
+			gameModel.clearBoard();
+		}
 		setupBoard();
 	}
 
@@ -74,10 +66,10 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 	private void setupResources() {
 		xImage = new Image(TicTacToeControllerView.class.getResource("/letterX.png").toString());
 		yImage = new Image(TicTacToeControllerView.class.getResource("/letterO.png").toString());
-		moveSound = new AudioClip(TicTacToeControllerView.class.getResource("/ticTacToeMove.mp3").toString());
-		winSound = new AudioClip(TicTacToeControllerView.class.getResource("/ticTacToeWin.mp3").toString());
-		loseSound = new AudioClip(TicTacToeControllerView.class.getResource("/ticTacToeLose.mp3").toString());
-		tieSound = new AudioClip(TicTacToeControllerView.class.getResource("/ticTacToeTie.mp3").toString());
+		moveSound = new AudioClip(TicTacToeControllerView.class.getResource("/moveSound.mp3").toString());
+		winSound = new AudioClip(TicTacToeControllerView.class.getResource("/winSound.mp3").toString());
+		loseSound = new AudioClip(TicTacToeControllerView.class.getResource("/loseSound.mp3").toString());
+		tieSound = new AudioClip(TicTacToeControllerView.class.getResource("/tieSound.mp3").toString());
 	}
 
 	/**
@@ -86,11 +78,7 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 	 */
 	private void setupBoard() {
 		placeholder = new BorderPane[3][3];
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
 
-			}
-		}
 		// we had to change this entirely when we swapped away from canvas.
 		// I tried to do all of this in a DRY manner but looping through made it
 		// difficult
@@ -199,6 +187,18 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 	}
 
 	/**
+	 * this just clears all listeners from the board
+	 */
+	private void disableListeners() {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				placeholder[i][j].setOnMouseClicked((click) -> {
+				});
+			}
+		}
+	}
+
+	/**
 	 * When the board changes and notifies this observer, clear the graphics context
 	 * and redraw it.
 	 */
@@ -226,8 +226,7 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
 			accountmanager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
 			tieSound.play();
-		}
-		else if (gameModel.won('X') || gameModel.won('O')) {
+		} else if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
 				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
 				accountmanager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1);
@@ -237,29 +236,63 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 				accountmanager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1);
 				loseSound.play();
 			}
-			String winningDirection = gameModel.getWinningDirection();
-			Point[] winningSquares = gameModel.getWinningSquares(winningDirection);
-			// gc.setStroke(Color.BLUE);
 
-			switch (winningDirection) {
-			case "horizontal":
-				// gc.strokeLine(0, winningSquares[0].x*200+100, 600,
-				// winningSquares[2].x*200+100);
-				break;
-			case "vertical":
-				// gc.strokeLine(winningSquares[0].y*200+100, 0, winningSquares[2].y*200+100,
-				// 600);
-				break;
-			case "diagonal":
-				if (winningSquares[0].x == 0) {
-					// gc.strokeLine(0, 0, 600, 600);
-				} else {
-					// gc.strokeLine(0, 600, 600, 0);
-				}
-				break;
-			}
-			// gc.setStroke(Color.BLACK);
+			/*
+			 * *****Old code to figure out a stroke for the winning row/col/diagonal****
+			 * String winningDirection = gameModel.getWinningDirection(); Point[]
+			 * winningSquares = gameModel.getWinningSquares(winningDirection);
+			 * gc.setStroke(Color.BLUE);
+			 * 
+			 * switch (winningDirection) { case "horizontal": gc.strokeLine(0,
+			 * winningSquares[0].x*200+100, 600, winningSquares[2].x*200+100); break; case
+			 * "vertical": gc.strokeLine(winningSquares[0].y*200+100, 0,
+			 * winningSquares[2].y*200+100, 600); break; case "diagonal": if
+			 * (winningSquares[0].x == 0) { gc.strokeLine(0, 0, 600, 600); } else {
+			 * gc.strokeLine(0, 600, 600, 0); } break; } gc.setStroke(Color.BLACK);
+			 */
 		}
+	}
+
+	@Override
+	public boolean loadSaveGame(String filepath) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean saveGame(String filepath) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean pauseGame() {
+		try {
+			disableListeners();
+		} catch (Exception ex) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean unPauseGame() {
+		try {
+			setupListeners();
+		} catch (Exception ex) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean newGame() {
+		try {
+			initializeGame();
+		} catch (Exception ex) {
+			return false;
+		}
+		return true;
 	}
 
 }
