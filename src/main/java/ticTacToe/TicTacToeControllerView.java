@@ -7,6 +7,9 @@ import controller.AccountManager;
 import controller.logStatType;
 
 import javafx.geometry.Pos;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -19,10 +22,10 @@ import model.GameJamGameInterface;
  * Provides a GUI view and the listeners required for players to make Tic Tac
  * Toe moves with mouse clicks.
  * 
- * @author Wes Rodgers
+ * @author Wes Rodgers, Joey McMaster
  *
  */
-public class TicTacToeControllerView extends GridPane implements Observer, GameJamGameInterface {
+public class TicTacToeControllerView extends BorderPane implements Observer, GameJamGameInterface {
 
 	private TicTacToeModel gameModel;
 	public static final int WIDTH = 600;
@@ -35,14 +38,20 @@ public class TicTacToeControllerView extends GridPane implements Observer, GameJ
 	private AudioClip tieSound;
 	private BorderPane[][] placeholder;
 	private AccountManager accountmanager;
-
+	// Original implemention by Wes has the object extending gridpane, this that grid pane.
+	// Updated version uses a border pane with original grid pane set to its center to add game speific options
+	// Should look and play the exact same way as before.
+	private GridPane _primarypane;
 	public TicTacToeControllerView() {
+		_primarypane = new GridPane();
 		initializeGame();
 		setupResources();
+		this.setTop(setUpMenuBar());
 		accountmanager = AccountManager.getInstance();
-
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
+		_primarypane.setPrefWidth(WIDTH);
+		_primarypane.setPrefHeight(HEIGHT);
 	}
 
 	/**
@@ -85,61 +94,63 @@ public class TicTacToeControllerView extends GridPane implements Observer, GameJ
 		// to properly set up the listeners, and since it was a last second fix I didn't
 		// have time to figure out a more elegant method than this.
 
-		this.setAlignment(Pos.CENTER);
+		_primarypane.setAlignment(Pos.CENTER);
 		topLeft = new BorderPane();
 		topLeft.setStyle("-fx-border-color : white black black white; -fx-border-width : 2");
 		topLeft.setPrefSize(200, 200);
-		this.add(topLeft, 0, 0);
+		_primarypane.add(topLeft, 0, 0);
 		placeholder[0][0] = topLeft;
 
 		midLeft = new BorderPane();
 		midLeft.setStyle("-fx-border-color : black black black white; -fx-border-width : 2");
 		midLeft.setPrefSize(200, 200);
-		this.add(midLeft, 0, 1);
+		_primarypane.add(midLeft, 0, 1);
 		placeholder[0][1] = midLeft;
 
 		botLeft = new BorderPane();
 		botLeft.setStyle("-fx-border-color : black black white white; -fx-border-width : 2");
 		botLeft.setPrefSize(200, 200);
-		this.add(botLeft, 0, 2);
+		_primarypane.add(botLeft, 0, 2);
 		placeholder[0][2] = botLeft;
 
 		topCenter = new BorderPane();
 		topCenter.setStyle("-fx-border-color : white black black black; -fx-border-width : 2");
 		topCenter.setPrefSize(200, 200);
-		this.add(topCenter, 1, 0);
+		_primarypane.add(topCenter, 1, 0);
 		placeholder[1][0] = topCenter;
 
 		midCenter = new BorderPane();
 		midCenter.setStyle("-fx-border-color : black black black black; -fx-border-width : 2");
 		midCenter.setPrefSize(200, 200);
-		this.add(midCenter, 1, 1);
+		_primarypane.add(midCenter, 1, 1);
 		placeholder[1][1] = midCenter;
 
 		botCenter = new BorderPane();
 		botCenter.setStyle("-fx-border-color : black black white black; -fx-border-width : 2");
 		botCenter.setPrefSize(200, 200);
-		this.add(botCenter, 1, 2);
+		_primarypane.add(botCenter, 1, 2);
 		placeholder[1][2] = botCenter;
 
 		topRight = new BorderPane();
 		topRight.setStyle("-fx-border-color : white white black black; -fx-border-width : 2");
 		topRight.setPrefSize(200, 200);
-		this.add(topRight, 2, 0);
+		_primarypane.add(topRight, 2, 0);
 		placeholder[2][0] = topRight;
 
 		midRight = new BorderPane();
 		midRight.setStyle("-fx-border-color : black white black black; -fx-border-width : 2");
 		midRight.setPrefSize(200, 200);
-		this.add(midRight, 2, 1);
+		_primarypane.add(midRight, 2, 1);
 		placeholder[2][1] = midRight;
 
 		botRight = new BorderPane();
 		botRight.setStyle("-fx-border-color : black white white black; -fx-border-width : 2");
 		botRight.setPrefSize(200, 200);
-		this.add(botRight, 2, 2);
+		_primarypane.add(botRight, 2, 2);
 		placeholder[2][2] = botRight;
 
+		
+		this.setCenter(this._primarypane);
 		setupListeners();
 
 	}
@@ -216,8 +227,8 @@ public class TicTacToeControllerView extends GridPane implements Observer, GameJ
 					HBox box = new HBox();
 					box.getChildren().add(imageView);
 					box.setStyle(placeholder[j][i].getStyle());
-					this.getChildren().remove(placeholder[j][i]);
-					this.add(box, j, i);
+					_primarypane.getChildren().remove(placeholder[j][i]);
+					_primarypane.add(box, j, i);
 				}
 			}
 		}
@@ -288,11 +299,36 @@ public class TicTacToeControllerView extends GridPane implements Observer, GameJ
 	@Override
 	public boolean newGame() {
 		try {
-			initializeGame();
+			gameModel.clearBoard();
+			_primarypane = new GridPane();
+			setupBoard();
+			_primarypane.setPrefWidth(WIDTH);
+			_primarypane.setPrefHeight(HEIGHT);
 		} catch (Exception ex) {
 			return false;
 		}
 		return true;
 	}
-
+	/**
+	 * Sets up the Menubar for the game Tic-tac-toe
+	 * @return The menu bar to be placed at the top of the game's UI.
+	 */
+	private MenuBar setUpMenuBar() {
+		MenuBar bar = new MenuBar();
+		Menu optmenu = new Menu("Tic-Tac-Toe Options");
+		MenuItem newgame = new MenuItem("Start New Game");
+		newgame.setOnAction((event) -> { 
+			if (!(gameModel.won('X') || gameModel.won('O')) && gameModel.maxMovesRemaining() > 0) {
+				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+				accountmanager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+			}
+			boolean result = newGame();
+			if (!result) {
+				System.err.println("ERROR on trying to set new tic-tac-toe game!");
+			}
+		});
+		optmenu.getItems().addAll(newgame);
+		bar.getMenus().addAll(optmenu);
+		return bar;
+	}
 }

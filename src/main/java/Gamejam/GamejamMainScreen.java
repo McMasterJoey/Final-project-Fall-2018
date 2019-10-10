@@ -292,10 +292,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private GridPane initGamePanel() {
 		GridPane grid = new GridPane();
-		grid.getColumnConstraints().add(new ColumnConstraints(260));
-		grid.getColumnConstraints().add(new ColumnConstraints(260));
-		grid.getColumnConstraints().add(new ColumnConstraints(260));
-		grid.getColumnConstraints().add(new ColumnConstraints(260));
+		grid.getColumnConstraints().add(new ColumnConstraints(272));
+		grid.getColumnConstraints().add(new ColumnConstraints(272));
+		grid.getColumnConstraints().add(new ColumnConstraints(272));
+		grid.getColumnConstraints().add(new ColumnConstraints(272));
 		this.initgamelist = getGameList();
 		for (int x = 0; x < this.initgamelist.length; x++) {
 			// Sanity check
@@ -362,9 +362,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		PasswordField password = (PasswordField) this.initTopBar.getChildren().get(2);
 		boolean successful = doLogin(username.getText(), password.getText());
 		if (successful) {
-			// TODO: Update the Left with statistics
-			System.out.println("Login successful\n");
-			userLoggedIn = true;
+			this.userLoggedIn = true;
 			this.loggedinusername = username.getText();
 			UpdateLoggedInBarsWithUserNameOfCurrentUser();
 			this.setTop(this.initLoggedInBar);
