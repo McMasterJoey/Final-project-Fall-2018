@@ -52,7 +52,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
 	private boolean userisAdmin = false;
-	private boolean DEBUG_FakeDatabase = true; // REMOVE WHEN DONE
+	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
 	public GamejamMainScreen() {
 		super();
 		init();
@@ -368,8 +368,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			UpdateLoggedInBarsWithUserNameOfCurrentUser();
 			this.setTop(this.initLoggedInBar);
 		} else {
-			// TODO: Handle unsuccessful login
-			System.out.println("Invalid username or password\n");
+			username.setPromptText("Invalid username or password");
+			username.setText("");
+			password.setText("");
 		}
 		
 		//updateLeftPane();

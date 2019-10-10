@@ -4,6 +4,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import controller.AccountManager;
+import controller.logStatType;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -130,7 +131,7 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	 * saves the game to the given filepath
 	 * 
 	 * @param filepath the name of the file we want to save
-	 * @return true if the save was succesful, false otherwise
+	 * @return true if the save was successful, false otherwise
 	 */
 	public boolean saveGame(String filepath) {
 		// TODO Auto-generated method stub
@@ -142,7 +143,7 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	 * loads a saved game from the given filepath
 	 * 
 	 * @param filepath the location from which to load the game
-	 * @return true if the load was succesful, false otherwise
+	 * @return true if the load was successful, false otherwise
 	 */
 	public boolean loadSaveGame(String filepath) {
 		// TODO Auto-generated method stub
@@ -183,7 +184,7 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	/**
 	 * creates a new game
 	 * 
-	 * @return true if the new game was started succesfully, false otherwise
+	 * @return true if the new game was started successfully, false otherwise
 	 */
 	public boolean newGame() {
 		try {
@@ -207,20 +208,23 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 			}
 		}
 		
-		System.out.println("--------------");
-		System.out.println(gameModel.toString());
-		System.out.println("--------------");
+		//System.out.println("--------------");
+		//System.out.println(gameModel.toString());
+		//System.out.println("--------------");
 		
 		if (gameModel.tied()) {
-			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 2, 1);
+			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
+			accountmanager.logGameStat("Connect-Four", logStatType.TIE, 0);
 			tieSound.play();
 		} else if (gameModel.won('R') || gameModel.won('Y')) {
 			disableListeners();
 			if (gameModel.won('R')) {
-				accountmanager.logGlobalStat(true, "Connect-Four", 0, 1);
+				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
+				accountmanager.logGameStat("Connect-Four", logStatType.WIN, 0);
 				winSound.play();
 			} else {
-				accountmanager.logGlobalStat(true, "Connect-Four", 1, 1);
+				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
+				accountmanager.logGameStat("Connect-Four", logStatType.LOSS, 0);
 				loseSound.play();
 			}
 		}
