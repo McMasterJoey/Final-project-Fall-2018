@@ -169,8 +169,12 @@ public class ConnectFourMVCTest {
 		m.humanMove(3, true);
 
 		/*
-		 * _ _ _ _ _ _ _ _ _ _ _ _ _ _ R _ _ _ _ _ _ Y R _ _ _ _ _ Y Y R _ _ _ _ Y Y Y R
-		 * _ _ _
+		 * _ _ _ _ _ _ _ 
+		 * _ _ _ _ _ _ _ 
+		 * R _ _ _ _ _ _ 
+		 * Y R _ _ _ _ _ 
+		 * Y Y R _ _ _ _ 
+		 * Y Y Y R		 * _ _ _
 		 */
 		assertTrue(m.won('R'));
 		assertFalse(m.won('Y'));
@@ -193,12 +197,46 @@ public class ConnectFourMVCTest {
 		m.humanMove(3, true);
 
 		/*
-		 * _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ R _ _ _ _ _ R Y _ _ _ _ R Y Y _ _ _ R
-		 * Y Y Y
+		 * _ _ _ _ _ _ _ 
+		 * _ _ _ _ _ _ _ 
+		 * _ _ _ _ _ _ R 
+		 * _ _ _ _ _ R Y 
+		 * _ _ _ _ R Y Y 
+		 * _ _ _ R Y Y Y
 		 */
 
 		assertTrue(m.won('R'));
 		assertFalse(m.won('Y'));
 		assertFalse(m.isStillRunning());
+	}
+	
+	@Test
+	public void testDiags() {
+		ConnectFourModel m = new ConnectFourModel();
+		char[][] board = m.getBoard();
+		m.humanMove(0, true);
+		m.computerMove(1);
+		m.humanMove(1, true);
+		m.computerMove(1);
+		m.computerMove(2);
+		m.computerMove(2);
+		m.humanMove(2, true);
+		m.computerMove(3);
+		m.humanMove(3, true);
+		m.computerMove(3);
+		m.humanMove(4, true);
+		m.computerMove(4);
+		m.computerMove(4);
+		m.humanMove(4, true);
+		m.computerMove(4);
+		m.humanMove(5, true);
+		assertTrue(m.isStillRunning());
+		m.humanMove(3, true);
+		assertEquals(board[5][0], 'R');
+		assertEquals(board[4][1], 'R');
+		assertEquals(board[3][2], 'R');
+		assertEquals(board[2][3], 'R');
+		assertFalse(m.isStillRunning());
+		assertTrue(m.won('R'));
 	}
 }
