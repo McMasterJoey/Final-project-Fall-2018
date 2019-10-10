@@ -1,10 +1,9 @@
 package ticTacToe;
 
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-import connectFour.ConnectFourEasyAI;
-import connectFour.ConnectFourHardAI;
 import controller.AccountManager;
 import controller.logStatType;
 
@@ -302,15 +301,22 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 	public boolean newGame() {
 		try {
 			gameModel.clearBoard();
-			_primarypane = new GridPane();
+			clearView();
 			setupBoard();
-			_primarypane.setPrefWidth(WIDTH);
-			_primarypane.setPrefHeight(HEIGHT);
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			return false;
 		}
 		return true;
 	}
+	private void clearView() {		
+		ArrayList<Object> al = new ArrayList<Object>();
+		for(Object o : _primarypane.getChildren()) {
+			al.add(o);
+		}
+		_primarypane.getChildren().removeAll(al);		
+	}
+
 	/**
 	 * Sets up the Menubar for the game Tic-tac-toe
 	 * @return The menu bar to be placed at the top of the game's UI.

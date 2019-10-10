@@ -5,16 +5,11 @@ import java.util.Observer;
 
 import controller.AccountManager;
 import controller.logStatType;
-import javafx.geometry.Pos;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
@@ -201,10 +196,7 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 	public boolean newGame() {
 		try {
 			gameModel.clearBoard();
-			_primarypane = new GridPane();
 			setupBoard();
-			_primarypane.setPrefWidth(WIDTH);
-			_primarypane.setPrefHeight(HEIGHT);
 		} catch (Exception ex) {
 			return false;
 		}

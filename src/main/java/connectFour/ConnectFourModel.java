@@ -453,8 +453,13 @@ public class ConnectFourModel extends Observable implements Serializable {
 		// check top left to bottom right diagonals
 
 				/*
-				 * this loop checks these spots x _ _ _ _ _ _ x x _ _ _ _ _ x x x _ _ _ _ _ x x
-				 * x _ _ _ _ _ x x x _ _ _ _ _ x x x _
+				 * this loop checks these spots 
+				 * x _ _ _ _ _ _ 
+				 * x x _ _ _ _ _ 
+				 * x x x _ _ _ _ 
+				 * _ x x x _ _ _ 
+				 * _ _ x x x _ _ 
+				 * _ _ _ x x x _
 				 */
 				for (int i = 0; i < height - 3; i++) {
 					int numSame = 0;
@@ -475,8 +480,13 @@ public class ConnectFourModel extends Observable implements Serializable {
 				}
 
 				/*
-				 * this loop checks these spots x x x x _ _ _ _ x x x x _ _ _ _ x x x x _ _ _ _
-				 * x x x x _ _ _ _ x x x _ _ _ _ _ x x
+				 * this loop checks these spots 
+				 * x x x x _ _ _ 
+				 * _ x x x x _ _ 
+				 * _ _ x x x x _ 
+				 * _ _ _ x x x x 
+				 * _ _ _ _ x x x 
+				 * _ _ _ _ _ x x
 				 */
 				for (int i = 0; i < width - 3; i++) {
 					int numSame = 0;
@@ -499,8 +509,13 @@ public class ConnectFourModel extends Observable implements Serializable {
 				// now check on the bottom left to top right diagonals
 
 				/*
-				 * This loop checks these spots _ _ _ x x x x _ _ x x x x _ _ x x x x _ _ x x x
-				 * x _ _ _ x x x _ _ _ _ x x _ _ _ _ _
+				 * This loop checks these spots 
+				 * _ _ _ x x x x 
+				 * _ _ x x x x _ 
+				 * _ x x x x _ _ 
+				 * x x x x _ _ _ 
+				 * x x x _ _ _ _ 
+				 * x x _ _ _ _ _
 				 */
 				for (int i = width - 1; i > 2; i--) {
 					int numSame = 0;
@@ -521,8 +536,13 @@ public class ConnectFourModel extends Observable implements Serializable {
 				}
 
 				/*
-				 * This loop checks these spots _ _ _ _ _ _ x _ _ _ _ _ x x _ _ _ _ x x x _ _ _
-				 * x x x _ _ _ x x x _ _ _ x x x _ _ _
+				 * This loop checks these spots 
+				 * _ _ _ _ _ _ x 
+				 * _ _ _ _ _ x x 
+				 * _ _ _ _ x x x 
+				 * _ _ _ x x x _ 
+				 * _ _ x x x _ _ 
+				 * _ x x x _ _ _
 				 */
 				for (int i = 0; i < height - 3; i++) {
 					int numSame = 0;
