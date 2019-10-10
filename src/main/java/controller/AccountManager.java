@@ -81,12 +81,12 @@ public class AccountManager extends Observable {
 	 * Logs a game played for the given user
 	 * 
 	 * @param game The name of the game that was played
-	 * @param stattype [Unused atm, may remove arg]
-	 * @param value The value to set the stat to.
+	 * @param stattype The result of the game.
+	 * @param time The ammout of time that elasped the game [Unimplemented]
 	 */
-	public void logGameStat(String game, int stattype, int value) {
+	public void logGameStat(String game, int stattype, int time) {
 		// Arg Check
-		if (stattype < 0 || stattype > 4 || value < 0) {
+		if (stattype < 0 || stattype > 4 || time < 0) {
 			throw new IllegalArgumentException("Invalid stattype was out of range or value was below 0.");
 		}
 		if (this.isGuest) {
@@ -97,7 +97,7 @@ public class AccountManager extends Observable {
 		ResultSet rs = null;
 		try {
 			int gameid = getGameIdFromString(game);
-			conn.execute("insert into gamelog(accountid,gameid,result) values(?,?,?)", this.dataBaseUserId, gameid, value);
+			conn.execute("insert into gamelog(accountid,gameid,result) values(?,?,?)", this.dataBaseUserId, gameid, stattype);
 			
 		} catch (SQLException se) {
 			se.printStackTrace();
