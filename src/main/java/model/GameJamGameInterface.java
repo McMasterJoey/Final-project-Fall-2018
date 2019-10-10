@@ -16,8 +16,7 @@ public interface GameJamGameInterface {
 	public boolean unPauseGame();
 	// Starts a new game, overrides current save game.
 	public boolean newGame();
-	
-	// All methods return true of false
+	// All methods return true or false
 	// Returning true indicates the action was a success
 	// Returning false indicates the action failed or is unimplemented.
 }

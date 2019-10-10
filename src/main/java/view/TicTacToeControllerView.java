@@ -4,6 +4,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import controller.AccountManager;
+import controller.logStatType;
 
 import java.awt.Point;
 
@@ -222,15 +223,18 @@ public class TicTacToeControllerView extends GridPane implements Observer {
 		}
 		System.out.println(gameModel.toString());
 		if (gameModel.tied()) {
-			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 2, 1);
+			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
+			accountmanager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
 			tieSound.play();
 		}
 		else if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
-				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 0, 1);
+				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
+				accountmanager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1);
 				winSound.play();
 			} else {
-				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 1, 1);
+				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
+				accountmanager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1);
 				loseSound.play();
 			}
 			String winningDirection = gameModel.getWinningDirection();
