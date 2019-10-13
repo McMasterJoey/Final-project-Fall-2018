@@ -1,5 +1,6 @@
 package connectFour;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -177,11 +178,13 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 		FileInputStream fis;
 		ObjectInputStream ois;
 		try {
-			fis = new FileInputStream(filepath);
+			File file = new File(filepath);
+			fis = new FileInputStream(file);
 			ois = new ObjectInputStream(fis);
 			gameModel = (ConnectFourModel) ois.readObject();
 			ois.close();
 			update(gameModel, this);
+			file.delete();
 		} catch(IOException | ClassNotFoundException e) {
 			return false;
 		}
