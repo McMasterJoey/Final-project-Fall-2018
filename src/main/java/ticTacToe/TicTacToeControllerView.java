@@ -1,5 +1,10 @@
 package ticTacToe;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -43,6 +48,8 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 	// Updated version uses a border pane with original grid pane set to its center to add game speific options
 	// Should look and play the exact same way as before.
 	private GridPane _primarypane;
+	private String gameName = "tic-tac-toe";
+	
 	public TicTacToeControllerView() {
 		_primarypane = new GridPane();
 		initializeGame();
@@ -263,18 +270,56 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 			 * gc.strokeLine(0, 600, 600, 0); } break; } gc.setStroke(Color.BLACK);
 			 */
 		}
+		System.out.println("current directory = " + System.getProperty("user.dir"));
 	}
 
 	@Override
-	public boolean loadSaveGame(String filepath) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
+	/**
+	 * saves the game to the given filepath
+	 * 
+	 * @param filepath the name of the file we want to save
+	 * @return true if the save was successful, false otherwise
+	 */
 	public boolean saveGame(String filepath) {
-		// TODO Auto-generated method stub
-		return false;
+		if(accountmanager.isGuest()) {
+			return false;
+		}
+		FileOutputStream fos;
+		ObjectOutputStream oos;
+		try {
+			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
+			String sep = System.getProperty("file.separator");
+			fos = new FileOutputStream(System.getProperty("user.dir") + sep + "save-data" + sep + fname);			
+			oos = new ObjectOutputStream(fos);
+			oos.writeObject(gameModel);
+			oos.close();
+		} catch (IOException e) {
+			return false;
+		}
+		
+		return true;
+	}
+
+	@Override
+	/**
+	 * loads a saved game from the given filepath
+	 * 
+	 * @param filepath the location from which to load the game
+	 * @return true if the load was successful, false otherwise
+	 */
+	public boolean loadSaveGame(String filepath) {
+		FileInputStream fis;
+		ObjectInputStream ois;
+		try {
+			fis = new FileInputStream(filepath);
+			ois = new ObjectInputStream(fis);
+			gameModel = (TicTacToeModel) ois.readObject();
+			ois.close();
+			update(gameModel, this);
+		} catch(IOException | ClassNotFoundException e) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override

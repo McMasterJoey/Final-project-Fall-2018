@@ -1,5 +1,10 @@
 package connectFour;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -35,6 +40,7 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 	private AudioClip moveSound, winSound, loseSound, tieSound;
 	private AccountManager accountmanager;
 	private StackPane[][] placeholder;
+	private String gameName = "connect-four";
 	
 	// Original implemention by Wes has the object extending gridpane, this that grid pane.
 	// Updated version uses a border pane with original grid pane set to its center to add game speific options
@@ -141,8 +147,23 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 	 * @return true if the save was successful, false otherwise
 	 */
 	public boolean saveGame(String filepath) {
-		// TODO Auto-generated method stub
-		return false;
+		if(accountmanager.isGuest()) {
+			return false;
+		}
+		FileOutputStream fos;
+		ObjectOutputStream oos;
+		try {
+			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
+			String sep = System.getProperty("file.separator");
+			fos = new FileOutputStream(System.getProperty("user.dir") + sep + "save-data" + sep + fname);			
+			oos = new ObjectOutputStream(fos);
+			oos.writeObject(gameModel);
+			oos.close();
+		} catch (IOException e) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	@Override
@@ -153,8 +174,18 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 	 * @return true if the load was successful, false otherwise
 	 */
 	public boolean loadSaveGame(String filepath) {
-		// TODO Auto-generated method stub
-		return false;
+		FileInputStream fis;
+		ObjectInputStream ois;
+		try {
+			fis = new FileInputStream(filepath);
+			ois = new ObjectInputStream(fis);
+			gameModel = (ConnectFourModel) ois.readObject();
+			ois.close();
+			update(gameModel, this);
+		} catch(IOException | ClassNotFoundException e) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
