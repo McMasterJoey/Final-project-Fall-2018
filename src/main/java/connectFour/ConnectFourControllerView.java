@@ -257,28 +257,56 @@ public class ConnectFourControllerView extends GameControllerView {
 		//System.out.println("--------------");
 		
 		if (gameModel.tied()) {
-			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
-			accountmanager.logGameStat("Connect-Four", logStatType.TIE, 0);
+			//accountmanager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
+			//accountmanager.logGameStat("Connect-Four", logStatType.TIE, 0);
 			tieSound.play();
 		} else if (gameModel.won('R') || gameModel.won('Y')) {
 			disableListeners();
 			if (gameModel.won('R')) {
-				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
-				accountmanager.logGameStat("Connect-Four", logStatType.WIN, 0);
+				//accountmanager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
+				//accountmanager.logGameStat("Connect-Four", logStatType.WIN, 0);
 				winSound.play();
 			} else {
-				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
-				accountmanager.logGameStat("Connect-Four", logStatType.LOSS, 0);
+				//accountmanager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
+				//accountmanager.logGameStat("Connect-Four", logStatType.LOSS, 0);
 				loseSound.play();
 			}
 		}
 	}
-
 	@Override
 	protected void updateStatistics() {
 		if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
 			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 1);
 			accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
 		}		
+	/**
+	 * Sets up the Menubar for the game Tic-tac-toe
+	 * @return The menu bar to be placed at the top of the game's UI.
+	 */
+	private MenuBar setUpMenuBar() {
+		MenuBar bar = new MenuBar();
+		Menu optmenu = new Menu("Connect Four Options");
+		MenuItem newgame = new MenuItem("Start New Game");
+		MenuItem diffhard = new MenuItem("Set diffuclty to Hard");
+		MenuItem diffeasy = new MenuItem("Set diffuclty to Easy");
+		newgame.setOnAction((event) -> { 
+			if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
+				//accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 1);
+				//accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
+			}
+			boolean result = newGame();
+			if (!result) {
+				System.err.println("ERROR on trying to set new Connect 4 game!");
+			}
+		});
+		diffhard.setOnAction((event) -> { 
+			gameModel.setAIStrategy(new ConnectFourHardAI());
+		});
+		diffeasy.setOnAction((event) -> { 
+			gameModel.setAIStrategy(new ConnectFourEasyAI());
+		});
+		optmenu.getItems().addAll(newgame,diffeasy,diffhard);
+		bar.getMenus().addAll(optmenu);
+		return bar;
 	}
 }

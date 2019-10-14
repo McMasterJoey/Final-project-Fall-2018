@@ -253,17 +253,17 @@ public class TicTacToeControllerView extends GameControllerView {
 		System.out.println("----------");
 		
 		if (gameModel.tied()) {
-			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
-			accountmanager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
+			//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
+			//accountmanager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
 			tieSound.play();
 		} else if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
-				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
-				accountmanager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1);
+				//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
+				//accountmanager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1);
 				winSound.play();
 			} else {
-				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
-				accountmanager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1);
+				//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
+				//accountmanager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1);
 				loseSound.play();
 			}
 
@@ -388,6 +388,34 @@ public class TicTacToeControllerView extends GameControllerView {
 			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
 			accountmanager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
 		}
-		
+	/**
+	 * Sets up the Menubar for the game Tic-tac-toe
+	 * @return The menu bar to be placed at the top of the game's UI.
+	 */
+	private MenuBar setUpMenuBar() {
+		MenuBar bar = new MenuBar();
+		Menu optmenu = new Menu("Tic-Tac-Toe Options");
+		MenuItem newgame = new MenuItem("Start New Game");
+		MenuItem diffinter = new MenuItem("Set diffuclty to Intermediate");
+		MenuItem diffeasy = new MenuItem("Set diffuclty to Easy");
+		newgame.setOnAction((event) -> { 
+			if (!(gameModel.won('X') || gameModel.won('O')) && gameModel.maxMovesRemaining() > 0) {
+				//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+				//accountmanager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+			}
+			boolean result = newGame();
+			if (!result) {
+				System.err.println("ERROR on trying to set new tic-tac-toe game!");
+			}
+		});
+		diffinter.setOnAction((event) -> { 
+			gameModel.setAIStrategy(new IntermediateAI());
+		});
+		diffeasy.setOnAction((event) -> { 
+			gameModel.setAIStrategy(new EasyAI());
+		});
+		optmenu.getItems().addAll(newgame,diffeasy,diffinter);
+		bar.getMenus().addAll(optmenu);
+		return bar;
 	}
 }

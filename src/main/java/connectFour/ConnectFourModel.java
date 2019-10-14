@@ -521,7 +521,7 @@ public class ConnectFourModel extends Observable implements Serializable {
 					int numSame = 0;
 					int row = 0;
 					int col = i;
-					while (col > 0 && row < height) {
+					while (col >= 0 && row < height) {
 						if (testBoard[row][col] == c) {
 							numSame++;
 						} else {
