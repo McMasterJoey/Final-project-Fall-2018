@@ -1,6 +1,7 @@
 package ticTacToe;
 
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.Random;
 
 import model.IGotNoWhereToGoException;
@@ -13,7 +14,12 @@ import model.IGotNoWhereToGoException;
  * 
  * @author Rick Mercer
  */
-public class IntermediateAI implements TicTacToeStrategy {
+public class IntermediateAI implements TicTacToeStrategy, Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Ask the computer player to return a Point that would win. If not possible to

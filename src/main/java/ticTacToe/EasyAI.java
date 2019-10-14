@@ -1,6 +1,7 @@
 package ticTacToe;
 
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.Random;
 
 import model.IGotNoWhereToGoException;
@@ -10,7 +11,12 @@ import model.IGotNoWhereToGoException;
  * 
  * @author Rick Mercer and Linjie Liu
  */
-public class EasyAI implements TicTacToeStrategy {
+public class EasyAI implements TicTacToeStrategy, Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Find an available square while ignoring possible wins and blocks to make this

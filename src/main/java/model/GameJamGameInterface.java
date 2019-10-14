@@ -7,9 +7,9 @@ package model;
 public interface GameJamGameInterface {
 	// Takes a path, loads the save game linked
 	// Sets the state of that save game to current state of game.
-	public boolean loadSaveGame(String filepath);
+	public boolean loadSaveGame();
 	// Takes a path, saves the current game state to linked path.
-	public boolean saveGame(String filepath);
+	public boolean saveGame();
 	// When applicable, pauses the game. 
 	public boolean pauseGame();
 	// When applicable, unpauses the game if it was paused.

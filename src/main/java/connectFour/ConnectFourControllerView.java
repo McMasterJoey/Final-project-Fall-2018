@@ -7,21 +7,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Observable;
-import java.util.Observer;
 
 import controller.AccountManager;
+import controller.GameControllerView;
+import controller.GameMenu;
 import controller.logStatType;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import model.GameJamGameInterface;
+
 import ticTacToe.TicTacToeControllerView;
 
 /**
@@ -34,14 +31,12 @@ import ticTacToe.TicTacToeControllerView;
  * @author Wes Rodgers
  *
  */
-public class ConnectFourControllerView extends BorderPane implements Observer, GameJamGameInterface {
+public class ConnectFourControllerView extends GameControllerView {
 	private ConnectFourModel gameModel;
 	public static final int WIDTH = 600;
 	public static final int HEIGHT = 600;
 	private AudioClip moveSound, winSound, loseSound, tieSound;
-	private AccountManager accountmanager;
 	private StackPane[][] placeholder;
-	private String gameName = "connect-four";
 	
 	// Original implemention by Wes has the object extending gridpane, this that grid pane.
 	// Updated version uses a border pane with original grid pane set to its center to add game speific options
@@ -52,7 +47,8 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 	 * listeners
 	 */
 	public ConnectFourControllerView() {
-		this.setTop(setUpMenuBar());
+		gameName = "connect-four";
+		this.setTop(GameMenu.getMenuBar(this));
 		initializeGame();
 		setupResources();
 		accountmanager = AccountManager.getInstance();
@@ -147,7 +143,7 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 	 * @param filepath the name of the file we want to save
 	 * @return true if the save was successful, false otherwise
 	 */
-	public boolean saveGame(String filepath) {
+	public boolean saveGame() {
 		if(accountmanager.isGuest()) {
 			return false;
 		}
@@ -156,7 +152,8 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 		try {
 			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
-			fos = new FileOutputStream(System.getProperty("user.dir") + sep + "save-data" + sep + fname);			
+			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
+			fos = new FileOutputStream(filepath);			
 			oos = new ObjectOutputStream(fos);
 			oos.writeObject(gameModel);
 			oos.close();
@@ -174,13 +171,14 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 	 * @param filepath the location from which to load the game
 	 * @return true if the load was successful, false otherwise
 	 */
-	public boolean loadSaveGame(String filepath) {
-		FileInputStream fis;
-		ObjectInputStream ois;
+	public boolean loadSaveGame() {
 		try {
+			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
+			String sep = System.getProperty("file.separator");
+			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
 			File file = new File(filepath);
-			fis = new FileInputStream(file);
-			ois = new ObjectInputStream(fis);
+			FileInputStream fis = new FileInputStream(file);
+			ObjectInputStream ois = new ObjectInputStream(fis);
 			gameModel = (ConnectFourModel) ois.readObject();
 			ois.close();
 			update(gameModel, this);
@@ -188,6 +186,10 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 		} catch(IOException | ClassNotFoundException e) {
 			return false;
 		}
+		setupBoard();
+		setupListeners();
+		gameModel.addObserver(this);
+		update(gameModel, this);
 		return true;
 	}
 
@@ -271,34 +273,12 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 			}
 		}
 	}
-	/**
-	 * Sets up the Menubar for the game Tic-tac-toe
-	 * @return The menu bar to be placed at the top of the game's UI.
-	 */
-	private MenuBar setUpMenuBar() {
-		MenuBar bar = new MenuBar();
-		Menu optmenu = new Menu("Connect Four Options");
-		MenuItem newgame = new MenuItem("Start New Game");
-		MenuItem diffhard = new MenuItem("Set diffuclty to Hard");
-		MenuItem diffeasy = new MenuItem("Set diffuclty to Easy");
-		newgame.setOnAction((event) -> { 
-			if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
-				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 1);
-				accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
-			}
-			boolean result = newGame();
-			if (!result) {
-				System.err.println("ERROR on trying to set new Connect 4 game!");
-			}
-		});
-		diffhard.setOnAction((event) -> { 
-			gameModel.setAIStrategy(new ConnectFourHardAI());
-		});
-		diffeasy.setOnAction((event) -> { 
-			gameModel.setAIStrategy(new ConnectFourEasyAI());
-		});
-		optmenu.getItems().addAll(newgame,diffeasy,diffhard);
-		bar.getMenus().addAll(optmenu);
-		return bar;
+
+	@Override
+	protected void updateStatistics() {
+		if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
+			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 1);
+			accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
+		}		
 	}
 }
