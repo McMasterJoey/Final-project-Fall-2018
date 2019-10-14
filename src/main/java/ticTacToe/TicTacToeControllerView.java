@@ -15,6 +15,7 @@ import controller.GameMenu;
 import controller.logStatType;
 
 import javafx.geometry.Pos;
+import javafx.scene.control.MenuBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -45,13 +46,15 @@ public class TicTacToeControllerView extends GameControllerView {
 	// Updated version uses a border pane with original grid pane set to its center to add game speific options
 	// Should look and play the exact same way as before.
 	private GridPane _primarypane;
+	GameMenu menuBar;
 	
 	public TicTacToeControllerView() {
 		gameName = "tic-tac-toe";
+		menuBar = GameMenu.getMenuBar(this);
+		this.setTop(menuBar);		
 		_primarypane = new GridPane();
 		initializeGame();
-		setupResources();
-		this.setTop(GameMenu.getMenuBar(this));
+		setupResources();		
 		accountmanager = AccountManager.getInstance();
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
@@ -210,6 +213,13 @@ public class TicTacToeControllerView extends GameControllerView {
 		botRight.setOnMouseClicked((click) -> {
 			gameModel.humanMove(2, 2, false);
 			moveSound.play();
+		});
+		
+		menuBar.getDiffinter().setOnAction((event) -> { 
+			gameModel.setAIStrategy(new IntermediateAI());
+		});
+		menuBar.getDiffeasy().setOnAction((event) -> { 
+			gameModel.setAIStrategy(new EasyAI());
 		});
 	}
 
@@ -386,36 +396,7 @@ public class TicTacToeControllerView extends GameControllerView {
 	protected void updateStatistics() {
 		if (!(gameModel.won('X') || gameModel.won('O')) && gameModel.maxMovesRemaining() > 0) {
 			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
-			accountmanager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+			//accountmanager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
 		}
-	/**
-	 * Sets up the Menubar for the game Tic-tac-toe
-	 * @return The menu bar to be placed at the top of the game's UI.
-	 */
-	private MenuBar setUpMenuBar() {
-		MenuBar bar = new MenuBar();
-		Menu optmenu = new Menu("Tic-Tac-Toe Options");
-		MenuItem newgame = new MenuItem("Start New Game");
-		MenuItem diffinter = new MenuItem("Set diffuclty to Intermediate");
-		MenuItem diffeasy = new MenuItem("Set diffuclty to Easy");
-		newgame.setOnAction((event) -> { 
-			if (!(gameModel.won('X') || gameModel.won('O')) && gameModel.maxMovesRemaining() > 0) {
-				//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
-				//accountmanager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
-			}
-			boolean result = newGame();
-			if (!result) {
-				System.err.println("ERROR on trying to set new tic-tac-toe game!");
-			}
-		});
-		diffinter.setOnAction((event) -> { 
-			gameModel.setAIStrategy(new IntermediateAI());
-		});
-		diffeasy.setOnAction((event) -> { 
-			gameModel.setAIStrategy(new EasyAI());
-		});
-		optmenu.getItems().addAll(newgame,diffeasy,diffinter);
-		bar.getMenus().addAll(optmenu);
-		return bar;
 	}
 }

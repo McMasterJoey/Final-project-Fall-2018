@@ -12,6 +12,8 @@ import controller.AccountManager;
 import controller.GameControllerView;
 import controller.GameMenu;
 import controller.logStatType;
+import javafx.geometry.Pos;
+import javafx.scene.control.MenuBar;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.AudioClip;
@@ -42,13 +44,15 @@ public class ConnectFourControllerView extends GameControllerView {
 	// Updated version uses a border pane with original grid pane set to its center to add game speific options
 	// Should look and play the exact same way as before.
 	private GridPane _primarypane;
+	private GameMenu menuBar;
 	/**
 	 * Constructor for the Connect 4 controller-view sets up the board and various
 	 * listeners
 	 */
 	public ConnectFourControllerView() {
 		gameName = "connect-four";
-		this.setTop(GameMenu.getMenuBar(this));
+		menuBar = GameMenu.getMenuBar(this);
+		this.setTop(menuBar);
 		initializeGame();
 		setupResources();
 		accountmanager = AccountManager.getInstance();
@@ -105,6 +109,7 @@ public class ConnectFourControllerView extends GameControllerView {
 			}
 		}
 		this.setCenter(_primarypane);
+		_primarypane.setAlignment(Pos.CENTER);
 		setupListeners();
 	}
 
@@ -125,6 +130,13 @@ public class ConnectFourControllerView extends GameControllerView {
 				// TODO change to non testing when strategy is implemented.
 				gameModel.humanMove(col, false);
 			}
+		});
+		
+		menuBar.getDiffinter().setOnAction((event) -> { 
+			gameModel.setAIStrategy(new ConnectFourHardAI());
+		});
+		menuBar.getDiffeasy().setOnAction((event) -> { 
+			gameModel.setAIStrategy(new ConnectFourEasyAI());
 		});
 	}
 
@@ -277,36 +289,7 @@ public class ConnectFourControllerView extends GameControllerView {
 	protected void updateStatistics() {
 		if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
 			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 1);
-			accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
-		}		
-	/**
-	 * Sets up the Menubar for the game Tic-tac-toe
-	 * @return The menu bar to be placed at the top of the game's UI.
-	 */
-	private MenuBar setUpMenuBar() {
-		MenuBar bar = new MenuBar();
-		Menu optmenu = new Menu("Connect Four Options");
-		MenuItem newgame = new MenuItem("Start New Game");
-		MenuItem diffhard = new MenuItem("Set diffuclty to Hard");
-		MenuItem diffeasy = new MenuItem("Set diffuclty to Easy");
-		newgame.setOnAction((event) -> { 
-			if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
-				//accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 1);
-				//accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
-			}
-			boolean result = newGame();
-			if (!result) {
-				System.err.println("ERROR on trying to set new Connect 4 game!");
-			}
-		});
-		diffhard.setOnAction((event) -> { 
-			gameModel.setAIStrategy(new ConnectFourHardAI());
-		});
-		diffeasy.setOnAction((event) -> { 
-			gameModel.setAIStrategy(new ConnectFourEasyAI());
-		});
-		optmenu.getItems().addAll(newgame,diffeasy,diffhard);
-		bar.getMenus().addAll(optmenu);
-		return bar;
+			//accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
+		}
 	}
 }
