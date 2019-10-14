@@ -553,7 +553,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			//throw new SanityCheckFailedException("getLoaddedGame returned null when stoping and saving current game!");
 		}
 		String path = "/userdata/" + acctMgr.getCurUsername();
-		game.saveGame(path);
+		game.saveGame();
 		game.pauseGame();
 	}
 	/**

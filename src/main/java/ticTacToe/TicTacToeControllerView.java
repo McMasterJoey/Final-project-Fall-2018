@@ -1,23 +1,26 @@
 package ticTacToe;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Observable;
-import java.util.Observer;
 
 import controller.AccountManager;
+import controller.GameControllerView;
+import controller.GameMenu;
 import controller.logStatType;
 
 import javafx.geometry.Pos;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.AudioClip;
-import model.GameJamGameInterface;
 
 /**
  * Provides a GUI view and the listeners required for players to make Tic Tac
@@ -26,7 +29,7 @@ import model.GameJamGameInterface;
  * @author Wes Rodgers, Joey McMaster
  *
  */
-public class TicTacToeControllerView extends BorderPane implements Observer, GameJamGameInterface {
+public class TicTacToeControllerView extends GameControllerView {
 
 	private TicTacToeModel gameModel;
 	public static final int WIDTH = 600;
@@ -38,16 +41,17 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 	private AudioClip loseSound;
 	private AudioClip tieSound;
 	private BorderPane[][] placeholder;
-	private AccountManager accountmanager;
 	// Original implemention by Wes has the object extending gridpane, this that grid pane.
 	// Updated version uses a border pane with original grid pane set to its center to add game speific options
 	// Should look and play the exact same way as before.
 	private GridPane _primarypane;
+	
 	public TicTacToeControllerView() {
+		gameName = "tic-tac-toe";
 		_primarypane = new GridPane();
 		initializeGame();
 		setupResources();
-		this.setTop(setUpMenuBar());
+		this.setTop(GameMenu.getMenuBar(this));
 		accountmanager = AccountManager.getInstance();
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
@@ -163,38 +167,49 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 	private void setupListeners() {
 		topLeft.setOnMouseClicked((click) -> {
 			gameModel.humanMove(0, 0, false);
+			moveSound.play();
 		});
 
 		midLeft.setOnMouseClicked((click) -> {
 			gameModel.humanMove(1, 0, false);
+			moveSound.play();
 		});
 
 		botLeft.setOnMouseClicked((click) -> {
 			gameModel.humanMove(2, 0, false);
+			moveSound.play();
 		});
 
 		topCenter.setOnMouseClicked((click) -> {
 			gameModel.humanMove(0, 1, false);
+			moveSound.play();
 		});
 
 		midCenter.setOnMouseClicked((click) -> {
+			System.out.println("what what");
 			gameModel.humanMove(1, 1, false);
+			System.out.println(gameModel.toString());
+			moveSound.play();
 		});
 
 		botCenter.setOnMouseClicked((click) -> {
 			gameModel.humanMove(2, 1, false);
+			moveSound.play();
 		});
 
 		topRight.setOnMouseClicked((click) -> {
 			gameModel.humanMove(0, 2, false);
+			moveSound.play();
 		});
 
 		midRight.setOnMouseClicked((click) -> {
 			gameModel.humanMove(1, 2, false);
+			moveSound.play();
 		});
 
 		botRight.setOnMouseClicked((click) -> {
 			gameModel.humanMove(2, 2, false);
+			moveSound.play();
 		});
 	}
 
@@ -216,7 +231,6 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 	 */
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		moveSound.play();
 		char[][] board = gameModel.getBoard();
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -233,7 +247,11 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 				}
 			}
 		}
+		
+		System.out.println("----------");
 		System.out.println(gameModel.toString());
+		System.out.println("----------");
+		
 		if (gameModel.tied()) {
 			//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
 			//accountmanager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
@@ -263,18 +281,65 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 			 * gc.strokeLine(0, 600, 600, 0); } break; } gc.setStroke(Color.BLACK);
 			 */
 		}
+		System.out.println("current directory = " + System.getProperty("user.dir"));
 	}
 
 	@Override
-	public boolean loadSaveGame(String filepath) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean saveGame() {
+		System.out.println(accountmanager.getCurUsername());
+		if(accountmanager.isGuest()) {
+			return false;
+		}
+		FileOutputStream fos;
+		ObjectOutputStream oos;
+		try {
+			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
+			String sep = System.getProperty("file.separator");
+			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
+			fos = new FileOutputStream(filepath);			
+			oos = new ObjectOutputStream(fos);
+			oos.writeObject(gameModel);
+			oos.close();
+			System.out.println("Saved the game");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;		
 	}
-
+	
 	@Override
-	public boolean saveGame(String filepath) {
-		// TODO Auto-generated method stub
-		return false;
+	/**
+	 * loads a saved game from the given filepath
+	 * 
+	 * @param filepath the location from which to load the game
+	 * @return true if the load was successful, false otherwise
+	 */
+	public boolean loadSaveGame() {
+		FileInputStream fis;
+		ObjectInputStream ois;
+		try {
+			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
+			String sep = System.getProperty("file.separator");
+			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
+			File file = new File(filepath);
+			fis = new FileInputStream(file);
+			ois = new ObjectInputStream(fis);
+			gameModel = (TicTacToeModel) ois.readObject();
+			ois.close();
+			file.delete();
+			System.out.println("Succesfully loaded");
+		} catch(IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		}
+		clearView();
+		setupBoard();
+		setupListeners();
+		gameModel.addObserver(this);
+		update(gameModel, this);
+		return true;	
 	}
 
 	@Override
@@ -317,6 +382,12 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 		_primarypane.getChildren().removeAll(al);		
 	}
 
+	@Override
+	protected void updateStatistics() {
+		if (!(gameModel.won('X') || gameModel.won('O')) && gameModel.maxMovesRemaining() > 0) {
+			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+			accountmanager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+		}
 	/**
 	 * Sets up the Menubar for the game Tic-tac-toe
 	 * @return The menu bar to be placed at the top of the game's UI.

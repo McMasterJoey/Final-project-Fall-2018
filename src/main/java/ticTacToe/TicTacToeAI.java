@@ -1,6 +1,7 @@
 package ticTacToe;
 
 import java.awt.Point;
+import java.io.Serializable;
 
 /**
  * This class lets a person choose from a variety of different AIs to play
@@ -10,8 +11,12 @@ import java.awt.Point;
  *
  */
 
-public class TicTacToeAI {
+public class TicTacToeAI implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private TicTacToeStrategy AIStrategy;
 
     /**

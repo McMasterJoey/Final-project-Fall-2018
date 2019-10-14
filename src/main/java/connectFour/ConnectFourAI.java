@@ -1,5 +1,7 @@
 package connectFour;
 
+import java.io.Serializable;
+
 /**
 * This class lets a person choose from a variety of different AIs to play
 * against in Connect Four. Dependent on TODO insert connect four strategy name
@@ -7,8 +9,12 @@ package connectFour;
 * @author Wes Rodgers
 *
 */
-public class ConnectFourAI {
+public class ConnectFourAI implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ConnectFourStrategy AIStrategy;
 
 	/**

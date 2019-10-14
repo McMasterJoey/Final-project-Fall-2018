@@ -1,10 +1,16 @@
 package connectFour;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import model.IGotNoWhereToGoException;
 
-public class ConnectFourEasyAI implements ConnectFourStrategy {
+public class ConnectFourEasyAI implements ConnectFourStrategy, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Find an available column while ignoring possible wins and blocks to make this
 	 * AI very easy to bet
