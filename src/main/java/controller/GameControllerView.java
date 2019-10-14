@@ -1,17 +1,11 @@
 package controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+
 import java.util.Observer;
 
 import javafx.scene.layout.BorderPane;
 import model.GameJamGameInterface;
 import model.GameModel;
-import ticTacToe.TicTacToeModel;
 
 public abstract class GameControllerView extends BorderPane implements Observer, GameJamGameInterface{
 	protected AccountManager accountmanager;
