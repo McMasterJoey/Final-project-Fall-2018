@@ -235,17 +235,17 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 		}
 		System.out.println(gameModel.toString());
 		if (gameModel.tied()) {
-			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
-			accountmanager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
+			//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
+			//accountmanager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
 			tieSound.play();
 		} else if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
-				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
-				accountmanager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1);
+				//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
+				//accountmanager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1);
 				winSound.play();
 			} else {
-				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
-				accountmanager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1);
+				//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
+				//accountmanager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1);
 				loseSound.play();
 			}
 
@@ -329,8 +329,8 @@ public class TicTacToeControllerView extends BorderPane implements Observer, Gam
 		MenuItem diffeasy = new MenuItem("Set diffuclty to Easy");
 		newgame.setOnAction((event) -> { 
 			if (!(gameModel.won('X') || gameModel.won('O')) && gameModel.maxMovesRemaining() > 0) {
-				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
-				accountmanager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+				//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+				//accountmanager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
 			}
 			boolean result = newGame();
 			if (!result) {

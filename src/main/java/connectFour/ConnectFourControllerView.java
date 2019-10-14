@@ -221,18 +221,18 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 		//System.out.println("--------------");
 		
 		if (gameModel.tied()) {
-			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
-			accountmanager.logGameStat("Connect-Four", logStatType.TIE, 0);
+			//accountmanager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
+			//accountmanager.logGameStat("Connect-Four", logStatType.TIE, 0);
 			tieSound.play();
 		} else if (gameModel.won('R') || gameModel.won('Y')) {
 			disableListeners();
 			if (gameModel.won('R')) {
-				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
-				accountmanager.logGameStat("Connect-Four", logStatType.WIN, 0);
+				//accountmanager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
+				//accountmanager.logGameStat("Connect-Four", logStatType.WIN, 0);
 				winSound.play();
 			} else {
-				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
-				accountmanager.logGameStat("Connect-Four", logStatType.LOSS, 0);
+				//accountmanager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
+				//accountmanager.logGameStat("Connect-Four", logStatType.LOSS, 0);
 				loseSound.play();
 			}
 		}
@@ -249,8 +249,8 @@ public class ConnectFourControllerView extends BorderPane implements Observer, G
 		MenuItem diffeasy = new MenuItem("Set diffuclty to Easy");
 		newgame.setOnAction((event) -> { 
 			if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
-				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 1);
-				accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
+				//accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 1);
+				//accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
 			}
 			boolean result = newGame();
 			if (!result) {

@@ -452,6 +452,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		UpdateLoggedInBarsWithUserNameOfCurrentUser();
 		this.setTop(this.initLoggedInBar);
 		this.setCenter(this.initGameselectonboxarea);
+		updateLeftPane();
 	}
 	/**
 	 * Sets the message to the left panel.

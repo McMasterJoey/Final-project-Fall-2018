@@ -14,10 +14,9 @@ public class AccountManager extends Observable {
 	private boolean isGuest;
 	private int exp, level;
 	private DBConnection conn;
-	
-	// Used to reduce the number of database calls
-	private int dataBaseUserId = -1; // Used as cache.
-	private HashMap<String, Integer> databaseGameid;
+	private int accountID;
+	private HashMap<Integer, Integer> userStatsIDs; // maps gameid (key) to statsid (value)
+	private HashMap<String, Integer> databaseGameID;
 	
 	// Use the singleton pattern for this class
 	private static AccountManager singleton = null;
@@ -29,8 +28,10 @@ public class AccountManager extends Observable {
 		isGuest = true;
 		exp = 0;
 		level = 1;
+		accountID = -1;
+		userStatsIDs = null;
 		conn = DBConnection.getInstance();
-		this.databaseGameid = new HashMap<String, Integer>();
+		this.databaseGameID = new HashMap<String, Integer>();
 	}
 	
 	// Getter for the class
@@ -58,15 +59,17 @@ public class AccountManager extends Observable {
 					this.isGuest = rs.getBoolean("guest");
 					this.exp = rs.getInt("exp");
 					this.level = rs.getInt("level");
+					this.accountID = rs.getInt("accountid");
+					fillUserStatsIDs();
 					
 					System.out.println("Login: " + curUsername + " " + isAdmin + " " + isGuest);
 					
 					setChanged();
 					notifyObservers();
 					// Fetch userId from database, used to reduce the frequency of queries to database.
-					rs = conn.executeQuery("select accountid from accounts where accounts.username = ?", this.curUsername);
-					rs.next();
-					this.dataBaseUserId = rs.getInt("accountid");
+//					rs = conn.executeQuery("select accountid from accounts where accounts.username = ?", this.curUsername);
+//					rs.next();
+//					this.dataBaseUserId = rs.getInt("accountid");
 					return true;
 				}
 			}
@@ -80,14 +83,14 @@ public class AccountManager extends Observable {
 	 * Logs a game played for the given user
 	 * 
 	 * @param game The name of the game that was played
-	 * @param stattype The result of the game.
-	 * @param time The ammout of time that elasped the game [Unimplemented]
+	 * @param win Whether the game was won
+	 * @param loss Whether the game was lost
+	 * @param tie Whether the game was a tie
+	 * @param incomplete Whether the game is incomplete
+	 * @param time The amount of time that elapsed the game
 	 */
-	public void logGameStat(String game, int stattype, int time) {
-		// Arg Check
-		if (stattype < 0 || stattype > 4 || time < 0) {
-			throw new IllegalArgumentException("Invalid stattype was out of range or value was below 0.");
-		}
+	public void logGameStat(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time) {
+
 		if (this.isGuest) {
 			System.out.println("\nWe are a guest!!");
 			// Do nothing if this is a guest account.
@@ -97,7 +100,8 @@ public class AccountManager extends Observable {
 			System.out.println("\nFetching game from a string!");
 			int gameid = getGameIdFromString(game);
 			System.out.println(gameid);
-			conn.execute("insert into gamelog(accountid,gameid,result) values(?,?,?)", this.dataBaseUserId, gameid, stattype);
+			String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
+			conn.execute(transaction, userStatsIDs.get(gameid), win, loss, tie, incomplete, time);
 			
 		} catch (SQLException se) {
 			se.printStackTrace();
@@ -154,7 +158,7 @@ public class AccountManager extends Observable {
 				dv[stattype] = value;
 				try {
 					int gameid = getGameIdFromString(game);
-					conn.execute("INSERT INTO statistics(accountid, gameid, wins, losses, ties, incomplete, timeplayed) VALUES(?, ?, ?, ?, ?, ?, ?)", this.dataBaseUserId, gameid, dv[0],dv[1],dv[2],dv[3],dv[4]);
+					conn.execute("INSERT INTO statistics(accountid, gameid, wins, losses, ties, incomplete, timeplayed) VALUES(?, ?, ?, ?, ?, ?, ?)", this.accountID, gameid, dv[0],dv[1],dv[2],dv[3],dv[4]);
 				} catch (SQLException se) {
 					se.printStackTrace();
 				}
@@ -170,6 +174,8 @@ public class AccountManager extends Observable {
 		isGuest = true;
 		exp = 0;
 		level = 1;
+		accountID = -1;
+		userStatsIDs = null;
 
 		setChanged();
 		notifyObservers();
@@ -185,10 +191,16 @@ public class AccountManager extends Observable {
 		try {
 			conn.execute("INSERT INTO accounts(username, password) VALUES(?, ?)", username, password);
 			// Fetch userId from database, used to reduce the frequency of queries to database.
-			rs = conn.executeQuery("select accountid from accounts where accounts.username = ?", this.curUsername);
+			rs = conn.executeQuery("select accountid from accounts where accounts.username = ?", username);
 			rs.next();
-			this.dataBaseUserId = rs.getInt("accountid");
-			this.isGuest = false;
+			curUsername = username;
+			isAdmin = false;
+			isGuest = false;
+			exp = 0;
+			level = 1;
+			accountID = rs.getInt("accountid");
+			createStatisticsEntries();
+			fillUserStatsIDs();
 			
 		} catch (SQLException se) {
 			if (se.getErrorCode() == 1062) { // 1062 indicates username is already in the db
@@ -199,6 +211,49 @@ public class AccountManager extends Observable {
 		}
 		
 		return 1;
+	}
+
+	private void createStatisticsEntries() {
+		ResultSet rs = null;
+
+		try
+		{
+			rs = conn.executeQuery("SELECT * FROM statistics WHERE statistics.accountid = ?", accountID);
+
+			if (rs.next()) { // An entry already exists for this user
+				return;
+			} else {
+				rs = conn.executeQuery("SELECT gameid FROM games");
+
+				while (rs.next()) {
+					int gameID = rs.getInt("gameid");
+					conn.execute("INSERT INTO statistics(accountid, gameid) VALUES(?, ?)", accountID, gameID);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void fillUserStatsIDs() {
+		ResultSet rs = null;
+		userStatsIDs = new HashMap<>();
+
+		try {
+			System.out.println("fillUserStatsIDs: accountID = " + accountID);
+			rs = conn.executeQuery("SELECT statsid, gameid FROM statistics WHERE statistics.accountid = ?", accountID);
+
+			while (rs.next()) {
+				int gameID = rs.getInt("gameid");
+				int statsID = rs.getInt("statsid");
+				userStatsIDs.put(gameID, statsID);
+			}
+
+			userStatsIDs.forEach((key, value) -> System.out.println("gameID: " + key + "  statsID: " + value));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	// Attempt to delete an account
@@ -239,6 +294,14 @@ public class AccountManager extends Observable {
 	public int getLevel() {
 		return level;
 	}
+
+	public int getAccountID() {
+		return accountID;
+	}
+
+	public HashMap<Integer, Integer> getUserStatsIDs() {
+		return userStatsIDs;
+	}
 	// End getters for account information
 	// ---
 	/**
@@ -248,8 +311,8 @@ public class AccountManager extends Observable {
 	 */
 	private int getGameIdFromString(String game) {
 		System.out.println("ggifs: game = " + game);
-		if (this.databaseGameid.containsKey(game)) {
-			return this.databaseGameid.get(game);
+		if (this.databaseGameID.containsKey(game)) {
+			return this.databaseGameID.get(game);
 		}
 		// Cache miss, fetch from database.
 		ResultSet rs = null;
@@ -262,7 +325,7 @@ public class AccountManager extends Observable {
 				throw new SanityCheckFailedException("getGameIdFromString fetched a gameid of " + gameid + " from the query!");
 			}
 			// Add it to Hashmap so we can quickly fetch it.
-			this.databaseGameid.put(game,gameid);
+			this.databaseGameID.put(game,gameid);
 		} catch (SQLException se) {
 			se.printStackTrace();
 			throw new SanityCheckFailedException("getGameIdFromString threw an SQL execption when adding a game to the cache.");
