@@ -80,6 +80,25 @@ public class AccountManager extends Observable {
 		return false;
 	}
 	/**
+	 * Logs a game played for the given user, Alternate function
+	 * @param game The name of the game that was played
+	 * @param stattype The type of stat being recorded see logStatType. 
+	 * @param time The amount of time passed during this run of the game.
+	 */
+	public void logGameStat(String game, int stattype, int time) {
+		if (stattype == 0) {
+			this.logGameStat(game,true,false,false,false,time);
+		} else if (stattype == 1) {
+			this.logGameStat(game,false,true,false,false,time);
+		} else if (stattype == 2) {
+			this.logGameStat(game,false,false,true,false,time);
+		} else if (stattype == 3) {
+			this.logGameStat(game,false,false,false,true,time);
+		} else {
+			throw new IllegalArgumentException("Invalid stattype was out of range or value was below 0.");
+		}
+	}
+	/**
 	 * Logs a game played for the given user
 	 * 
 	 * @param game The name of the game that was played
@@ -90,9 +109,7 @@ public class AccountManager extends Observable {
 	 * @param time The amount of time that elapsed the game
 	 */
 	public void logGameStat(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time) {
-
 		if (this.isGuest) {
-			System.out.println("\nWe are a guest!!");
 			// Do nothing if this is a guest account.
 			return;
 		}
@@ -310,7 +327,6 @@ public class AccountManager extends Observable {
 	 * @return The gameid in the database of the game. 
 	 */
 	private int getGameIdFromString(String game) {
-		System.out.println("ggifs: game = " + game);
 		if (this.databaseGameID.containsKey(game)) {
 			return this.databaseGameID.get(game);
 		}

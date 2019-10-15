@@ -23,6 +23,10 @@ public class Gamejam extends Application {
 		GamejamMainScreen screen = new GamejamMainScreen();
 		Scene scene = new Scene(screen, 1280, 720);
 		stage.setScene(scene);
+		stage.setOnCloseRequest((event)->{
+			// On Application close, run this
+			System.out.println("Closing App");
+		});
 		stage.show();
 		
 	}
