@@ -4,27 +4,32 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+
 import Gamejam.GameIconItem;
 /**
  * Interacts with the database on behalf of the Main GUI, Does any interaction that dosn't directly involve account management.
  * @author Joey McMaster
  *
  */
-public class GameJamViewDatabaseInteractionManager {
-	private static GameJamViewDatabaseInteractionManager _singleton = null;
+public class DBGameManager
+{
+	private static DBGameManager _singleton = null;
 	private DBConnection DBconnection;
+	private HashMap<String, Integer> gameList;
 	
-	private GameJamViewDatabaseInteractionManager() {
+	private DBGameManager() {
 		DBconnection = DBConnection.getInstance();
+		gameList = new HashMap<>();
 	}
 
 	/**
 	 * Makes the class a singleton
 	 * @return The only instance of the class.
 	 */
-	synchronized public static GameJamViewDatabaseInteractionManager getInstance() {
+	synchronized public static DBGameManager getInstance() {
 		if (_singleton == null) {
-			_singleton = new GameJamViewDatabaseInteractionManager();
+			_singleton = new DBGameManager();
 		}
 		return _singleton;
 	}
@@ -39,8 +44,11 @@ public class GameJamViewDatabaseInteractionManager {
 		try {
 			rs = DBconnection.executeQuery("SELECT name, iconpath, gameid FROM games");
 			while (rs.next()) {
-				GameIconItem game = new GameIconItem(rs.getString("name"), rs.getString("iconpath"), rs.getInt("gameid"));
+				String name = rs.getString("name");
+				Integer id = rs.getInt("gameid");
+				GameIconItem game = new GameIconItem(name, rs.getString("iconpath"), id);
 				retval.add(game);
+				gameList.put(name, id);
 			}
 		} catch (SQLException se) {
 			se.printStackTrace();
@@ -55,5 +63,9 @@ public class GameJamViewDatabaseInteractionManager {
 		// Sort it to keep consistent order.
 		Collections.sort(retval);
 		return retval;
+	}
+
+	public HashMap<String, Integer> getGameList() {
+		return gameList;
 	}
 }
