@@ -223,6 +223,8 @@ public class AccountManager extends Observable {
 		return 1;
 	}
 
+	// Helper for createAccount, generates the appropriate entries in the statistics table
+	// for the new user
 	private void createStatisticsEntries() {
 		ResultSet rs = null;
 
@@ -246,6 +248,8 @@ public class AccountManager extends Observable {
 
 	}
 
+	// Fills the userStatsIDs, gameWins, gameLosses, gameTies, gameIncompletes, and numGamesPlayed
+	// HashMaps with the current users statistics
 	private void fillUserStats() {
 		ResultSet rs = null;
 		userStatsIDs = new HashMap<>();
@@ -277,6 +281,12 @@ public class AccountManager extends Observable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+
+	// Public method to trigger fillUserStats
+	public void refreshUserStats() {
+		fillUserStats();
 	}
 	
 	// Attempt to delete an account

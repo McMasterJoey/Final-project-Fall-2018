@@ -331,7 +331,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		stopAndSaveCurrentGame();
 		this.setTop(this.initLoggedInBar);
 		this.setCenter(this.initGameselectonboxarea);
-		
+		updateLeftPane();
 	}
 	/**
 	 * Handles the event were the Log out button is clicked Assumes: A user is
@@ -480,6 +480,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.leftBarMsg.setText("Administrator Account");
 			this.leftBarStats.setText("");
 		} else {
+			acctMgr.refreshUserStats();
 			this.leftBarMsg.setText("Welcome to Gamejam, " + this.acctMgr.getCurUsername());
 			this.leftBarStats.setText("\n\nLevel: " + this.acctMgr.getLevel() + "\nExp: " + this.acctMgr.getExp());
 
