@@ -32,13 +32,13 @@ public class TestStrategiesC4 {
 	        ties++;
 	    }
 
-	    System.out.println("IntermediateAI strategy should have many more wins than the");
-	    System.out.println("RandomAI strategy. This tournament has the Intermediate");
-	    System.out.println("strategy choose first.  Ties can certainly happen.");
-	    System.out.println("===========================================");
-	    System.out.println("Intermediate win percentage: " + IntermediatePlayerWins / 10. + "%");
-	    System.out.println("Random win percentage: " + randomPlayerWins/ 10. + "%");
-	    System.out.println("Ties happened " + ties/ 10. + "% of the games");
+	    Gamejam.DPrint("IntermediateAI strategy should have many more wins than the");
+	    Gamejam.DPrint("RandomAI strategy. This tournament has the Intermediate");
+	    Gamejam.DPrint("strategy choose first.  Ties can certainly happen.");
+	    Gamejam.DPrint("===========================================");
+	    Gamejam.DPrint("Intermediate win percentage: " + IntermediatePlayerWins / 10. + "%");
+	    Gamejam.DPrint("Random win percentage: " + randomPlayerWins/ 10. + "%");
+	    Gamejam.DPrint("Ties happened " + ties/ 10. + "% of the games");
 	  }
 	  
 	  private char playOneGame( ConnectFourAI first, ConnectFourAI second) {

@@ -350,7 +350,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private void userSettingsButtonClick() {
 		// TODO: Implement User Settings
-		System.out.println("User settings!");
+		Gamejam.DPrint("User settings!");
 	}
 
 	/**
@@ -404,7 +404,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			button.setTextFill(Color.BLACK);
 			doGUIUpdateOnCreateAccountSuccess();
 		} else if (status == 2) {
-			System.out.println("Username already in use");
+			Gamejam.DPrint("Username already in use");
 			// TODO: Handle username already in use
 			info.setText("User name: '" + username.getText() + "' already in use. Try a diffrent one.");
 			button.setTextFill(Color.RED);
@@ -448,7 +448,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * Updates the GUI after a new account is made succesfuly,
 	 */
 	private void doGUIUpdateOnCreateAccountSuccess() {
-		System.out.println("Account creation successful");
+		Gamejam.DPrint("Account creation successful");
 		UpdateLoggedInBarsWithUserNameOfCurrentUser();
 		this.setTop(this.initLoggedInBar);
 		this.setCenter(this.initGameselectonboxarea);
@@ -520,7 +520,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * @return Status code of the result.
 	 */
 	private int doCreateNewAccount(String username, String password) {
-		System.out.println("username = '" + username + "' password = '" + password + "'");
+		Gamejam.DPrint("username = '" + username + "' password = '" + password + "'");
 		if (this.DEBUG_FakeDatabase) {
 			return 1;
 		} else {
@@ -534,7 +534,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * @return The result code of the attempted login
 	 */
 	private boolean doLogin(String username, String password) {
-		System.out.println("username = '" + username + "' password = '" + password + "'");
+		Gamejam.DPrint("username = '" + username + "' password = '" + password + "'");
 		if (this.DEBUG_FakeDatabase) {
 			return true;
 		} else {

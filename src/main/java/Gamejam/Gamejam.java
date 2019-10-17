@@ -43,4 +43,15 @@ public class Gamejam extends Application {
 			System.out.println(string);
 		}
 	}
+	/**
+	 * Prints the int that is passed in.
+	 * Only prints if the ShowDebugOutput constant is true.
+	 * Allows for easy toggling of debug related output;
+	 * @param num The number to be printed.
+	 */
+	public static void DPrint(int num) {
+		if (ShowDebugOutput) {
+			System.out.println(num);
+		}
+	}
 }

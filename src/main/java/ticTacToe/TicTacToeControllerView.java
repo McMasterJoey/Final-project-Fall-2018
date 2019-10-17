@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Observable;
 
+import Gamejam.Gamejam;
 import controller.AccountManager;
 import controller.GameControllerView;
 import controller.GameMenu;
@@ -258,9 +259,9 @@ public class TicTacToeControllerView extends GameControllerView {
 			}
 		}
 		
-		//System.out.println("----------");
-		//System.out.println(gameModel.toString());
-		//System.out.println("----------");
+		Gamejam.DPrint("----------");
+		Gamejam.DPrint(gameModel.toString());
+		Gamejam.DPrint("----------");
 		
 		if (gameModel.tied()) {
 			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
@@ -277,7 +278,7 @@ public class TicTacToeControllerView extends GameControllerView {
 				loseSound.play();
 			}
 		}
-		System.out.println("current directory = " + System.getProperty("user.dir"));
+		Gamejam.DPrint("current directory = " + System.getProperty("user.dir"));
 	}
 
 	@Override
@@ -296,7 +297,7 @@ public class TicTacToeControllerView extends GameControllerView {
 			oos = new ObjectOutputStream(fos);
 			oos.writeObject(gameModel);
 			oos.close();
-			System.out.println("Saved the game");
+			Gamejam.DPrint("Saved the game");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;

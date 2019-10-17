@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Observable;
 
+import Gamejam.Gamejam;
 import model.SanityCheckFailedException;
 
 public class AccountManager extends Observable {
@@ -107,13 +108,13 @@ public class AccountManager extends Observable {
 	public void logGameStat(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time) {
 		if (this.isGuest) {
 			// Do nothing if this is a guest account.
-			System.out.println("logGameStat, not doing anything!");
+			Gamejam.DPrint("logGameStat, not doing anything!");
 			return;
 		}
 		try {
-			System.out.println("\nFetching game from a string!");
+			Gamejam.DPrint("\nFetching game from a string!");
 			int gameid = getGameIdFromString(game);
-			System.out.println(gameid);
+			Gamejam.DPrint(gameid);
 			String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
 			conn.execute(transaction, userStatsIDs.get(gameid), win, loss, tie, incomplete, time, 0);
 			
@@ -255,7 +256,7 @@ public class AccountManager extends Observable {
 		userStatsIDs = new HashMap<>();
 
 		try {
-			System.out.println("fillUserStatsIDs: accountID = " + accountID);
+			Gamejam.DPrint("fillUserStatsIDs: accountID = " + accountID);
 			rs = conn.executeQuery("SELECT statsid, gameid FROM statistics WHERE statistics.accountid = ?", accountID);
 
 			while (rs.next()) {
@@ -263,8 +264,9 @@ public class AccountManager extends Observable {
 				int statsID = rs.getInt("statsid");
 				userStatsIDs.put(gameID, statsID);
 			}
-
-			userStatsIDs.forEach((key, value) -> System.out.println("gameID: " + key + "  statsID: " + value));
+			userStatsIDs.forEach((key, value) -> 
+				Gamejam.DPrint("gameID: " + key + "  statsID: " + value)
+			);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -280,7 +282,7 @@ public class AccountManager extends Observable {
 		try {
 			conn.execute("DELETE from accounts where username = '"+ username + "'");
 		} catch (SQLException se) {
-			
+			Gamejam.DPrint("Delete account threw an SQLExecption!");
 		}
 
 		return 1;
