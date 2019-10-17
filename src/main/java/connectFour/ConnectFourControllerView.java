@@ -177,7 +177,11 @@ public class ConnectFourControllerView extends GameControllerView {
 		try {
 			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
-			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
+			String filepath = System.getProperty("user.dir") + sep + "save-data";
+			if(!new File(filepath).exists()) {
+				new File(filepath).mkdir();
+			}
+			filepath += sep + fname;
 			fos = new FileOutputStream(filepath);			
 			oos = new ObjectOutputStream(fos);
 			oos.writeObject(gameModel);
