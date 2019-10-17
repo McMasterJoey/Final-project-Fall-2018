@@ -8,6 +8,8 @@ import java.util.Observable;
 import Gamejam.Gamejam;
 import model.SanityCheckFailedException;
 
+import javax.management.remote.rmi._RMIConnection_Stub;
+
 public class AccountManager extends Observable {
 
 	private String curUsername;
@@ -15,10 +17,16 @@ public class AccountManager extends Observable {
 	private boolean isGuest;
 	private int exp, level;
 	private DBConnection conn;
+	private DBGameManager gameManager;
 	private int accountID;
 	private HashMap<Integer, Integer> userStatsIDs; // maps gameid (key) to statsid (value)
 	private HashMap<String, Integer> databaseGameID;
-	
+	private HashMap<Integer, Integer> gameWins; // maps gameid to # of wins
+	private HashMap<Integer, Integer> gameLosses; // maps gameid to # of losses
+	private HashMap<Integer, Integer> gameTies; // maps gameid to # ties
+	private HashMap<Integer, Integer> gameIncompletes; // maps gameid to # incomplete games
+	private HashMap<Integer, Integer> numGamesPlayed; // maps gameid (key) to # of times played (value)
+
 	// Use the singleton pattern for this class
 	private static AccountManager singleton = null;
 	
@@ -31,7 +39,13 @@ public class AccountManager extends Observable {
 		level = 1;
 		accountID = -1;
 		userStatsIDs = null;
+		gameWins = null;
+		gameLosses = null;
+		gameTies = null;
+		gameIncompletes = null;
+		numGamesPlayed = null;
 		conn = DBConnection.getInstance();
+		gameManager.getInstance();
 		this.databaseGameID = new HashMap<String, Integer>();
 	}
 	
@@ -61,7 +75,7 @@ public class AccountManager extends Observable {
 					this.exp = rs.getInt("exp");
 					this.level = rs.getInt("level");
 					this.accountID = rs.getInt("accountid");
-					fillUserStatsIDs();
+					fillUserStats();
 					
 					System.out.println("Login: " + curUsername + " " + isAdmin + " " + isGuest);
 					
@@ -215,7 +229,7 @@ public class AccountManager extends Observable {
 			level = 1;
 			accountID = rs.getInt("accountid");
 			createStatisticsEntries();
-			fillUserStatsIDs();
+			fillUserStats();
 			
 		} catch (SQLException se) {
 			if (se.getErrorCode() == 1062) { // 1062 indicates username is already in the db
@@ -228,6 +242,8 @@ public class AccountManager extends Observable {
 		return 1;
 	}
 
+	// Helper for createAccount, generates the appropriate entries in the statistics table
+	// for the new user
 	private void createStatisticsEntries() {
 		ResultSet rs = null;
 
@@ -251,18 +267,33 @@ public class AccountManager extends Observable {
 
 	}
 
-	private void fillUserStatsIDs() {
+	// Fills the userStatsIDs, gameWins, gameLosses, gameTies, gameIncompletes, and numGamesPlayed
+	// HashMaps with the current users statistics
+	private void fillUserStats() {
 		ResultSet rs = null;
 		userStatsIDs = new HashMap<>();
-
+		gameWins = new HashMap<>();
+		gameLosses = new HashMap<>();
+		gameTies = new HashMap<>();
+		gameIncompletes = new HashMap<>();
+		numGamesPlayed = new HashMap<>();
 		try {
 			Gamejam.DPrint("fillUserStatsIDs: accountID = " + accountID);
-			rs = conn.executeQuery("SELECT statsid, gameid FROM statistics WHERE statistics.accountid = ?", accountID);
+			rs = conn.executeQuery("SELECT * FROM statistics WHERE statistics.accountid = ?", accountID);
 
 			while (rs.next()) {
 				int gameID = rs.getInt("gameid");
 				int statsID = rs.getInt("statsid");
+				int wins = rs.getInt("wins");
+				int losses = rs.getInt("losses");
+				int ties = rs.getInt("ties");
+				int incomplete = rs.getInt("incomplete");
 				userStatsIDs.put(gameID, statsID);
+				gameWins.put(gameID, wins);
+				gameLosses.put(gameID, losses);
+				gameTies.put(gameID, ties);
+				gameIncompletes.put(gameID, incomplete);
+				numGamesPlayed.put(gameID, wins + losses + ties + incomplete);
 			}
 			userStatsIDs.forEach((key, value) -> 
 				Gamejam.DPrint("gameID: " + key + "  statsID: " + value)
@@ -270,6 +301,12 @@ public class AccountManager extends Observable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+
+	// Public method to trigger fillUserStats
+	public void refreshUserStats() {
+		fillUserStats();
 	}
 	
 	// Attempt to delete an account
@@ -318,6 +355,28 @@ public class AccountManager extends Observable {
 	public HashMap<Integer, Integer> getUserStatsIDs() {
 		return userStatsIDs;
 	}
+
+	public HashMap<Integer, Integer> getGameWins() {
+		return gameWins;
+	}
+
+	public HashMap<Integer, Integer> getGameLosses() {
+		return gameLosses;
+	}
+
+	public HashMap<Integer, Integer> getGameTies() {
+		return gameTies;
+	}
+
+	public HashMap<Integer, Integer> getGameIncompletes() {
+		return gameIncompletes;
+	}
+
+	public HashMap<Integer, Integer> getNumGamesPlayed() {
+		return numGamesPlayed;
+	}
+
+
 	// End getters for account information
 	// ---
 	/**

@@ -1,5 +1,6 @@
 package Gamejam;
 
+import java.util.Collections;
 import java.util.Observer;
 
 import connectFour.ConnectFourControllerView;
@@ -7,7 +8,7 @@ import connectFour.ConnectFourControllerView;
 import java.util.ArrayList;
 import java.util.Observable;
 import controller.AccountManager;
-import controller.GameJamViewDatabaseInteractionManager;
+import controller.DBGameManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -45,7 +46,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private Label leftBarStats;
 	private VBox initCreateAccountMenu;
 	private AccountManager acctMgr;
-	private GameJamViewDatabaseInteractionManager _dbgameconnections;
+	private DBGameManager dbGameManager;
 	private TicTacToeControllerView tictactoegameview;
 	private int gameInUseIndex = -1;
 	private GameIconItem[] initgamelist;
@@ -67,7 +68,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// KEEP THESE AT TOP OR YOU WILL HAVE FUN WITH NULL POINTER EXECPTIONS!
 		this.acctMgr = AccountManager.getInstance();
 		this.acctMgr.addObserver(this);
-		this._dbgameconnections = GameJamViewDatabaseInteractionManager.getInstance();
+		this.dbGameManager = DBGameManager.getInstance();
 		
 		// Set up GUI Elements
 		this.initTopBar = initTopBar();
@@ -330,7 +331,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		stopAndSaveCurrentGame();
 		this.setTop(this.initLoggedInBar);
 		this.setCenter(this.initGameselectonboxarea);
-		
+		updateLeftPane();
 	}
 	/**
 	 * Handles the event were the Log out button is clicked Assumes: A user is
@@ -479,8 +480,24 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.leftBarMsg.setText("Administrator Account");
 			this.leftBarStats.setText("");
 		} else {
+			acctMgr.refreshUserStats();
 			this.leftBarMsg.setText("Welcome to Gamejam, " + this.acctMgr.getCurUsername());
 			this.leftBarStats.setText("\n\nLevel: " + this.acctMgr.getLevel() + "\nExp: " + this.acctMgr.getExp());
+
+			ArrayList<String> games = new ArrayList<>(dbGameManager.getGameList().keySet());
+			Collections.sort(games);
+
+			leftBarStats.setText(leftBarStats.getText() + "\n");
+
+			for (String game : games) {
+				Integer id = dbGameManager.getGameList().get(game);
+				Integer numPlayed = acctMgr.getNumGamesPlayed().get(dbGameManager.getGameList().get(game));
+				leftBarStats.setText(leftBarStats.getText() + "\n" + game + ":");
+				leftBarStats.setText(leftBarStats.getText() + "\nWins: " + acctMgr.getGameWins().get(id));
+				leftBarStats.setText(leftBarStats.getText() + "\nLosses: " + acctMgr.getGameLosses().get(id));
+				leftBarStats.setText(leftBarStats.getText() + "\nTies: " + acctMgr.getGameTies().get(id));
+				leftBarStats.setText(leftBarStats.getText() + "\nIncomplete: " + acctMgr.getGameIncompletes().get(id) + "\n");
+			}
 		}
 	}
 	/**
@@ -503,7 +520,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			retval[1] = new GameIconItem("Connect-Four", "/connectFourIcon.png", 1);
 			return retval;
 		}
-		ArrayList<GameIconItem> allgames = this._dbgameconnections.fetchAllGameSetUpInfo();
+		ArrayList<GameIconItem> allgames = this.dbGameManager.fetchAllGameSetUpInfo();
 		GameIconItem[] retval = new GameIconItem[allgames.size()];
 		for(int x = 0; x < retval.length; x++) {
 			retval[x] = allgames.get(x); // Transfer the arraylist content to the array

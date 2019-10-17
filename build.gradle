@@ -25,6 +25,17 @@ compileJava {
   targetCompatibility = 1.8
 }
 
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'Gamejam',  
+        	'Implementation-Version': '0.5',
+        	'Main-Class': 'Gamejam.Gamejam'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 repositories {
   jcenter()
   mavenCentral()
