@@ -15,7 +15,6 @@ import controller.GameMenu;
 import controller.logStatType;
 
 import javafx.geometry.Pos;
-import javafx.scene.control.MenuBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;

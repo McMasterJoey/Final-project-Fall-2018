@@ -13,7 +13,6 @@ import controller.GameControllerView;
 import controller.GameMenu;
 import controller.logStatType;
 import javafx.geometry.Pos;
-import javafx.scene.control.MenuBar;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.AudioClip;

@@ -49,16 +49,6 @@ public class TicTacToeModel extends Observable implements Serializable {
 	}
 
 	/**
-	 * starts a new game and sends observers a String that they can use to identify
-	 * this fact.
-	 */
-	public void startNewGame() {
-		initializeBoard();
-		setChanged();
-		notifyObservers("startNewGame()");
-	}
-
-	/**
 	 * Changes the AI's strategy
 	 * 
 	 * @param strat the strategy used by the computer to determine its move
