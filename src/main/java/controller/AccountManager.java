@@ -66,10 +66,6 @@ public class AccountManager extends Observable {
 					
 					setChanged();
 					notifyObservers();
-					// Fetch userId from database, used to reduce the frequency of queries to database.
-//					rs = conn.executeQuery("select accountid from accounts where accounts.username = ?", this.curUsername);
-//					rs.next();
-//					this.dataBaseUserId = rs.getInt("accountid");
 					return true;
 				}
 			}
@@ -111,6 +107,7 @@ public class AccountManager extends Observable {
 	public void logGameStat(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time) {
 		if (this.isGuest) {
 			// Do nothing if this is a guest account.
+			System.out.println("logGameStat, not doing anything!");
 			return;
 		}
 		try {
@@ -118,7 +115,7 @@ public class AccountManager extends Observable {
 			int gameid = getGameIdFromString(game);
 			System.out.println(gameid);
 			String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
-			conn.execute(transaction, userStatsIDs.get(gameid), win, loss, tie, incomplete, time);
+			conn.execute(transaction, userStatsIDs.get(gameid), win, loss, tie, incomplete, time, 0);
 			
 		} catch (SQLException se) {
 			se.printStackTrace();
