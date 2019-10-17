@@ -7,7 +7,7 @@ import javafx.scene.control.MenuItem;
 import ticTacToe.EasyAI;
 import ticTacToe.IntermediateAI;
 
-public class GameMenu extends MenuBar{
+public class GameMenu extends MenuBar {
 	private Menu optmenu;
 	private MenuItem newgame;
 	private MenuItem diffinter;

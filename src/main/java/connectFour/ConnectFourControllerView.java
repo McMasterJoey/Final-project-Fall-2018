@@ -13,7 +13,9 @@ import controller.GameControllerView;
 import controller.GameMenu;
 import controller.logStatType;
 import javafx.geometry.Pos;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.AudioClip;
@@ -45,11 +47,21 @@ public class ConnectFourControllerView extends GameControllerView {
 	// Should look and play the exact same way as before.
 	private GridPane _primarypane;
 	private GameMenu menuBar;
+	// Size of 5: 0 = Overall color, 1 = Blank Circle color, 2 = Circle outline color 
+	//            3 = Player Piece color, 4 = AI Piece color 
+	private Color[] themesettings; // Used to
 	/**
 	 * Constructor for the Connect 4 controller-view sets up the board and various
 	 * listeners
 	 */
 	public ConnectFourControllerView() {
+		themesettings = new Color[5];
+		themesettings[0] = Color.BLUE;
+		themesettings[1] = Color.WHITE;
+		themesettings[2] = Color.BLACK;
+		themesettings[3] = Color.INDIANRED;
+		themesettings[4] = Color.YELLOW;
+		
 		gameName = "connect-four";
 		menuBar = GameMenu.getMenuBar(this);
 		this.setTop(menuBar);
@@ -61,6 +73,7 @@ public class ConnectFourControllerView extends GameControllerView {
 		this.setHeight(HEIGHT);
 		_primarypane.setPrefHeight(HEIGHT);
 		_primarypane.setPrefWidth(WIDTH);
+		addCustomUIOptions();
 	}
 
 	/**
@@ -98,9 +111,9 @@ public class ConnectFourControllerView extends GameControllerView {
 		placeholder = new StackPane[7][6];
 		for (int row = 0; row < 6; row++) {
 			for (int col = 0; col < 7; col++) {
-				Rectangle rect = new Rectangle(100, 100, Color.BLUE);
-				Circle circ = new Circle(43, Color.WHITE);
-				circ.setStroke(Color.BLACK);
+				Rectangle rect = new Rectangle(100, 100, themesettings[0]);
+				Circle circ = new Circle(43, themesettings[1]);
+				circ.setStroke(themesettings[2]);
 				circ.setStrokeWidth(1);
 				StackPane spane = new StackPane();
 				spane.getChildren().addAll(rect, circ);
@@ -258,7 +271,7 @@ public class ConnectFourControllerView extends GameControllerView {
 		for (int row = 0; row < 6; row++) {
 			for (int col = 0; col < 7; col++) {
 				if (board[row][col] != '_') {
-					Circle circ = new Circle(43, board[row][col] == 'R' ? Color.INDIANRED : Color.YELLOW);
+					Circle circ = new Circle(43, board[row][col] == 'R' ? themesettings[3] : themesettings[4]);
 					placeholder[col][row].getChildren().add(circ);
 				}
 			}
@@ -291,5 +304,59 @@ public class ConnectFourControllerView extends GameControllerView {
 			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 1);
 			accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
 		}
+	}
+	/**
+	 * Redraws the game GUI. Ment to be used after changing the theme.
+	 */
+	private void reDrawGameUI() {
+		placeholder = new StackPane[7][6];
+		for (int row = 0; row < 6; row++) {
+			for (int col = 0; col < 7; col++) {
+				Rectangle rect = new Rectangle(100, 100, themesettings[0]);
+				Circle circ = new Circle(43, themesettings[1]);
+				circ.setStroke(themesettings[2]);
+				circ.setStrokeWidth(1);
+				StackPane spane = new StackPane();
+				spane.getChildren().addAll(rect, circ);
+				_primarypane.add(spane, col, row);
+				placeholder[col][row] = spane;
+			}
+		}
+		
+		char[][] board = gameModel.getBoard();
+		for (int row = 0; row < 6; row++) {
+			for (int col = 0; col < 7; col++) {
+				if (board[row][col] != '_') {
+					Circle circ = new Circle(43, board[row][col] == 'R' ? themesettings[3] : themesettings[4]);
+					placeholder[col][row].getChildren().add(circ);
+				}
+			}
+		}
+	}
+	/**
+	 * 
+	 */
+	private void addCustomUIOptions() {
+		Menu thememenu = new Menu("Theme Menu");
+		MenuItem opt1 = new MenuItem("Set Default Theme");
+		opt1.setOnAction((event) -> {
+			themesettings[0] = Color.BLUE;
+			themesettings[1] = Color.WHITE;
+			themesettings[2] = Color.BLACK;
+			themesettings[3] = Color.INDIANRED;
+			themesettings[4] = Color.YELLOW;
+			reDrawGameUI();
+		});
+		MenuItem opt2 = new MenuItem("Set Alternate Theme");
+		opt2.setOnAction((event) -> {
+			themesettings[0] = Color.DARKRED;
+			themesettings[1] = Color.GREEN;
+			themesettings[2] = Color.RED;
+			themesettings[3] = Color.BLACK;
+			themesettings[4] = Color.WHITE;
+			reDrawGameUI();
+		});
+		thememenu.getItems().addAll(opt1,opt2);
+		menuBar.getMenus().add(thememenu);
 	}
 }
