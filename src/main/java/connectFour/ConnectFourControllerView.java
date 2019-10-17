@@ -269,18 +269,18 @@ public class ConnectFourControllerView extends GameControllerView {
 		//System.out.println("--------------");
 		
 		if (gameModel.tied()) {
-			//accountmanager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
-			//accountmanager.logGameStat("Connect-Four", logStatType.TIE, 0);
+			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
+			accountmanager.logGameStat("Connect-Four", logStatType.TIE, 0);
 			tieSound.play();
 		} else if (gameModel.won('R') || gameModel.won('Y')) {
 			disableListeners();
 			if (gameModel.won('R')) {
-				//accountmanager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
-				//accountmanager.logGameStat("Connect-Four", logStatType.WIN, 0);
+				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
+				accountmanager.logGameStat("Connect-Four", logStatType.WIN, 0);
 				winSound.play();
 			} else {
-				//accountmanager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
-				//accountmanager.logGameStat("Connect-Four", logStatType.LOSS, 0);
+				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
+				accountmanager.logGameStat("Connect-Four", logStatType.LOSS, 0);
 				loseSound.play();
 			}
 		}
@@ -289,7 +289,7 @@ public class ConnectFourControllerView extends GameControllerView {
 	protected void updateStatistics() {
 		if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
 			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 1);
-			//accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
+			accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
 		}
 	}
 }

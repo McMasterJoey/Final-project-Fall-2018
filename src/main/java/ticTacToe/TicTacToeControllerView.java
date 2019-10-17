@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Observable;
 
+import Gamejam.Gamejam;
 import controller.AccountManager;
 import controller.GameControllerView;
 import controller.GameMenu;
@@ -258,40 +259,26 @@ public class TicTacToeControllerView extends GameControllerView {
 			}
 		}
 		
-		System.out.println("----------");
-		System.out.println(gameModel.toString());
-		System.out.println("----------");
+		Gamejam.DPrint("----------");
+		Gamejam.DPrint(gameModel.toString());
+		Gamejam.DPrint("----------");
 		
 		if (gameModel.tied()) {
-			//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
-			//accountmanager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
+			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
+			accountmanager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
 			tieSound.play();
 		} else if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
-				//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
-				//accountmanager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1);
+				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
+				accountmanager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1);
 				winSound.play();
 			} else {
-				//accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
-				//accountmanager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1);
+				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
+				accountmanager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1);
 				loseSound.play();
 			}
-
-			/*
-			 * *****Old code to figure out a stroke for the winning row/col/diagonal****
-			 * String winningDirection = gameModel.getWinningDirection(); Point[]
-			 * winningSquares = gameModel.getWinningSquares(winningDirection);
-			 * gc.setStroke(Color.BLUE);
-			 * 
-			 * switch (winningDirection) { case "horizontal": gc.strokeLine(0,
-			 * winningSquares[0].x*200+100, 600, winningSquares[2].x*200+100); break; case
-			 * "vertical": gc.strokeLine(winningSquares[0].y*200+100, 0,
-			 * winningSquares[2].y*200+100, 600); break; case "diagonal": if
-			 * (winningSquares[0].x == 0) { gc.strokeLine(0, 0, 600, 600); } else {
-			 * gc.strokeLine(0, 600, 600, 0); } break; } gc.setStroke(Color.BLACK);
-			 */
 		}
-		System.out.println("current directory = " + System.getProperty("user.dir"));
+		Gamejam.DPrint("current directory = " + System.getProperty("user.dir"));
 	}
 
 	@Override
@@ -310,7 +297,7 @@ public class TicTacToeControllerView extends GameControllerView {
 			oos = new ObjectOutputStream(fos);
 			oos.writeObject(gameModel);
 			oos.close();
-			System.out.println("Saved the game");
+			Gamejam.DPrint("Saved the game");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -396,7 +383,7 @@ public class TicTacToeControllerView extends GameControllerView {
 	protected void updateStatistics() {
 		if (!(gameModel.won('X') || gameModel.won('O')) && gameModel.maxMovesRemaining() > 0) {
 			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
-			//accountmanager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+			accountmanager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
 		}
 	}
 }
