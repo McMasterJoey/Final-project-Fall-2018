@@ -356,7 +356,34 @@ public class ConnectFourControllerView extends GameControllerView {
 			themesettings[4] = Color.WHITE;
 			reDrawGameUI();
 		});
-		thememenu.getItems().addAll(opt1,opt2);
+		MenuItem opt3 = new MenuItem("Set America Theme");
+		opt3.setOnAction((event) -> {
+			themesettings[0] = Color.AQUA;
+			themesettings[1] = Color.WHITE;
+			themesettings[2] = Color.GREY;
+			themesettings[3] = Color.RED;
+			themesettings[4] = Color.BLUE;
+			reDrawGameUI();
+		});
+		MenuItem opt4 = new MenuItem("Set MLG PRO Theme");
+		opt4.setOnAction((event) -> {
+			themesettings[0] = Color.BLACK;
+			themesettings[1] = Color.GREY;
+			themesettings[2] = Color.WHITE;
+			themesettings[3] = Color.GREEN;
+			themesettings[4] = Color.RED;
+			reDrawGameUI();
+		});
+		MenuItem opt5 = new MenuItem("Set Greyscale Theme");
+		opt5.setOnAction((event) -> {
+			themesettings[0] = Color.WHITE;
+			themesettings[1] = Color.WHITE;
+			themesettings[2] = Color.WHITE;
+			themesettings[3] = Color.BLACK;
+			themesettings[4] = Color.GREY;
+			reDrawGameUI();
+		});
+		thememenu.getItems().addAll(opt1,opt2,opt3,opt4,opt5);
 		menuBar.getMenus().add(thememenu);
 	}
 }
