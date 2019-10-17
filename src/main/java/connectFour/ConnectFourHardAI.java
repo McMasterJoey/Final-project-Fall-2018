@@ -12,7 +12,7 @@ public class ConnectFourHardAI implements ConnectFourStrategy, Serializable{
 	/*
 	 * Find an possible column by looking at 5 steps ahead. Use MinMax algorithm.
 	 */
-	static final int SMALL_NUMBER = -9999999;
+	static final int SMALL_NUMBER = Integer.MIN_VALUE;
 
 	@Override
 	public int desiredMove(ConnectFourModel theGame) throws IGotNoWhereToGoException {
