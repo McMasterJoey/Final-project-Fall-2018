@@ -14,7 +14,6 @@ import controller.GameMenu;
 import controller.logStatType;
 import javafx.geometry.Pos;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
