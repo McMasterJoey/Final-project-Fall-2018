@@ -10,15 +10,22 @@ import java.util.Observable;
 import controller.AccountManager;
 import controller.DBGameManager;
 import controller.GameControllerView;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -42,6 +49,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private HBox initCreateAccountMenuBar;
 	private HBox initLoggedInInGameBar;
 	private VBox initLeftBar;
+	private MenuBar initGeneralOptMenuBar;
 	private Label leftBarMsg;
 	private Label leftBarStats;
 	private VBox initCreateAccountMenu;
@@ -55,6 +63,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private boolean userLoggedIn = false;
 	private boolean userisAdmin = false;
 	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
+	private Color[] themeSettings;
 	public GamejamMainScreen() {
 		super();
 		init();
@@ -71,6 +80,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.dbGameManager = DBGameManager.getInstance();
 		
 		// Set up GUI Elements
+		this.initGeneralOptMenuBar = initThemeMenu();
 		this.initTopBar = initTopBar();
 		this.initGameselectonboxarea = initGamePanel();
 		this.initLeftBar = initLeftBar();
@@ -132,7 +142,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		return leftbox;
 	}
 	/**
-	 * Gets the item that is surposed to be the top most part of the application
+	 * Gets the item that is supposed to be the top most part of the application
 	 * This should be the clickable menus that allow the use to log in and adjust
 	 * their account settings.
 	 * 
@@ -154,7 +164,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		leftbox.setPrefWidth(758);
 		leftbox.setPrefHeight(25);
 		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
-		// Add to right hbox first to acheive correct look
+		// Add to right hbox first to achieve correct look
 		retval.getChildren().add(leftbox);
 
 		TextField username = new TextField();
@@ -203,7 +213,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		leftbox.setPrefWidth(1100);
 		leftbox.setPrefHeight(25);
 		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
-		// Add to right hbox first to acheive correct look
+		// Add to right hbox first to achieve correct look
 		retval.getChildren().add(leftbox);
 
 		Label loggedinusername = new Label("Test User");
@@ -222,14 +232,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		return retval;
 	}
 	/**
-	 * Generates the iteme that will be put in the top bar of the application while a user is in a game and logged in.
+	 * Generates the item that will be put in the top bar of the application while a user is in a game and logged in.
 	 * @return An HBox with the control structures to act as the top bar of the application.
 	 */
 	private HBox initLoggedInInGameBar() {
 		HBox retval = new HBox(); // General Box
 		retval.setAlignment(Pos.TOP_RIGHT); // Set it so it aligns on the right
 		HBox leftbox = new HBox();
-		// Create New Account Button
+		// Back to Main Menu Button
 		Button logout = new Button("Back To Main Menu");
 		logout.setPrefWidth(144);
 		logout.setPrefHeight(25);
@@ -241,7 +251,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		leftbox.setPrefWidth(1100);
 		leftbox.setPrefHeight(25);
 		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
-		// Add to right hbox first to acheive correct look
+		// Add to right hbox first to achieve correct look
 		retval.getChildren().add(leftbox);
 
 		Label loggedinusername = new Label("Test User");
@@ -313,6 +323,48 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			grid.add(gamebutton, x % 4, x / 4);
 		}
 		return grid;
+	}
+	/**
+	 * Gets the item that is the theme menu for the main GUI
+	 * @return The menu bar to put into a control structure.
+	 */
+	private MenuBar initThemeMenu() {
+		initDefaultTheme();
+		MenuBar bar = new MenuBar();
+		Menu thememenu = new Menu("Theme Menu");
+		MenuItem opt1 = new MenuItem("Default Theme");
+		opt1.setOnAction((event) -> {
+			updateTheme();
+		});
+		MenuItem opt2 = new MenuItem("Night Theme");
+		opt2.setOnAction((event) -> {
+			updateTheme();
+		});
+		thememenu.getItems().addAll(opt1,opt2);
+		bar.getMenus().add(thememenu);
+		return bar;
+	}
+	/**
+	 * Creates the themearray and inits it.
+	 */
+	private void initDefaultTheme() {
+		this.themeSettings = new Color[8];
+		this.themeSettings[0] = Color.GREY; // Button Backgrounds
+		this.themeSettings[1] = Color.BLACK; // Left Panel Upper Text color 
+		this.themeSettings[2] = Color.GREY; // Upper bars background
+		this.themeSettings[3] = Color.GREY; // Middle Area background / Overall background
+		this.themeSettings[4] = Color.GREY; // Left Panel background
+		this.themeSettings[5] = Color.BLACK; // New account/Back/Logout button text
+		this.themeSettings[6] = Color.BLACK; // Left Panel Lower text color
+		this.themeSettings[7] = Color.RED; // Login button text color
+	}
+	
+	/**
+	 * Updates the theme of mainGUI
+	 */
+	private void updateTheme() {
+		this.setBackground(new Background(new BackgroundFill(this.themeSettings[3],CornerRadii.EMPTY,new Insets(0))));
+		
 	}
 //////////////////////// Button Click Handlers go here  /////////////////////////////////////////////
 	/**
@@ -442,7 +494,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		}
 	}
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
-
 	/**
 	 * Updates the GUI after a new account is made succesfuly,
 	 */
