@@ -289,7 +289,6 @@ public class TicTacToeControllerView extends GameControllerView {
 		// Don't save if the game was completed
 		if(!gameModel.isStillRunning()) {
 			gameModel.clearBoard();
-			saveGame();
 		}
 		FileOutputStream fos;
 		ObjectOutputStream oos;
