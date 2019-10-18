@@ -484,6 +484,12 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 
 	private void viewLeaderboardClick() {
 		this.setCenter(leaderScreen);
+
+		if (userLoggedIn) {
+			this.setTop(initLoggedInInGameBar);
+		} else {
+			this.setTop(initCreateAccountMenuBar);
+		}
 	}
 
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
