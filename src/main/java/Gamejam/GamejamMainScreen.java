@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Observable;
 import controller.AccountManager;
 import controller.DBGameManager;
+import controller.GameControllerView;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -23,7 +24,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
-import model.GameJamGameInterface;
 import model.SanityCheckFailedException;
 import ticTacToe.TicTacToeControllerView;
 
@@ -406,12 +406,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			doGUIUpdateOnCreateAccountSuccess();
 		} else if (status == 2) {
 			Gamejam.DPrint("Username already in use");
-			// TODO: Handle username already in use
 			info.setText("User name: '" + username.getText() + "' already in use. Try a diffrent one.");
 			button.setTextFill(Color.RED);
 		} else if (status == 3) {
 			System.err.println("Other error encounted on account creation");
-			// TODO: Handle other error in creation
 			info.setText("Error in account creation, try again later.");
 			button.setTextFill(Color.RED);
 		}
@@ -563,25 +561,25 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * Stops and saves the current game so the user can go back the main menu.
 	 */
 	private void stopAndSaveCurrentGame() {
-		GameJamGameInterface game = getLoaddedGame();
+		GameControllerView game = getLoaddedGame();
 		if (game == null) {
-			return;
-			// Will swap out once intergrated with Wes's code.
-			//throw new SanityCheckFailedException("getLoaddedGame returned null when stoping and saving current game!");
+			throw new SanityCheckFailedException("getLoaddedGame returned null when stoping and saving current game!");
 		}
-		String path = "/userdata/" + acctMgr.getCurUsername();
-		game.saveGame();
-		game.pauseGame();
+		boolean saved = game.saveGame();
+		boolean paused = game.pauseGame();
+		if (!saved || !paused) {
+			throw new SanityCheckFailedException("getLoaddedGame saveGame or pauseGame failed to save and pause!");
+		}
 	}
 	/**
 	 * Returns the view of the loaded game in interface form.
 	 * @return The view of the loaded game, returns null if no game is loaded.
 	 */
-	private GameJamGameInterface getLoaddedGame() {
+	private GameControllerView getLoaddedGame() {
 		if (this.gameInUseIndex == 0) {
-			return (GameJamGameInterface) this.tictactoegameview;
+			return (GameControllerView) this.tictactoegameview;
 		} else if (this.gameInUseIndex == 1) {
-			return (GameJamGameInterface) this.connectFourGameView;
+			return (GameControllerView) this.connectFourGameView;
 		}
 		return null;
 	}
