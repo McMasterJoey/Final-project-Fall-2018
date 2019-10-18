@@ -5,11 +5,11 @@ package model;
  *
  * @Author Nicholas Fiegel
  */
-public class Score {
+public class Score implements Comparable {
     private int gameID;
     private String gameName;
-    private int userID;
-    private String userName;
+    private int accountID;
+    private String username;
     private int score;
 
     /**
@@ -24,8 +24,8 @@ public class Score {
     public Score(int gameID, String gameName, int userID, String userName, int score) {
         this.gameID = gameID;
         this.gameName = gameName;
-        this.userID = userID;
-        this.userName = userName;
+        this.accountID = userID;
+        this.username = userName;
         this.score = score;
     }
 
@@ -40,16 +40,29 @@ public class Score {
         return gameName;
     }
 
-    public int getUserID() {
-        return userID;
+    public int getAccountID() {
+        return accountID;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
     public int getScore() {
         return score;
+    }
+
+    @Override
+    public int compareTo(Object other) {
+        int otherScore = ((Score) other).getScore();
+
+        if (score > otherScore) {
+            return 1;
+        } else if (score < otherScore) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 
     // End Getters

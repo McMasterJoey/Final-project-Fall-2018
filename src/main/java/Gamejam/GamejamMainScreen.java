@@ -484,14 +484,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.leftBarMsg.setText("Welcome to Gamejam, " + this.acctMgr.getCurUsername());
 			this.leftBarStats.setText("\n\nLevel: " + this.acctMgr.getLevel() + "\nExp: " + this.acctMgr.getExp());
 
-			ArrayList<String> games = new ArrayList<>(dbGameManager.getGameList().keySet());
+			ArrayList<String> games = new ArrayList<>(dbGameManager.getGameListByName().keySet());
 			Collections.sort(games);
 
 			leftBarStats.setText(leftBarStats.getText() + "\n");
 
 			for (String game : games) {
-				Integer id = dbGameManager.getGameList().get(game);
-				Integer numPlayed = acctMgr.getNumGamesPlayed().get(dbGameManager.getGameList().get(game));
+				Integer id = dbGameManager.getGameListByName().get(game);
+				Integer numPlayed = acctMgr.getNumGamesPlayed().get(dbGameManager.getGameListByName().get(game));
 				leftBarStats.setText(leftBarStats.getText() + "\n" + game + ":");
 				leftBarStats.setText(leftBarStats.getText() + "\nWins: " + acctMgr.getGameWins().get(id));
 				leftBarStats.setText(leftBarStats.getText() + "\nLosses: " + acctMgr.getGameLosses().get(id));

@@ -16,11 +16,13 @@ public class DBGameManager
 {
 	private static DBGameManager _singleton = null;
 	private DBConnection DBconnection;
-	private HashMap<String, Integer> gameList;
+	private HashMap<String, Integer> gameListByName; // Maps game name to gameid
+	private HashMap<Integer, String> gameListByID; // Maps gameid to game name
 	
 	private DBGameManager() {
 		DBconnection = DBConnection.getInstance();
-		gameList = new HashMap<>();
+		gameListByName = new HashMap<>();
+		gameListByID = new HashMap<>();
 	}
 
 	/**
@@ -48,7 +50,8 @@ public class DBGameManager
 				Integer id = rs.getInt("gameid");
 				GameIconItem game = new GameIconItem(name, rs.getString("iconpath"), id);
 				retval.add(game);
-				gameList.put(name, id);
+				gameListByName.put(name, id);
+				gameListByID.put(id, name);
 			}
 		} catch (SQLException se) {
 			se.printStackTrace();
@@ -65,7 +68,11 @@ public class DBGameManager
 		return retval;
 	}
 
-	public HashMap<String, Integer> getGameList() {
-		return gameList;
+	public HashMap<String, Integer> getGameListByName() {
+		return gameListByName;
+	}
+
+	public HashMap<Integer, String> getGameListByID() {
+		return gameListByID;
 	}
 }
