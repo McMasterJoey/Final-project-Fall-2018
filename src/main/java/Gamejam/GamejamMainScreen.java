@@ -299,11 +299,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		grid.getColumnConstraints().add(new ColumnConstraints(272));
 		this.initgamelist = getGameList();
 		for (int x = 0; x < this.initgamelist.length; x++) {
-			// Sanity check
 			if (this.initgamelist[x].getGameID() < 0 || this.initgamelist[x].getGameID() > 11) {
 				throw new SanityCheckFailedException("When adding game icons, one of the games had id that was out of range!");
 			}
-			//
 			GameButton gamebutton = new GameButton();
 			Image icon = new Image(getClass().getResourceAsStream(this.initgamelist[x].getIconFilePath()));
 			gamebutton.setGraphic(new ImageView(icon));
@@ -340,7 +338,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private void logoutButtonClick() {
 		acctMgr.logout();
 		userLoggedIn = false;
-		System.out.println("Logout!");
+		Gamejam.DPrint("Logout!");
 		this.setTop(this.initTopBar);
 		//updateLeftPane();
 	}
@@ -409,7 +407,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			info.setText("User name: '" + username.getText() + "' already in use. Try a diffrent one.");
 			button.setTextFill(Color.RED);
 		} else if (status == 3) {
-			System.err.println("Other error encounted on account creation");
+			Gamejam.DPrint("Other error encounted on account creation");
 			info.setText("Error in account creation, try again later.");
 			button.setTextFill(Color.RED);
 		}
@@ -425,6 +423,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		if (name.equals("Tic-Tac-Toe")) {
 			this.gameInUseIndex = 0;
 			if (userLoggedIn) {
+				loadAndResumeGame();
 				this.setTop(this.initLoggedInInGameBar);
 			} else {
 				this.setTop(this.initCreateAccountMenuBar);
@@ -432,13 +431,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.setCenter(this.tictactoegameview);
 		}
 		if (name.equals("Connect-Four")) {
+			this.gameInUseIndex = 1;
 			if(userLoggedIn) {
+				loadAndResumeGame();
 				this.setTop(this.initLoggedInInGameBar);
 			} else {
 				this.setTop(this.initCreateAccountMenuBar);
 			}
 			this.setCenter(this.connectFourGameView);
-			//connectFourGameView.setAlignment(Pos.CENTER);
 		}
 	}
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
@@ -560,15 +560,44 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	/**
 	 * Stops and saves the current game so the user can go back the main menu.
 	 */
-	private void stopAndSaveCurrentGame() {
+	public void stopAndSaveCurrentGame() {
 		GameControllerView game = getLoaddedGame();
 		if (game == null) {
-			throw new SanityCheckFailedException("getLoaddedGame returned null when stoping and saving current game!");
+			throw new SanityCheckFailedException("stopAndSaveCurrentGame: couldn't get the loaded game!");
+		}
+		boolean paused = game.pauseGame();
+		if (this.acctMgr.isGuest()) {
+			// The user is not logged in, do nothing.
+			if (!paused) {
+				throw new SanityCheckFailedException("stopAndSaveCurrentGame: pauseGame failed to pause!");
+			}
+			return;
 		}
 		boolean saved = game.saveGame();
-		boolean paused = game.pauseGame();
 		if (!saved || !paused) {
-			throw new SanityCheckFailedException("getLoaddedGame saveGame or pauseGame failed to save and pause!");
+			throw new SanityCheckFailedException("stopAndSaveCurrentGame: saveGame or pauseGame failed to save and pause!");
+		}
+	}
+	/**
+	 * Loads the saved data of the current game into the gamestate.
+	 * If no data exists or it fails, does nothing.
+	 */
+	private void loadAndResumeGame() {
+		GameControllerView game = getLoaddedGame();
+		if (game == null) {
+			throw new SanityCheckFailedException("loadAndResumeGame: couldn't get the loaded game!");
+		}
+		boolean unpaused = game.unPauseGame();
+		if (this.acctMgr.isGuest()) {
+			// The user is not logged in, do nothing.
+			if (!unpaused) {
+				throw new SanityCheckFailedException("loadAndResumeGame: unPauseGame failed to unpause!");
+			}
+			return;
+		}
+		boolean loaded = game.loadSaveGame();
+		if (!loaded || !unpaused) {
+			throw new SanityCheckFailedException("loadAndResumeGame: loadSaveGame or unPauseGame failed to load and unpause!");
 		}
 	}
 	/**

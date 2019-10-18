@@ -189,9 +189,9 @@ public class TicTacToeControllerView extends GameControllerView {
 		});
 
 		midCenter.setOnMouseClicked((click) -> {
-			System.out.println("what what");
+			Gamejam.DPrint("what what");
 			gameModel.humanMove(1, 1, false);
-			System.out.println(gameModel.toString());
+			Gamejam.DPrint(gameModel.toString());
 			moveSound.play();
 		});
 
@@ -282,9 +282,14 @@ public class TicTacToeControllerView extends GameControllerView {
 
 	@Override
 	public boolean saveGame() {
-		System.out.println(accountmanager.getCurUsername());
+		Gamejam.DPrint(accountmanager.getCurUsername());
 		if(accountmanager.isGuest()) {
 			return false;
+		}
+		// Don't save if the game was completed
+		if(!gameModel.isStillRunning()) {
+			gameModel.clearBoard();
+			saveGame();
 		}
 		FileOutputStream fos;
 		ObjectOutputStream oos;
@@ -319,17 +324,22 @@ public class TicTacToeControllerView extends GameControllerView {
 	public boolean loadSaveGame() {
 		FileInputStream fis;
 		ObjectInputStream ois;
+		boolean retVal = true;
 		try {
 			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
 			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
 			File file = new File(filepath);
-			fis = new FileInputStream(file);
-			ois = new ObjectInputStream(fis);
-			gameModel = (TicTacToeModel) ois.readObject();
-			ois.close();
-			file.delete();
-			System.out.println("Succesfully loaded");
+			if(file.exists()) {
+				fis = new FileInputStream(file);
+				ois = new ObjectInputStream(fis);
+				gameModel = (TicTacToeModel) ois.readObject();
+				ois.close();
+				update(gameModel, this);
+				file.delete();
+			} else {
+				retVal = newGame();
+			}
 		} catch(IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 			return false;

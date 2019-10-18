@@ -171,6 +171,11 @@ public class ConnectFourControllerView extends GameControllerView {
 		if(accountmanager.isGuest()) {
 			return false;
 		}
+		// Don't save if the game was completed
+		if(!gameModel.isStillRunning()) {
+			gameModel.clearBoard();
+			saveGame();
+		}
 		FileOutputStream fos;
 		ObjectOutputStream oos;
 		try {
@@ -200,17 +205,22 @@ public class ConnectFourControllerView extends GameControllerView {
 	 * @return true if the load was successful, false otherwise
 	 */
 	public boolean loadSaveGame() {
+		boolean retVal = true;
 		try {
 			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
 			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
 			File file = new File(filepath);
-			FileInputStream fis = new FileInputStream(file);
-			ObjectInputStream ois = new ObjectInputStream(fis);
-			gameModel = (ConnectFourModel) ois.readObject();
-			ois.close();
-			update(gameModel, this);
-			file.delete();
+			if(file.exists()) {
+				FileInputStream fis = new FileInputStream(file);
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				gameModel = (ConnectFourModel) ois.readObject();
+				ois.close();
+				update(gameModel, this);
+				file.delete();
+			} else {
+				retVal = newGame();
+			}
 		} catch(IOException | ClassNotFoundException e) {
 			return false;
 		}
