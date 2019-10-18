@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Observable;
 
 import Gamejam.Gamejam;
+import connectFour.ConnectFourModel;
 import controller.AccountManager;
 import controller.GameControllerView;
 import controller.GameMenu;
@@ -319,17 +320,22 @@ public class TicTacToeControllerView extends GameControllerView {
 	public boolean loadSaveGame() {
 		FileInputStream fis;
 		ObjectInputStream ois;
+		boolean retVal = true;
 		try {
 			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
 			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
 			File file = new File(filepath);
-			fis = new FileInputStream(file);
-			ois = new ObjectInputStream(fis);
-			gameModel = (TicTacToeModel) ois.readObject();
-			ois.close();
-			file.delete();
-			System.out.println("Succesfully loaded");
+			if(file.exists()) {
+				fis = new FileInputStream(file);
+				ois = new ObjectInputStream(fis);
+				gameModel = (TicTacToeModel) ois.readObject();
+				ois.close();
+				update(gameModel, this);
+				file.delete();
+			} else {
+				retVal = newGame();
+			}
 		} catch(IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 			return false;
