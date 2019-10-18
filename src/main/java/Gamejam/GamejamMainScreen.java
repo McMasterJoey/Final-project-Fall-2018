@@ -58,12 +58,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private TicTacToeControllerView tictactoegameview;
 	private int gameInUseIndex = -1;
 	private GameIconItem[] initgamelist;
+	private Button[] initbuttonlist;
 	private ConnectFourControllerView connectFourGameView;
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
 	private boolean userisAdmin = false;
 	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
-	private Color[] themeSettings;
+	private int[] themeSettings;
 	public GamejamMainScreen() {
 		super();
 		init();
@@ -79,8 +80,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.acctMgr.addObserver(this);
 		this.dbGameManager = DBGameManager.getInstance();
 		
+		// Init Collections
+		this.initbuttonlist = new Button[16];
+		
 		// Set up GUI Elements
-		this.initGeneralOptMenuBar = initThemeMenu();
 		this.initTopBar = initTopBar();
 		this.initGameselectonboxarea = initGamePanel();
 		this.initLeftBar = initLeftBar();
@@ -90,6 +93,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initLoggedInBar = initLoggedInBar();
 		this.initCreateAccountMenuBar = initCreateAccountMenuBar();
 		this.initLoggedInInGameBar = initLoggedInInGameBar();
+		
+		
+		this.initGeneralOptMenuBar = initThemeMenu();
 		
 		// Set up Game Views
 		this.tictactoegameview = new TicTacToeControllerView();
@@ -110,9 +116,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		retval.setPrefWidth(145);
 		retval.setPrefHeight(578);
 
-		leftBarMsg = new Label();
-		leftBarMsg.setWrapText(true);
-		leftBarStats = new Label();
+		this.leftBarMsg = new Label();
+		this.leftBarMsg.setWrapText(true);
+		this.leftBarStats = new Label();
 		setGuestMessage();
 		
 		retval.getChildren().addAll(leftBarMsg, leftBarStats);
@@ -134,6 +140,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		mainmenu.setOnMouseClicked((click) -> {
 			doBackToMainMenuButtonClickInCreateAccountMenuBar();
 		});
+		// Add to button collection
+		this.initbuttonlist[0] = mainmenu;
+		
 		// Add to Left Hbox
 		leftbox.getChildren().add(mainmenu);
 		leftbox.setPrefWidth(758);
@@ -184,6 +193,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		login.setOnMouseClicked((click) -> {
 			loginButtonClick();
 		});
+		// Add buttons to button collection
+		this.initbuttonlist[1] = newacc;
+		this.initbuttonlist[2] = login;
+		
 		retval.getChildren().addAll(username, password, login);
 		retval.setPrefWidth(600);
 		retval.setPrefHeight(25);
@@ -226,6 +239,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		settings.setOnMouseClicked((click) -> {
 			userSettingsButtonClick();
 		});
+		// Add buttons to collection
+		this.initbuttonlist[3] = logout;
+		this.initbuttonlist[4] = settings;
+				
 		retval.getChildren().addAll(loggedinusername, settings);
 		retval.setPrefWidth(600);
 		retval.setPrefHeight(25);
@@ -264,6 +281,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		settings.setOnMouseClicked((click) -> {
 			userSettingsButtonClick();
 		});
+		// Add buttons to collection
+		this.initbuttonlist[5] = logout; // Back to main menu button
+		this.initbuttonlist[6] = settings;
+				
 		retval.getChildren().addAll(loggedinusername, settings);
 		retval.setPrefWidth(600);
 		retval.setPrefHeight(25);
@@ -290,6 +311,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		makeaccount.setOnMouseClicked((click) -> {
 			createNewAccountButtonOnFinishedClick();
 		});
+		// Add button to collection
+		this.initbuttonlist[7] = makeaccount;
+				
 		retval.getChildren().addAll(info, username, password, makeaccount);
 		retval.setPrefWidth(600);
 		retval.setPrefHeight(600);
@@ -308,6 +332,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		grid.getColumnConstraints().add(new ColumnConstraints(272));
 		grid.getColumnConstraints().add(new ColumnConstraints(272));
 		this.initgamelist = getGameList();
+		int bid = 10;
 		for (int x = 0; x < this.initgamelist.length; x++) {
 			if (this.initgamelist[x].getGameID() < 0 || this.initgamelist[x].getGameID() > 11) {
 				throw new SanityCheckFailedException("When adding game icons, one of the games had id that was out of range!");
@@ -320,6 +345,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 				GameButton but = (GameButton) click.getSource();
 				gameButtonClick(but.getMetaDataString());
 			});
+			// Add button to collection
+			this.initbuttonlist[bid] = gamebutton;
+			bid++;
 			grid.add(gamebutton, x % 4, x / 4);
 		}
 		return grid;
@@ -345,27 +373,63 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		return bar;
 	}
 	/**
-	 * Creates the themearray and inits it.
+	 * Creates the theme array and inits it, then updates the theme.
 	 */
 	private void initDefaultTheme() {
-		this.themeSettings = new Color[8];
-		this.themeSettings[0] = Color.GREY; // Button Backgrounds
-		this.themeSettings[1] = Color.BLACK; // Left Panel Upper Text color 
-		this.themeSettings[2] = Color.GREY; // Upper bars background
-		this.themeSettings[3] = Color.GREY; // Middle Area background / Overall background
-		this.themeSettings[4] = Color.GREY; // Left Panel background
-		this.themeSettings[5] = Color.BLACK; // New account/Back/Logout button text
-		this.themeSettings[6] = Color.BLACK; // Left Panel Lower text color
-		this.themeSettings[7] = Color.RED; // Login button text color
+		this.themeSettings = new int[8];
+		this.themeSettings[0] = RegionColors.GREY;   // Button Backgrounds
+		this.themeSettings[1] = RegionColors.BLACK;  // Left Panel Upper Text color 
+		this.themeSettings[2] = RegionColors.GREY;   // Upper bars background
+		this.themeSettings[3] = RegionColors.GREY;   // Middle Area background / Overall background
+		this.themeSettings[4] = RegionColors.GREY;   // Left Panel background
+		this.themeSettings[5] = RegionColors.BLACK;  // New account/Back/Logout button text
+		this.themeSettings[6] = RegionColors.BLACK;  // Left Panel Lower text color
+		this.themeSettings[7] = RegionColors.RED;    // Login button text color
+		updateTheme();
 	}
 	
 	/**
 	 * Updates the theme of mainGUI
 	 */
 	private void updateTheme() {
-		this.setBackground(new Background(new BackgroundFill(this.themeSettings[3],CornerRadii.EMPTY,new Insets(0))));
+		for(int x = 0; x < this.initbuttonlist.length; x++) {
+			if (this.initbuttonlist[x] == null) {
+				continue;
+			}
+			this.initbuttonlist[x].setBackground(RegionColors.getBackgroundColor(this.themeSettings[0]));
+		}
+		this.leftBarMsg.setTextFill(RegionColors.getColor(this.themeSettings[1]));
 		
+		this.initTopBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
+		this.initLoggedInInGameBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
+		this.initLoggedInBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
+		this.initCreateAccountMenuBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
+		
+		this.setBackground(RegionColors.getBackgroundColor(this.themeSettings[3]));
+		
+		this.initLeftBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[4]));
+		
+		this.initbuttonlist[0].setTextFill(RegionColors.getColor(this.themeSettings[5]));
+		this.initbuttonlist[7].setTextFill(RegionColors.getColor(this.themeSettings[5]));
+		
+		this.leftBarStats.setTextFill(RegionColors.getColor(this.themeSettings[6]));
+		
+		this.initbuttonlist[2].setTextFill(RegionColors.getColor(this.themeSettings[7]));
+		
+		/*
+				this.initGeneralOptMenuBar = initThemeMenu();
+				this.initTopBar = initTopBar();
+				this.initGameselectonboxarea = initGamePanel();
+				this.initLeftBar = initLeftBar();
+				
+				// Not in user parts that can be used later
+				this.initCreateAccountMenu = initCreateAccountScreen();
+				this.initLoggedInBar = initLoggedInBar();
+				this.initCreateAccountMenuBar = initCreateAccountMenuBar();
+				this.initLoggedInInGameBar = initLoggedInInGameBar();
+		*/
 	}
+	
 //////////////////////// Button Click Handlers go here  /////////////////////////////////////////////
 	/**
 	 * Handles when a user wants to exit the create account screen without creating an account.
