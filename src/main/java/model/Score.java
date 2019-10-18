@@ -18,14 +18,14 @@ public class Score implements Comparable {
      * @param gameID The gameid in the database
      * @param gameName The name of the game in the database, associated with gameid
      * @param userID The userid in the database
-     * @param userName The account name associated with userid
+     * @param username The account name associated with userid
      * @param score The user's score for this instance of the game
      */
-    public Score(int gameID, String gameName, int userID, String userName, int score) {
+    public Score(int gameID, String gameName, int userID, String username, int score) {
         this.gameID = gameID;
         this.gameName = gameName;
         this.accountID = userID;
-        this.username = userName;
+        this.username = username;
         this.score = score;
     }
 

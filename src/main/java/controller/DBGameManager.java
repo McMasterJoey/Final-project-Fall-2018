@@ -23,6 +23,7 @@ public class DBGameManager
 		DBconnection = DBConnection.getInstance();
 		gameListByName = new HashMap<>();
 		gameListByID = new HashMap<>();
+		fetchAllGameSetUpInfo();
 	}
 
 	/**
