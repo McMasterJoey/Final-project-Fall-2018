@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Observable;
 
+import Gamejam.Gamejam;
 import model.SanityCheckFailedException;
 
 import javax.management.remote.rmi._RMIConnection_Stub;
@@ -90,6 +91,25 @@ public class AccountManager extends Observable {
 		return false;
 	}
 	/**
+	 * Logs a game played for the given user, Alternate function
+	 * @param game The name of the game that was played
+	 * @param stattype The type of stat being recorded see logStatType. 
+	 * @param time The amount of time passed during this run of the game.
+	 */
+	public void logGameStat(String game, int stattype, int time) {
+		if (stattype == 0) {
+			this.logGameStat(game,true,false,false,false,time);
+		} else if (stattype == 1) {
+			this.logGameStat(game,false,true,false,false,time);
+		} else if (stattype == 2) {
+			this.logGameStat(game,false,false,true,false,time);
+		} else if (stattype == 3) {
+			this.logGameStat(game,false,false,false,true,time);
+		} else {
+			throw new IllegalArgumentException("Invalid stattype was out of range or value was below 0.");
+		}
+	}
+	/**
 	 * Logs a game played for the given user
 	 * 
 	 * @param game The name of the game that was played
@@ -100,18 +120,17 @@ public class AccountManager extends Observable {
 	 * @param time The amount of time that elapsed the game
 	 */
 	public void logGameStat(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time) {
-
 		if (this.isGuest) {
-			System.out.println("\nWe are a guest!!");
 			// Do nothing if this is a guest account.
+			Gamejam.DPrint("logGameStat, not doing anything!");
 			return;
 		}
 		try {
-			System.out.println("\nFetching game from a string!");
+			Gamejam.DPrint("\nFetching game from a string!");
 			int gameid = getGameIdFromString(game);
-			System.out.println(gameid);
+			Gamejam.DPrint(gameid);
 			String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
-			conn.execute(transaction, userStatsIDs.get(gameid), win, loss, tie, incomplete, time);
+			conn.execute(transaction, userStatsIDs.get(gameid), win, loss, tie, incomplete, time, 0);
 			
 		} catch (SQLException se) {
 			se.printStackTrace();
@@ -259,7 +278,7 @@ public class AccountManager extends Observable {
 		gameIncompletes = new HashMap<>();
 		numGamesPlayed = new HashMap<>();
 		try {
-			System.out.println("fillUserStatsIDs: accountID = " + accountID);
+			Gamejam.DPrint("fillUserStatsIDs: accountID = " + accountID);
 			rs = conn.executeQuery("SELECT * FROM statistics WHERE statistics.accountid = ?", accountID);
 
 			while (rs.next()) {
@@ -276,8 +295,9 @@ public class AccountManager extends Observable {
 				gameIncompletes.put(gameID, incomplete);
 				numGamesPlayed.put(gameID, wins + losses + ties + incomplete);
 			}
-
-			userStatsIDs.forEach((key, value) -> System.out.println("gameID: " + key + "  statsID: " + value));
+			userStatsIDs.forEach((key, value) -> 
+				Gamejam.DPrint("gameID: " + key + "  statsID: " + value)
+			);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -299,7 +319,7 @@ public class AccountManager extends Observable {
 		try {
 			conn.execute("DELETE from accounts where username = '"+ username + "'");
 		} catch (SQLException se) {
-			
+			Gamejam.DPrint("Delete account threw an SQLExecption!");
 		}
 
 		return 1;
@@ -365,7 +385,6 @@ public class AccountManager extends Observable {
 	 * @return The gameid in the database of the game. 
 	 */
 	private int getGameIdFromString(String game) {
-		System.out.println("ggifs: game = " + game);
 		if (this.databaseGameID.containsKey(game)) {
 			return this.databaseGameID.get(game);
 		}
