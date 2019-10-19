@@ -1,11 +1,13 @@
 package Gamejam;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Observer;
 
 import connectFour.ConnectFourControllerView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Observable;
 import controller.AccountManager;
 import controller.DBGameManager;
@@ -49,7 +51,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private HBox initCreateAccountMenuBar;
 	private HBox initLoggedInInGameBar;
 	private VBox initLeftBar;
-	private MenuBar initGeneralOptMenuBar;
 	private Label leftBarMsg;
 	private Label leftBarStats;
 	private VBox initCreateAccountMenu;
@@ -63,6 +64,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private String loggedinusername;
 	private boolean userLoggedIn = false;
 	private boolean userisAdmin = false;
+	private boolean agamewasloaded = false;
 	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
 	private int[] themeSettings;
 	public GamejamMainScreen() {
@@ -94,12 +96,12 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initCreateAccountMenuBar = initCreateAccountMenuBar();
 		this.initLoggedInInGameBar = initLoggedInInGameBar();
 		
-		
-		this.initGeneralOptMenuBar = initThemeMenu();
-		
 		// Set up Game Views
 		this.tictactoegameview = new TicTacToeControllerView();
 		this.connectFourGameView = new ConnectFourControllerView();
+		
+		// Set up Extra menus
+		initThemeMenu();
 		
 		// Set currently in user views
 		this.setTop(this.initTopBar);
@@ -115,7 +117,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		VBox retval = new VBox();
 		retval.setPrefWidth(145);
 		retval.setPrefHeight(578);
-
+		retval.setPadding(new Insets(5));
 		this.leftBarMsg = new Label();
 		this.leftBarMsg.setWrapText(true);
 		this.leftBarStats = new Label();
@@ -356,78 +358,47 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * Gets the item that is the theme menu for the main GUI
 	 * @return The menu bar to put into a control structure.
 	 */
-	private MenuBar initThemeMenu() {
+	private void initThemeMenu() {
 		initDefaultTheme();
 		MenuBar bar = new MenuBar();
 		Menu thememenu = new Menu("Theme Menu");
 		MenuItem opt1 = new MenuItem("Default Theme");
 		opt1.setOnAction((event) -> {
+			initDefaultTheme();
 			updateTheme();
 		});
 		MenuItem opt2 = new MenuItem("Night Theme");
 		opt2.setOnAction((event) -> {
+			this.themeSettings[0] = RegionColors.BLACK;   // Button Backgrounds
+			this.themeSettings[1] = RegionColors.BLACK;  // Left Panel Upper Text color 
+			this.themeSettings[2] = RegionColors.BLACK;   // Upper bars background
+			this.themeSettings[3] = RegionColors.BLACK;   // Middle Area background / Overall background
+			this.themeSettings[4] = RegionColors.BLACK;   // Left Panel background
+			this.themeSettings[5] = RegionColors.WHITE;  // New account/Back/Logout button text
+			this.themeSettings[6] = RegionColors.WHITE;  // Left Panel Lower text color
+			this.themeSettings[7] = RegionColors.RED;    // Login button text color
 			updateTheme();
 		});
 		thememenu.getItems().addAll(opt1,opt2);
 		bar.getMenus().add(thememenu);
-		return bar;
+		// Menu Complete Inject its self into the other Parts
+		HBox tb1 = (HBox) this.initLoggedInBar.getChildren().get(0);
+		tb1.getChildren().add(bar);
+		updateTheme();
 	}
 	/**
 	 * Creates the theme array and inits it, then updates the theme.
 	 */
 	private void initDefaultTheme() {
 		this.themeSettings = new int[8];
-		this.themeSettings[0] = RegionColors.GREY;   // Button Backgrounds
+		this.themeSettings[0] = RegionColors.DEFAULT_BUTTON_BACKGROUND;   // Button Backgrounds
 		this.themeSettings[1] = RegionColors.BLACK;  // Left Panel Upper Text color 
-		this.themeSettings[2] = RegionColors.GREY;   // Upper bars background
-		this.themeSettings[3] = RegionColors.GREY;   // Middle Area background / Overall background
-		this.themeSettings[4] = RegionColors.GREY;   // Left Panel background
+		this.themeSettings[2] = RegionColors.DEFAULT_BACKGROUND;   // Upper bars background
+		this.themeSettings[3] = RegionColors.DEFAULT_BACKGROUND;   // Middle Area background / Overall background
+		this.themeSettings[4] = RegionColors.DEFAULT_BACKGROUND;   // Left Panel background
 		this.themeSettings[5] = RegionColors.BLACK;  // New account/Back/Logout button text
 		this.themeSettings[6] = RegionColors.BLACK;  // Left Panel Lower text color
 		this.themeSettings[7] = RegionColors.RED;    // Login button text color
-		updateTheme();
-	}
-	
-	/**
-	 * Updates the theme of mainGUI
-	 */
-	private void updateTheme() {
-		for(int x = 0; x < this.initbuttonlist.length; x++) {
-			if (this.initbuttonlist[x] == null) {
-				continue;
-			}
-			this.initbuttonlist[x].setBackground(RegionColors.getBackgroundColor(this.themeSettings[0]));
-		}
-		this.leftBarMsg.setTextFill(RegionColors.getColor(this.themeSettings[1]));
-		
-		this.initTopBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
-		this.initLoggedInInGameBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
-		this.initLoggedInBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
-		this.initCreateAccountMenuBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
-		
-		this.setBackground(RegionColors.getBackgroundColor(this.themeSettings[3]));
-		
-		this.initLeftBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[4]));
-		
-		this.initbuttonlist[0].setTextFill(RegionColors.getColor(this.themeSettings[5]));
-		this.initbuttonlist[7].setTextFill(RegionColors.getColor(this.themeSettings[5]));
-		
-		this.leftBarStats.setTextFill(RegionColors.getColor(this.themeSettings[6]));
-		
-		this.initbuttonlist[2].setTextFill(RegionColors.getColor(this.themeSettings[7]));
-		
-		/*
-				this.initGeneralOptMenuBar = initThemeMenu();
-				this.initTopBar = initTopBar();
-				this.initGameselectonboxarea = initGamePanel();
-				this.initLeftBar = initLeftBar();
-				
-				// Not in user parts that can be used later
-				this.initCreateAccountMenu = initCreateAccountScreen();
-				this.initLoggedInBar = initLoggedInBar();
-				this.initCreateAccountMenuBar = initCreateAccountMenuBar();
-				this.initLoggedInInGameBar = initLoggedInInGameBar();
-		*/
 	}
 	
 //////////////////////// Button Click Handlers go here  /////////////////////////////////////////////
@@ -538,6 +509,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.gameInUseIndex = -1;
 		if (name.equals("Tic-Tac-Toe")) {
 			this.gameInUseIndex = 0;
+			this.agamewasloaded = true;
 			if (userLoggedIn) {
 				loadAndResumeGame();
 				this.setTop(this.initLoggedInInGameBar);
@@ -548,6 +520,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		}
 		if (name.equals("Connect-Four")) {
 			this.gameInUseIndex = 1;
+			this.agamewasloaded = true;
 			if(userLoggedIn) {
 				loadAndResumeGame();
 				this.setTop(this.initLoggedInInGameBar);
@@ -673,9 +646,70 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	}
 ////////////////////////Other function types go here ////////////////////////////////////////////////////
 	/**
+	 * Updates the theme of mainGUI
+	 */
+	private void updateTheme() {
+		
+		for(int x = 0; x < this.initbuttonlist.length; x++) {
+			if (this.initbuttonlist[x] == null) {
+				continue;
+			}
+			this.initbuttonlist[x].setBackground(RegionColors.getBackgroundColor(this.themeSettings[0]));
+		}
+		HBox _k = (HBox) this.initLoggedInBar.getChildren().get(0);
+		MenuBar tb1 = (MenuBar) _k.getChildren().get(1);
+		tb1.setBackground(RegionColors.getBackgroundColor(this.themeSettings[0]));
+		
+		this.leftBarMsg.setTextFill(RegionColors.getColor(this.themeSettings[1]));
+		
+		this.initTopBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
+		this.initLoggedInInGameBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
+		this.initLoggedInBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
+		this.initCreateAccountMenuBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
+		
+		this.setBackground(RegionColors.getBackgroundColor(this.themeSettings[3]));
+		
+		this.initLeftBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[4]));
+		
+		this.initbuttonlist[0].setTextFill(RegionColors.getColor(this.themeSettings[5]));
+		this.initbuttonlist[7].setTextFill(RegionColors.getColor(this.themeSettings[5]));
+		/*
+		Iterator<Menu> iter = tb1.getMenus().iterator();
+		while(iter.hasNext()) {
+			Menu men = iter.next();
+			men.
+			Iterator<MenuItem> iter2 = men.getItems().iterator();
+			while(iter2.hasNext()) {
+				MenuItem i = iter2.next();
+				// 
+			}
+		}
+		*/
+		this.leftBarStats.setTextFill(RegionColors.getColor(this.themeSettings[6]));
+		
+		this.initbuttonlist[2].setTextFill(RegionColors.getColor(this.themeSettings[7]));
+		
+		/*
+				this.initGeneralOptMenuBar = initThemeMenu();
+				this.initTopBar = initTopBar();
+				this.initGameselectonboxarea = initGamePanel();
+				this.initLeftBar = initLeftBar();
+				
+				// Not in user parts that can be used later
+				this.initCreateAccountMenu = initCreateAccountScreen();
+				this.initLoggedInBar = initLoggedInBar();
+				this.initCreateAccountMenuBar = initCreateAccountMenuBar();
+				this.initLoggedInInGameBar = initLoggedInInGameBar();
+		*/
+	}
+	/**
 	 * Stops and saves the current game so the user can go back the main menu.
 	 */
 	public void stopAndSaveCurrentGame() {
+		// Fixes failing to exit the app when no games were loaded.
+		if (!this.agamewasloaded) {
+			return;
+		}
 		GameControllerView game = getLoaddedGame();
 		if (game == null) {
 			throw new SanityCheckFailedException("stopAndSaveCurrentGame: couldn't get the loaded game!");

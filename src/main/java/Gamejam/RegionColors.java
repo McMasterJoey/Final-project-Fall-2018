@@ -10,7 +10,6 @@ import javafx.scene.paint.Color;
  * Defines a set of color constants that can be used on Region UI Elements.
  * Here to reduce the quantity of new objects being made when swapping themes.
  * @author Joey McMaster
- *
  */
 public class RegionColors {
 	// Constants the define predefined colors.
@@ -28,6 +27,12 @@ public class RegionColors {
 	public static final Background BBLUE = new Background(new BackgroundFill(Color.BLUE,CornerRadii.EMPTY,new Insets(0)));
 	public static final int GREEN = 6;
 	public static final Background BGREEN = new Background(new BackgroundFill(Color.GREEN,CornerRadii.EMPTY,new Insets(0)));
+	public static final int DEFAULT_BACKGROUND = 7;
+	public static final Background BDEFAULTBACKGROUND = new Background(new BackgroundFill(Color.color(0.953125, 0.953125, 0.953125),CornerRadii.EMPTY,new Insets(0)));
+	public static final int DEFAULT_BUTTON_BACKGROUND = 8;
+	public static final Background BDEFAULTBUTTONBACKGROUND = new Background(new BackgroundFill(Color.color(0.827451, 0.827451, 0.827451),CornerRadii.EMPTY,new Insets(0)));
+	public static final int DARKGRAY = 9;
+	public static final Background BDARKGRAY = new Background(new BackgroundFill(Color.DARKGRAY,CornerRadii.EMPTY,new Insets(0)));
 	/**
 	 * Takes an id that represents the color. Returns the Background formated version of the color.
 	 * @param id The id of the color, Refer to the int constants for this class. If out of range, returns null.
@@ -48,6 +53,12 @@ public class RegionColors {
 			return BBLUE;
 		} else if (id == 6) {
 			return BGREEN;
+		} else if (id == 7) {
+			return BDEFAULTBACKGROUND;
+		} else if (id == 8) {
+			return BDEFAULTBUTTONBACKGROUND;
+		} else if (id == 9) {
+			return BDARKGRAY;
 		}
 		return null;
 	}
@@ -71,6 +82,12 @@ public class RegionColors {
 			return Color.BLUE;
 		} else if (id == 6) {
 			return Color.GREEN;
+		} else if (id == 7) {
+			return Color.color(0.953125, 0.953125, 0.953125); //(244,244,244)
+		} else if (id == 8) {
+			return Color.color(0.827451, 0.827451, 0.827451); //(221,221,221)
+		} else if (id == 9) {
+			return Color.DARKGRAY;
 		}
 		return null;
 	}
