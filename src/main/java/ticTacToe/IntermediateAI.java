@@ -17,7 +17,7 @@ import model.IGotNoWhereToGoException;
 public class IntermediateAI implements TicTacToeStrategy, Serializable {
 
 	/**
-	 * 
+	 * The serial number required to serialize the object.
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -34,12 +34,10 @@ public class IntermediateAI implements TicTacToeStrategy, Serializable {
 	 * @param theGame This is needed so the AI can examine the board.
 	 * 
 	 * @throws IGotNoWhereToGoException whenever asked for a desired move that is
-	 *                                  impossible to deliver because all 9 squares
-	 *                                  already taken.
+	 * impossible to deliver because all 9 squares already taken.
 	 */
 	@Override
 	public Point desiredMove(TicTacToeModel theGame) throws IGotNoWhereToGoException {
-		// TODO 2: Write a better strategy and run TestStrategies.java to make sure
 		if (theGame.maxMovesRemaining() == 0) {
 			throw new IGotNoWhereToGoException("The board is full!");
 		} else {
