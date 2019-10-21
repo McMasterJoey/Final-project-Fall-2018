@@ -91,4 +91,33 @@ public class RegionColors {
 		}
 		return null;
 	}
+	/**
+	 * Takes an id that represents the color. Returns the CSS rgb formated version of the color.
+	 * @param id The id of the color, Refer to the int constants for this class. If out of range, returns null.
+	 * @return The string that can be inserted into a css string
+	 */
+	public static String getRGBString(int id) {
+		if (id == 0) {
+			return "rgb(255,0,0)";
+		} else if (id == 1) {
+			return "rgb(255,255,255)";
+		} else if (id == 2) {
+			return "rgb(0,0,0)"; 
+		} else if (id == 3) {
+			return "rgb(128,128,128)"; 
+		} else if (id == 4) {
+			return "rgb(255,255,0)"; 
+		} else if (id == 5) {
+			return "rgb(0,0,255)"; 
+		} else if (id == 6) {
+			return "rgb(0,128,0)";
+		} else if (id == 7) {
+			return "rgb(244,244,244)";
+		} else if (id == 8) {
+			return "rgb(221,221,221)"; 
+		} else if (id == 9) {
+			return "rgb(169,169,169)"; 
+		}
+		return null;
+	}
 }

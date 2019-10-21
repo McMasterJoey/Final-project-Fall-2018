@@ -32,6 +32,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import model.SanityCheckFailedException;
 import ticTacToe.TicTacToeControllerView;
@@ -46,10 +47,12 @@ import ticTacToe.TicTacToeControllerView;
  */
 public class GamejamMainScreen extends BorderPane implements Observer {
 	private GridPane initGameselectonboxarea;
+	private GridPane initThemeMenu;
 	private HBox initTopBar;
 	private HBox initLoggedInBar;
 	private HBox initCreateAccountMenuBar;
 	private HBox initLoggedInInGameBar;
+	private VBox initUserSettingsMainMenu;
 	private VBox initLeftBar;
 	private Label leftBarMsg;
 	private Label leftBarStats;
@@ -57,7 +60,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private AccountManager acctMgr;
 	private DBGameManager dbGameManager;
 	private TicTacToeControllerView tictactoegameview;
-	private int gameInUseIndex = -1;
 	private GameIconItem[] initgamelist;
 	private Button[] initbuttonlist;
 	private ConnectFourControllerView connectFourGameView;
@@ -66,6 +68,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private boolean userisAdmin = false;
 	private boolean agamewasloaded = false;
 	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
+	private int gameInUseIndex = -1;
 	private int[] themeSettings;
 	public GamejamMainScreen() {
 		super();
@@ -83,7 +86,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.dbGameManager = DBGameManager.getInstance();
 		
 		// Init Collections
-		this.initbuttonlist = new Button[16];
+		this.initbuttonlist = new Button[70];
 		
 		// Set up GUI Elements
 		this.initTopBar = initTopBar();
@@ -101,7 +104,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.connectFourGameView = new ConnectFourControllerView();
 		
 		// Set up Extra menus
-		initThemeMenu();
+		this.initUserSettingsMainMenu = initUserSettingsGUI();
+		this.initThemeMenu = initThemeMenu();
 		
 		// Set currently in user views
 		this.setTop(this.initTopBar);
@@ -281,7 +285,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Image icon = new Image(getClass().getResourceAsStream("/usersettingsbuttonbackground.png"));
 		settings.setGraphic(new ImageView(icon));
 		settings.setOnMouseClicked((click) -> {
-			userSettingsButtonClick();
+			userSettingsButtonClickInGame();
 		});
 		// Add buttons to collection
 		this.initbuttonlist[5] = logout; // Back to main menu button
@@ -334,7 +338,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		grid.getColumnConstraints().add(new ColumnConstraints(272));
 		grid.getColumnConstraints().add(new ColumnConstraints(272));
 		this.initgamelist = getGameList();
-		int bid = 10;
+		int bid = 55;
 		for (int x = 0; x < this.initgamelist.length; x++) {
 			if (this.initgamelist[x].getGameID() < 0 || this.initgamelist[x].getGameID() > 11) {
 				throw new SanityCheckFailedException("When adding game icons, one of the games had id that was out of range!");
@@ -356,19 +360,31 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	}
 	/**
 	 * Gets the item that is the theme menu for the main GUI
-	 * @return The menu bar to put into a control structure.
+	 * @return The Gridpane to put into a control structure.
 	 */
-	private void initThemeMenu() {
+	private GridPane initThemeMenu() {
 		initDefaultTheme();
-		MenuBar bar = new MenuBar();
-		Menu thememenu = new Menu("Theme Menu");
-		MenuItem opt1 = new MenuItem("Default Theme");
-		opt1.setOnAction((event) -> {
+		GridPane retval = new GridPane();
+		retval.getColumnConstraints().add(new ColumnConstraints(544));
+		retval.getColumnConstraints().add(new ColumnConstraints(544));
+		VBox left = new VBox();  // Used for Pre-made Themes Buttons
+		VBox right = new VBox(); // Used for Custom made themes.
+		Button backtosettings = new Button("Back to Settings Menu");
+		backtosettings.setOnMouseClicked((click) -> {
+			this.setCenter(this.initUserSettingsMainMenu);
+		});
+		this.initbuttonlist[12] = backtosettings;
+		left.getChildren().add(backtosettings);
+		
+		Button theme0 = new Button("Default Theme");
+		theme0.setOnMouseClicked((click) -> {
 			initDefaultTheme();
 			updateTheme();
 		});
-		MenuItem opt2 = new MenuItem("Night Theme");
-		opt2.setOnAction((event) -> {
+		this.initbuttonlist[13] = theme0;
+		left.getChildren().add(theme0);
+		Button theme1 = new Button("Night Theme");
+		theme1.setOnMouseClicked((click) -> {
 			this.themeSettings[0] = RegionColors.BLACK;   // Button Backgrounds
 			this.themeSettings[1] = RegionColors.BLACK;  // Left Panel Upper Text color 
 			this.themeSettings[2] = RegionColors.BLACK;   // Upper bars background
@@ -379,12 +395,12 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.themeSettings[7] = RegionColors.RED;    // Login button text color
 			updateTheme();
 		});
-		thememenu.getItems().addAll(opt1,opt2);
-		bar.getMenus().add(thememenu);
-		// Menu Complete Inject its self into the other Parts
-		HBox tb1 = (HBox) this.initLoggedInBar.getChildren().get(0);
-		tb1.getChildren().add(bar);
+		this.initbuttonlist[14] = theme1;
+		left.getChildren().add(theme1);
 		updateTheme();
+		retval.add(left, 0, 0);
+		retval.add(right,1, 0);
+		return retval;
 	}
 	/**
 	 * Creates the theme array and inits it, then updates the theme.
@@ -400,8 +416,46 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.themeSettings[6] = RegionColors.BLACK;  // Left Panel Lower text color
 		this.themeSettings[7] = RegionColors.RED;    // Login button text color
 	}
-	
+	/**
+	 * Creates the Usersettings menu that pops up when the user clicks the gear icon.
+	 * @return An VBox that holds all the control elements that make up the user settings menu.
+	 */
+	private VBox initUserSettingsGUI() {
+		VBox pane = new VBox();
+		this.loggedinusername = acctMgr.getCurUsername();
+		Label info = new Label(this.loggedinusername + ": Account Settings");
+		info.setFont(new Font(60));
+		GridPane grid = new GridPane();
+		grid.getColumnConstraints().add(new ColumnConstraints(272));
+		grid.getColumnConstraints().add(new ColumnConstraints(272));
+		grid.getColumnConstraints().add(new ColumnConstraints(272));
+		grid.getColumnConstraints().add(new ColumnConstraints(272));
+		Button returnmenu = new Button();
+		Image icon0 = new Image(getClass().getResourceAsStream("/usersettingsmainmenubuttonbackground.png"));
+		returnmenu.setGraphic(new ImageView(icon0));
+		returnmenu.setOnMouseClicked((click) -> {
+			this.setCenter(this.initGameselectonboxarea);
+		});
+		this.initbuttonlist[10] = returnmenu;
+		grid.add(returnmenu,1,0);
+		Button thememenu = new Button();
+		Image icon1 = new Image(getClass().getResourceAsStream("/usersettingsthememenubuttonbackground.png"));
+		thememenu.setGraphic(new ImageView(icon1));
+		thememenu.setOnMouseClicked((click) -> {
+			swapToThemeMenuButtonClick();
+		});
+		this.initbuttonlist[11] = thememenu;
+		grid.add(thememenu,2,0);
+		pane.getChildren().addAll(info,grid);
+		return pane;
+	}
 //////////////////////// Button Click Handlers go here  /////////////////////////////////////////////
+	/**
+	 * Handles the event where the user who is logged in is at the user settings menu and clicks the Theme Menu Button.
+	 */
+	private void swapToThemeMenuButtonClick() {
+		this.setCenter(this.initThemeMenu);
+	}
 	/**
 	 * Handles when a user wants to exit the create account screen without creating an account.
 	 */
@@ -427,18 +481,23 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		userLoggedIn = false;
 		Gamejam.DPrint("Logout!");
 		this.setTop(this.initTopBar);
+		this.setCenter(this.initGameselectonboxarea);
 		//updateLeftPane();
 	}
 
 	/**
-	 * Handles the event were the User Settings button is clicked Assumes: A user is
+	 * Handles the event where the User Settings button is clicked Assumes: A user is
 	 * already logged in.
 	 */
 	private void userSettingsButtonClick() {
-		// TODO: Implement User Settings
-		Gamejam.DPrint("User settings!");
+		this.setCenter(this.initUserSettingsMainMenu);
 	}
-
+	/**
+	 * Handles the event where the user is loggedin and ingame and clicks the User Settings button.
+	 */
+	private void userSettingsButtonClickInGame() {
+		// Do Nothing!
+	}
 	/**
 	 * Handles the event were the Log in Button is Clicked
 	 */
@@ -656,9 +715,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			}
 			this.initbuttonlist[x].setBackground(RegionColors.getBackgroundColor(this.themeSettings[0]));
 		}
-		HBox _k = (HBox) this.initLoggedInBar.getChildren().get(0);
-		MenuBar tb1 = (MenuBar) _k.getChildren().get(1);
-		tb1.setBackground(RegionColors.getBackgroundColor(this.themeSettings[0]));
 		
 		this.leftBarMsg.setTextFill(RegionColors.getColor(this.themeSettings[1]));
 		
@@ -673,18 +729,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		
 		this.initbuttonlist[0].setTextFill(RegionColors.getColor(this.themeSettings[5]));
 		this.initbuttonlist[7].setTextFill(RegionColors.getColor(this.themeSettings[5]));
-		/*
-		Iterator<Menu> iter = tb1.getMenus().iterator();
-		while(iter.hasNext()) {
-			Menu men = iter.next();
-			men.
-			Iterator<MenuItem> iter2 = men.getItems().iterator();
-			while(iter2.hasNext()) {
-				MenuItem i = iter2.next();
-				// 
-			}
-		}
-		*/
 		this.leftBarStats.setTextFill(RegionColors.getColor(this.themeSettings[6]));
 		
 		this.initbuttonlist[2].setTextFill(RegionColors.getColor(this.themeSettings[7]));
