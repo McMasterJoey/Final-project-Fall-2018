@@ -21,7 +21,7 @@ import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-
+import ticTacToe.EasyAI;
 import ticTacToe.TicTacToeControllerView;
 
 /**
@@ -288,7 +288,9 @@ public class ConnectFourControllerView extends GameControllerView {
 		//System.out.println("--------------");
 		//System.out.println(gameModel.toString());
 		//System.out.println("--------------");
-		
+		if(!gameModel.isStillRunning()) {
+			System.out.println("\nGame score is " + getScore());
+		}
 		if (gameModel.tied()) {
 			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
 			accountmanager.logGameStat("Connect-Four", logStatType.TIE, 0);
@@ -393,5 +395,22 @@ public class ConnectFourControllerView extends GameControllerView {
 		});
 		thememenu.getItems().addAll(opt1,opt2,opt3,opt4,opt5);
 		menuBar.getMenus().add(thememenu);
+	}
+	
+	@Override
+	public int getScore() {
+		if(gameModel.isStillRunning()) {
+			return 0;
+		}
+		int baseScore;
+		int difficultyModifier = gameModel.getConnectFourAI().getStrategy() instanceof ConnectFourEasyAI ? 1 : 2;
+		if(gameModel.tied()) {
+			return (int) (difficultyModifier * 110);
+		}
+		int temp = gameModel.maxMovesRemaining();
+		int winModifier = 1 * (gameModel.won('Y') ? -1 : 1);
+		temp = temp * winModifier + 35;
+		baseScore = (int) (temp * 2.5 + 25);
+		return baseScore * difficultyModifier;
 	}
 }
