@@ -315,7 +315,7 @@ public class ConnectFourControllerView extends GameControllerView {
 		}
 	}
 	/**
-	 * Redraws the game GUI. Ment to be used after changing the theme.
+	 * Redraws the game GUI. Meant to be used after changing the theme.
 	 */
 	private void reDrawGameUI() {
 		placeholder = new StackPane[7][6];
