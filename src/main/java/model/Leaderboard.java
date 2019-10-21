@@ -79,6 +79,33 @@ public class Leaderboard {
     }
 
     /**
+     * Given an accountID, gameName, and a score, adds that score to the list of scores
+     * the leaderboard has a record of.
+     *
+     * @param accountID The accountid of the user in the database
+     * @param gameName The name of the game to record a score for
+     * @param score The score the user earned
+     */
+    public void addScore(int accountID, String gameName, int score) {
+        ResultSet rs = null;
+
+        try {
+            rs = conn.executeQuery("SELECT username FROM accounts WHERE accountid = ?", accountID);
+            boolean idFound = rs.next();
+
+            if (idFound) {
+                String username = rs.getString("username");
+                int gameID = gameMgr.getGameListByName().get(gameName);
+                scores.add(new Score(gameID, gameName, accountID, username, score));
+            } else {
+                System.err.println("accountid " + accountID + " not found in the database");
+            }
+        } catch (SQLException se) {
+            se.printStackTrace();
+        }
+    }
+
+    /**
      * Returns all scores.
      * @return An ArrayList<Score> containing all scores
      */
