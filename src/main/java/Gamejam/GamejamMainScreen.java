@@ -48,6 +48,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private VBox initCreateAccountMenu;
 	private VBox leaderScreen;
 	private TableView<Score> scoresTable;
+	private ComboBox<String> leaderBoardSelection;
 	private AccountManager acctMgr;
 	private DBGameManager dbGameManager;
 	private Leaderboard leaderboard;
@@ -332,7 +333,20 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private VBox initLeaderScreen() {
 		VBox screen = new VBox();
 		scoresTable = new TableView<>();
-		Label scoreType = new Label("All Scores");
+		leaderBoardSelection = new ComboBox();
+
+		// Fill the combobox to select leaderboard statistics
+		leaderBoardSelection.getItems().add("All Scores");
+
+		for (String game : dbGameManager.getGameListByName().keySet()) {
+			leaderBoardSelection.getItems().add(game);
+		}
+
+		leaderBoardSelection.getSelectionModel().selectFirst();
+
+		leaderBoardSelection.setOnAction( (ae) -> {
+			handleLeaderBoardSelectionChange();
+		});
 
 		TableColumn<Score, String> username = new TableColumn<>("Username");
 		username.setCellValueFactory(new PropertyValueFactory<>("username"));
@@ -344,12 +358,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		score.setCellValueFactory(new PropertyValueFactory<>("score"));
 
 		scoresTable.getColumns().addAll(username, gameName, score);
-
-		for (Score cur : leaderboard.getAllScores()) {
-			scoresTable.getItems().add(cur);
-		}
-
-		screen.getChildren().addAll(scoreType, scoresTable);
+		handleLeaderBoardSelectionChange();
+		screen.getChildren().addAll(leaderBoardSelection, scoresTable);
 
 		return screen;
 	}
@@ -607,6 +617,23 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			return this.acctMgr.login(username, password);
 		}
 	}
+
+	private void handleLeaderBoardSelectionChange() {
+		String choice = leaderBoardSelection.getValue();
+
+		scoresTable.getItems().clear();
+
+		if (choice.equals("All Scores")) {
+			for (Score cur : leaderboard.getAllScores()) {
+				scoresTable.getItems().add(cur);
+			}
+		} else {
+			for (Score cur : leaderboard.getTopTen(choice)) {
+				scoresTable.getItems().add(cur);
+			}
+		}
+	}
+
 ////////////////////////Other function types go here ////////////////////////////////////////////////////
 	/**
 	 * Stops and saves the current game so the user can go back the main menu.

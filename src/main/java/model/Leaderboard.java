@@ -99,13 +99,12 @@ public class Leaderboard {
 
             if (cur.getGameName().equals(game)) {
                 topTen.add(cur);
+                count++;
             }
 
-            if (count >= 10) {
+            if (count > 10) {
                 break;
             }
-
-            count++;
         }
 
         return topTen;
