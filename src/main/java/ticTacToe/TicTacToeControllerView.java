@@ -11,6 +11,12 @@ import java.util.Observable;
 
 import Gamejam.Gamejam;
 import controller.*;
+import Gamejam.RegionColors;
+import connectFour.ConnectFourModel;
+import controller.AccountManager;
+import controller.GameControllerView;
+import controller.GameMenu;
+import controller.logStatType;
 
 import javafx.geometry.Pos; 
 import javafx.scene.image.Image;
@@ -58,6 +64,8 @@ public class TicTacToeControllerView extends GameControllerView {
 		this.setHeight(HEIGHT);
 		_primarypane.setPrefWidth(WIDTH);
 		_primarypane.setPrefHeight(HEIGHT);
+		_primarypane.setBackground(RegionColors.BDEFAULTBACKGROUND);
+		
 	}
 
 	/**
@@ -187,9 +195,9 @@ public class TicTacToeControllerView extends GameControllerView {
 		});
 
 		midCenter.setOnMouseClicked((click) -> {
-			System.out.println("what what");
+			Gamejam.DPrint("what what");
 			gameModel.humanMove(1, 1, false);
-			System.out.println(gameModel.toString());
+			Gamejam.DPrint(gameModel.toString());
 			moveSound.play();
 		});
 
@@ -280,9 +288,13 @@ public class TicTacToeControllerView extends GameControllerView {
 
 	@Override
 	public boolean saveGame() {
-		System.out.println(accountManager.getCurUsername());
-		if(accountManager.isGuest()) {
+		Gamejam.DPrint(accountmanager.getCurUsername());
+		if(accountmanager.isGuest()) {
 			return false;
+		}
+		// Don't save if the game was completed
+		if(!gameModel.isStillRunning()) {
+			gameModel.clearBoard();
 		}
 		FileOutputStream fos;
 		ObjectOutputStream oos;

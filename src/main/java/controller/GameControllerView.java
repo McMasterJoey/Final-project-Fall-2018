@@ -3,7 +3,6 @@ package controller;
 import java.util.Observer;
 
 import javafx.scene.layout.BorderPane;
-import model.GameJamGameInterface;
 import model.GameModel;
 
 /**
@@ -11,8 +10,8 @@ import model.GameModel;
  * @author
  *
  */
-public abstract class GameControllerView extends BorderPane implements Observer, GameJamGameInterface {
-	protected AccountManager accountManager;
+public abstract class GameControllerView extends BorderPane implements Observer {
+	protected AccountManager accountmanager;
 	protected String gameName;
 	protected GameModel gameModel;
 	protected StatsManager statsManager;
