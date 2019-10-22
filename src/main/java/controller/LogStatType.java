@@ -4,7 +4,7 @@ package controller;
  * @author Joey McMaster
  *
  */
-public class logStatType {
+public class LogStatType {
 	public static final int WIN = 0;
 	public static final int LOSS = 1;
 	public static final int TIE = 2;
