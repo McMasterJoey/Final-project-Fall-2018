@@ -1,12 +1,15 @@
 package connectFour;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import model.IGotNoWhereToGoException;
 
 public class ConnectFourHardAI implements ConnectFourStrategy {
 	/*
 	 * Find an possible column by looking at 5 steps ahead. Use MinMax algorithm.
 	 */
-	static final int SMALL_NUMBER = -9999999;
+	static final int SMALL_NUMBER = Integer.MIN_VALUE;
 
 	@Override
 	public int desiredMove(ConnectFourModel theGame) throws IGotNoWhereToGoException {
@@ -104,27 +107,27 @@ public class ConnectFourHardAI implements ConnectFourStrategy {
 				theGame.computerCounterMove(c, testBoard);
 			}
 		}
+		ArrayList<Integer> tie = new ArrayList<Integer>();  // used to store the highest tie
+
 		int max = SMALL_NUMBER;
-		int maxCol = -1;
-		for (int i = 3; i < 7; i++) {
-
-			if (columnScore[i] > max) {
-				max = columnScore[i];
-				maxCol = i;
-			}
-
-		}
-		for (int i = 0; i < 3; i++) {
-			if (columnScore[i] > max) {
-				max = columnScore[i];
-				maxCol = i;
-			}
-		}
-
 		for (int i = 0; i < 7; i++) {
-			System.out.print(columnScore[i] + ", ");
+
+			if (columnScore[i] > max) {
+				max = columnScore[i];
+			}
+
 		}
-		return maxCol;
+		for (int i = 0; i < 7; i++) {
+			if (columnScore[i] == max) {
+				tie.add(i);
+			}
+		}
+		Random rand = new Random();
+		int chosenIdx = rand.nextInt(tie.size());
+//		for (int i = 0; i < 7; i++) {
+//			System.out.print(columnScore[i] + ", ");
+//		}
+		return tie.get(chosenIdx);
 	}
 
 	/*
@@ -143,8 +146,6 @@ public class ConnectFourHardAI implements ConnectFourStrategy {
 			won[column] = true;
 			if (step == 1)
 				return 999999999;
-			if (step == 2)
-				return 7000;
 			return 1;
 
 		}
