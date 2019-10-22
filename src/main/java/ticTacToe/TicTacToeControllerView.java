@@ -292,8 +292,8 @@ public class TicTacToeControllerView extends GameControllerView {
 
 	@Override
 	public boolean saveGame() {
-		Gamejam.DPrint(accountmanager.getCurUsername());
-		if(accountmanager.isGuest()) {
+		Gamejam.DPrint(accountManager.getCurUsername());
+		if(accountManager.isGuest()) {
 			return false;
 		}
 		// Don't save if the game was completed
