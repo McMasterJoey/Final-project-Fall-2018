@@ -2,10 +2,15 @@ package connectFour;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.io.Serializable;
 
 import model.IGotNoWhereToGoException;
 
-public class ConnectFourHardAI implements ConnectFourStrategy {
+public class ConnectFourHardAI implements ConnectFourStrategy, Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/*
 	 * Find an possible column by looking at 5 steps ahead. Use MinMax algorithm.
 	 */

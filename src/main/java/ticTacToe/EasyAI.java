@@ -1,6 +1,7 @@
 package ticTacToe;
 
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.Random;
 
 import model.IGotNoWhereToGoException;
@@ -10,19 +11,22 @@ import model.IGotNoWhereToGoException;
  * 
  * @author Rick Mercer and Linjie Liu
  */
-public class EasyAI implements TicTacToeStrategy {
+public class EasyAI implements TicTacToeStrategy, Serializable {
+
+	/**
+	 * The constant required to serialize the object.
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Find an available square while ignoring possible wins and blocks to make this
 	 * AI very easy to bet
 	 * 
 	 * @throws IGotNoWhereToGoException whenever asked for a desired move that is
-	 *                                  impossible to deliver because all 9 squares
-	 *                                  already taken
+	 * impossible to deliver because all 9 squares already taken
 	 */
 	@Override
 	public Point desiredMove(TicTacToeModel theGame) throws IGotNoWhereToGoException {
-		// TODO 1: Return a random available Point as a Beginner strategy
 		if (theGame.maxMovesRemaining() == 0) {
 			throw new IGotNoWhereToGoException("The board is full!");
 		} else {

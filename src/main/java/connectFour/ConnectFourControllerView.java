@@ -1,21 +1,23 @@
 package connectFour;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Observable;
-import java.util.Observer;
 
-import controller.AccountManager;
+import controller.*;
 import javafx.geometry.Pos;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import model.GameJamGameInterface;
 import ticTacToe.TicTacToeControllerView;
 
 /**
@@ -28,25 +30,48 @@ import ticTacToe.TicTacToeControllerView;
  * @author Wes Rodgers
  *
  */
-public class ConnectFourControllerView extends GridPane implements Observer, GameJamGameInterface {
+public class ConnectFourControllerView extends GameControllerView {
 	private ConnectFourModel gameModel;
 	public static final int WIDTH = 600;
 	public static final int HEIGHT = 600;
 	private AudioClip moveSound, winSound, loseSound, tieSound;
-	private AccountManager accountmanager;
 	private StackPane[][] placeholder;
-
+	
+	// Original implemention by Wes has the object extending gridpane, this that grid pane.
+	// Updated version uses a border pane with original grid pane set to its center to add game speific options
+	// Should look and play the exact same way as before.
+	private GridPane _primarypane;
+	private GameMenu menuBar;
+	private AccountManager accountManager;
+	private StatsManager statsManager;
+	// Size of 5: 0 = Overall color, 1 = Blank Circle color, 2 = Circle outline color 
+	//            3 = Player Piece color, 4 = AI Piece color 
+	private Color[] themesettings; // Used to
 	/**
 	 * Constructor for the Connect 4 controller-view sets up the board and various
 	 * listeners
 	 */
 	public ConnectFourControllerView() {
+		themesettings = new Color[5];
+		themesettings[0] = Color.BLUE;
+		themesettings[1] = Color.WHITE;
+		themesettings[2] = Color.BLACK;
+		themesettings[3] = Color.INDIANRED;
+		themesettings[4] = Color.YELLOW;
+		
+		gameName = "connect-four";
+		menuBar = GameMenu.getMenuBar(this);
+		this.setTop(menuBar);
 		initializeGame();
 		setupResources();
-		accountmanager = AccountManager.getInstance();
+		accountManager = AccountManager.getInstance();
+		statsManager = StatsManager.getInstance();
 
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
+		_primarypane.setPrefHeight(HEIGHT);
+		_primarypane.setPrefWidth(WIDTH);
+		addThemeUIOptions();
 	}
 
 	/**
@@ -80,20 +105,22 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	 * board to the screen
 	 */
 	private void setupBoard() {
+		_primarypane = new GridPane();
 		placeholder = new StackPane[7][6];
 		for (int row = 0; row < 6; row++) {
 			for (int col = 0; col < 7; col++) {
-				Rectangle rect = new Rectangle(100, 100, Color.BLUE);
-				Circle circ = new Circle(43, Color.WHITE);
-				circ.setStroke(Color.BLACK);
+				Rectangle rect = new Rectangle(100, 100, themesettings[0]);
+				Circle circ = new Circle(43, themesettings[1]);
+				circ.setStroke(themesettings[2]);
 				circ.setStrokeWidth(1);
 				StackPane spane = new StackPane();
 				spane.getChildren().addAll(rect, circ);
-				this.add(spane, col, row);
+				_primarypane.add(spane, col, row);
 				placeholder[col][row] = spane;
 			}
 		}
-
+		this.setCenter(_primarypane);
+		_primarypane.setAlignment(Pos.CENTER);
 		setupListeners();
 	}
 
@@ -102,18 +129,25 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	 * move
 	 */
 	private void setupListeners() {
-		this.setOnMouseClicked((click) -> {
+		_primarypane.setOnMouseClicked((click) -> {
 			// this finds the offset of the top left corner of the top
 			// left grid so we can accurately determine clicks no matter
 			// how the game is resized without having to write a listener for
 			// each of the columns.
 			moveSound.play();
-			double offset = this.getChildren().get(0).getLayoutX();
+			double offset = _primarypane.getChildren().get(0).getLayoutX();
 			int col = ((int) ((click.getX() - offset) / 100));
 			if (col >= 0 && col < 7 && gameModel.available(col)) {
 				// TODO change to non testing when strategy is implemented.
 				gameModel.humanMove(col, false);
 			}
+		});
+		
+		menuBar.getDiffinter().setOnAction((event) -> { 
+			gameModel.setAIStrategy(new ConnectFourHardAI());
+		});
+		menuBar.getDiffeasy().setOnAction((event) -> { 
+			gameModel.setAIStrategy(new ConnectFourEasyAI());
 		});
 	}
 
@@ -121,7 +155,7 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	 * disables the listeners
 	 */
 	private void disableListeners() {
-		this.setOnMouseClicked((click) -> {
+		_primarypane.setOnMouseClicked((click) -> {
 		});
 	}
 
@@ -130,11 +164,35 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	 * saves the game to the given filepath
 	 * 
 	 * @param filepath the name of the file we want to save
-	 * @return true if the save was succesful, false otherwise
+	 * @return true if the save was successful, false otherwise
 	 */
-	public boolean saveGame(String filepath) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean saveGame() {
+		if(accountManager.isGuest()) {
+			return false;
+		}
+		// Don't save if the game was completed
+		if(!gameModel.isStillRunning()) {
+			gameModel.clearBoard();
+		}
+		FileOutputStream fos;
+		ObjectOutputStream oos;
+		try {
+			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
+			String sep = System.getProperty("file.separator");
+			String filepath = System.getProperty("user.dir") + sep + "save-data";
+			if(!new File(filepath).exists()) {
+				new File(filepath).mkdir();
+			}
+			filepath += sep + fname;
+			fos = new FileOutputStream(filepath);			
+			oos = new ObjectOutputStream(fos);
+			oos.writeObject(gameModel);
+			oos.close();
+		} catch (IOException e) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	@Override
@@ -142,11 +200,33 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	 * loads a saved game from the given filepath
 	 * 
 	 * @param filepath the location from which to load the game
-	 * @return true if the load was succesful, false otherwise
+	 * @return true if the load was successful, false otherwise
 	 */
-	public boolean loadSaveGame(String filepath) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean loadSaveGame() {
+		boolean retVal = true;
+		try {
+			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
+			String sep = System.getProperty("file.separator");
+			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
+			File file = new File(filepath);
+			if(file.exists()) {
+				FileInputStream fis = new FileInputStream(file);
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				gameModel = (ConnectFourModel) ois.readObject();
+				ois.close();
+				update(gameModel, this);
+				file.delete();
+			} else {
+				retVal = newGame();
+			}
+		} catch(IOException | ClassNotFoundException e) {
+			return false;
+		}
+		setupBoard();
+		setupListeners();
+		gameModel.addObserver(this);
+		update(gameModel, this);
+		return retVal;
 	}
 
 	@Override
@@ -183,11 +263,12 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 	/**
 	 * creates a new game
 	 * 
-	 * @return true if the new game was started succesfully, false otherwise
+	 * @return true if the new game was started successfully, false otherwise
 	 */
 	public boolean newGame() {
 		try {
-			initializeGame();
+			gameModel.clearBoard();
+			setupBoard();
 		} catch (Exception ex) {
 			return false;
 		}
@@ -201,29 +282,138 @@ public class ConnectFourControllerView extends GridPane implements Observer, Gam
 		for (int row = 0; row < 6; row++) {
 			for (int col = 0; col < 7; col++) {
 				if (board[row][col] != '_') {
-					Circle circ = new Circle(43, board[row][col] == 'R' ? Color.INDIANRED : Color.YELLOW);
+					Circle circ = new Circle(43, board[row][col] == 'R' ? themesettings[3] : themesettings[4]);
 					placeholder[col][row].getChildren().add(circ);
 				}
 			}
 		}
 		
-		System.out.println("--------------");
-		System.out.println(gameModel.toString());
-		System.out.println("--------------");
-		
+		//System.out.println("--------------");
+		//System.out.println(gameModel.toString());
+		//System.out.println("--------------");
+		if(!gameModel.isStillRunning()) {
+			System.out.println("\nGame score is " + getScore());
+		}
 		if (gameModel.tied()) {
-			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 2, 1);
+			//accountManager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
+			statsManager.logGameStat("Connect-Four", logStatType.TIE, 0, getScore());
 			tieSound.play();
 		} else if (gameModel.won('R') || gameModel.won('Y')) {
 			disableListeners();
 			if (gameModel.won('R')) {
-				accountmanager.logGlobalStat(true, "Connect-Four", 0, 1);
+				//accountManager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
+				statsManager.logGameStat("Connect-Four", logStatType.WIN, 0, getScore());
 				winSound.play();
 			} else {
-				accountmanager.logGlobalStat(true, "Connect-Four", 1, 1);
+				//accountManager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
+				statsManager.logGameStat("Connect-Four", logStatType.LOSS, 0, getScore());
 				loseSound.play();
 			}
 		}
 	}
-
+	@Override
+	protected void updateStatistics() {
+		if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
+			//accountManager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 0);
+			statsManager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1, getScore());
+		}
+	}
+	/**
+	 * Redraws the game GUI. Ment to be used after changing the theme.
+	 */
+	private void reDrawGameUI() {
+		placeholder = new StackPane[7][6];
+		for (int row = 0; row < 6; row++) {
+			for (int col = 0; col < 7; col++) {
+				Rectangle rect = new Rectangle(100, 100, themesettings[0]);
+				Circle circ = new Circle(43, themesettings[1]);
+				circ.setStroke(themesettings[2]);
+				circ.setStrokeWidth(1);
+				StackPane spane = new StackPane();
+				spane.getChildren().addAll(rect, circ);
+				_primarypane.add(spane, col, row);
+				placeholder[col][row] = spane;
+			}
+		}
+		
+		char[][] board = gameModel.getBoard();
+		for (int row = 0; row < 6; row++) {
+			for (int col = 0; col < 7; col++) {
+				if (board[row][col] != '_') {
+					Circle circ = new Circle(43, board[row][col] == 'R' ? themesettings[3] : themesettings[4]);
+					placeholder[col][row].getChildren().add(circ);
+				}
+			}
+		}
+	}
+	/**
+	 * Generates the Theme menu and adds it to the Menu bar for Connect-4
+	 */
+	private void addThemeUIOptions() {
+		Menu thememenu = new Menu("Theme Menu");
+		MenuItem opt1 = new MenuItem("Set Default Theme");
+		opt1.setOnAction((event) -> {
+			themesettings[0] = Color.BLUE;
+			themesettings[1] = Color.WHITE;
+			themesettings[2] = Color.BLACK;
+			themesettings[3] = Color.INDIANRED;
+			themesettings[4] = Color.YELLOW;
+			reDrawGameUI();
+		});
+		MenuItem opt2 = new MenuItem("Set Alternate Theme");
+		opt2.setOnAction((event) -> {
+			themesettings[0] = Color.DARKRED;
+			themesettings[1] = Color.GREEN;
+			themesettings[2] = Color.RED;
+			themesettings[3] = Color.BLACK;
+			themesettings[4] = Color.WHITE;
+			reDrawGameUI();
+		});
+		MenuItem opt3 = new MenuItem("Set America Theme");
+		opt3.setOnAction((event) -> {
+			themesettings[0] = Color.AQUA;
+			themesettings[1] = Color.WHITE;
+			themesettings[2] = Color.GREY;
+			themesettings[3] = Color.RED;
+			themesettings[4] = Color.BLUE;
+			reDrawGameUI();
+		});
+		MenuItem opt4 = new MenuItem("Set MLG PRO Theme");
+		opt4.setOnAction((event) -> {
+			themesettings[0] = Color.BLACK;
+			themesettings[1] = Color.GREY;
+			themesettings[2] = Color.WHITE;
+			themesettings[3] = Color.GREEN;
+			themesettings[4] = Color.RED;
+			reDrawGameUI();
+		});
+		MenuItem opt5 = new MenuItem("Set Greyscale Theme");
+		opt5.setOnAction((event) -> {
+			themesettings[0] = Color.WHITE;
+			themesettings[1] = Color.WHITE;
+			themesettings[2] = Color.WHITE;
+			themesettings[3] = Color.BLACK;
+			themesettings[4] = Color.GREY;
+			reDrawGameUI();
+		});
+		thememenu.getItems().addAll(opt1,opt2,opt3,opt4,opt5);
+		menuBar.getMenus().add(thememenu);
+	}
+	
+	@Override
+	public int getScore() {
+		if(gameModel.isStillRunning()) {
+			return 0;
+		}
+		int baseScore;
+		int difficultyModifier = gameModel.getConnectFourAI().getStrategy() instanceof ConnectFourEasyAI ? 1 : 2;
+		if(gameModel.tied()) {
+			return (int) (difficultyModifier * 110);
+		}
+		int temp = gameModel.maxMovesRemaining();
+		int winModifier = 1 * (gameModel.won('Y') ? -1 : 1);
+		temp = temp * winModifier + 35;
+		baseScore = (int) (temp * 2.5 + 25);
+		return baseScore * difficultyModifier;
+	}
 }

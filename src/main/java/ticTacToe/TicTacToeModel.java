@@ -351,6 +351,7 @@ public class TicTacToeModel extends Observable implements Serializable {
 				board[i][j] = '_';
 			}
 		}
-
+		setChanged();
+		notifyObservers();
 	}
 }

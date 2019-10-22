@@ -1,27 +1,38 @@
 package ticTacToe;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Observable;
-import java.util.Observer;
 
+import Gamejam.Gamejam;
+import controller.*;
+import Gamejam.RegionColors;
 import controller.AccountManager;
+import controller.GameControllerView;
+import controller.GameMenu;
+import controller.logStatType;
 
-import javafx.geometry.Pos;
+import javafx.geometry.Pos; 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.AudioClip;
-import model.GameJamGameInterface;
 
 /**
  * Provides a GUI view and the listeners required for players to make Tic Tac
  * Toe moves with mouse clicks.
  * 
- * @author Wes Rodgers
+ * @author Wes Rodgers, Joey McMaster
  *
  */
-public class TicTacToeControllerView extends GridPane implements Observer, GameJamGameInterface {
+public class TicTacToeControllerView extends GameControllerView {
 
 	private TicTacToeModel gameModel;
 	public static final int WIDTH = 600;
@@ -33,15 +44,29 @@ public class TicTacToeControllerView extends GridPane implements Observer, GameJ
 	private AudioClip loseSound;
 	private AudioClip tieSound;
 	private BorderPane[][] placeholder;
-	private AccountManager accountmanager;
-
+	// Original implemention by Wes has the object extending gridpane, this that grid pane.
+	// Updated version uses a border pane with original grid pane set to its center to add game speific options
+	// Should look and play the exact same way as before.
+	private GridPane _primarypane;
+	private AccountManager accountManager;
+	private StatsManager statsManager;
+	GameMenu menuBar;
+	
 	public TicTacToeControllerView() {
+		gameName = "tic-tac-toe";
+		menuBar = GameMenu.getMenuBar(this);
+		this.setTop(menuBar);		
+		_primarypane = new GridPane();
 		initializeGame();
-		setupResources();
-		accountmanager = AccountManager.getInstance();
-
+		setupResources();		
+		accountManager = AccountManager.getInstance();
+		statsManager = StatsManager.getInstance();
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
+		_primarypane.setPrefWidth(WIDTH);
+		_primarypane.setPrefHeight(HEIGHT);
+		_primarypane.setBackground(RegionColors.BDEFAULTBACKGROUND);
+		
 	}
 
 	/**
@@ -84,61 +109,63 @@ public class TicTacToeControllerView extends GridPane implements Observer, GameJ
 		// to properly set up the listeners, and since it was a last second fix I didn't
 		// have time to figure out a more elegant method than this.
 
-		this.setAlignment(Pos.CENTER);
+		_primarypane.setAlignment(Pos.CENTER);
 		topLeft = new BorderPane();
 		topLeft.setStyle("-fx-border-color : white black black white; -fx-border-width : 2");
 		topLeft.setPrefSize(200, 200);
-		this.add(topLeft, 0, 0);
+		_primarypane.add(topLeft, 0, 0);
 		placeholder[0][0] = topLeft;
 
 		midLeft = new BorderPane();
 		midLeft.setStyle("-fx-border-color : black black black white; -fx-border-width : 2");
 		midLeft.setPrefSize(200, 200);
-		this.add(midLeft, 0, 1);
+		_primarypane.add(midLeft, 0, 1);
 		placeholder[0][1] = midLeft;
 
 		botLeft = new BorderPane();
 		botLeft.setStyle("-fx-border-color : black black white white; -fx-border-width : 2");
 		botLeft.setPrefSize(200, 200);
-		this.add(botLeft, 0, 2);
+		_primarypane.add(botLeft, 0, 2);
 		placeholder[0][2] = botLeft;
 
 		topCenter = new BorderPane();
 		topCenter.setStyle("-fx-border-color : white black black black; -fx-border-width : 2");
 		topCenter.setPrefSize(200, 200);
-		this.add(topCenter, 1, 0);
+		_primarypane.add(topCenter, 1, 0);
 		placeholder[1][0] = topCenter;
 
 		midCenter = new BorderPane();
 		midCenter.setStyle("-fx-border-color : black black black black; -fx-border-width : 2");
 		midCenter.setPrefSize(200, 200);
-		this.add(midCenter, 1, 1);
+		_primarypane.add(midCenter, 1, 1);
 		placeholder[1][1] = midCenter;
 
 		botCenter = new BorderPane();
 		botCenter.setStyle("-fx-border-color : black black white black; -fx-border-width : 2");
 		botCenter.setPrefSize(200, 200);
-		this.add(botCenter, 1, 2);
+		_primarypane.add(botCenter, 1, 2);
 		placeholder[1][2] = botCenter;
 
 		topRight = new BorderPane();
 		topRight.setStyle("-fx-border-color : white white black black; -fx-border-width : 2");
 		topRight.setPrefSize(200, 200);
-		this.add(topRight, 2, 0);
+		_primarypane.add(topRight, 2, 0);
 		placeholder[2][0] = topRight;
 
 		midRight = new BorderPane();
 		midRight.setStyle("-fx-border-color : black white black black; -fx-border-width : 2");
 		midRight.setPrefSize(200, 200);
-		this.add(midRight, 2, 1);
+		_primarypane.add(midRight, 2, 1);
 		placeholder[2][1] = midRight;
 
 		botRight = new BorderPane();
 		botRight.setStyle("-fx-border-color : black white white black; -fx-border-width : 2");
 		botRight.setPrefSize(200, 200);
-		this.add(botRight, 2, 2);
+		_primarypane.add(botRight, 2, 2);
 		placeholder[2][2] = botRight;
 
+		
+		this.setCenter(this._primarypane);
 		setupListeners();
 
 	}
@@ -150,38 +177,56 @@ public class TicTacToeControllerView extends GridPane implements Observer, GameJ
 	private void setupListeners() {
 		topLeft.setOnMouseClicked((click) -> {
 			gameModel.humanMove(0, 0, false);
+			moveSound.play();
 		});
 
 		midLeft.setOnMouseClicked((click) -> {
 			gameModel.humanMove(1, 0, false);
+			moveSound.play();
 		});
 
 		botLeft.setOnMouseClicked((click) -> {
 			gameModel.humanMove(2, 0, false);
+			moveSound.play();
 		});
 
 		topCenter.setOnMouseClicked((click) -> {
 			gameModel.humanMove(0, 1, false);
+			moveSound.play();
 		});
 
 		midCenter.setOnMouseClicked((click) -> {
+			Gamejam.DPrint("what what");
 			gameModel.humanMove(1, 1, false);
+			Gamejam.DPrint(gameModel.toString());
+			moveSound.play();
 		});
 
 		botCenter.setOnMouseClicked((click) -> {
 			gameModel.humanMove(2, 1, false);
+			moveSound.play();
 		});
 
 		topRight.setOnMouseClicked((click) -> {
 			gameModel.humanMove(0, 2, false);
+			moveSound.play();
 		});
 
 		midRight.setOnMouseClicked((click) -> {
 			gameModel.humanMove(1, 2, false);
+			moveSound.play();
 		});
 
 		botRight.setOnMouseClicked((click) -> {
 			gameModel.humanMove(2, 2, false);
+			moveSound.play();
+		});
+		
+		menuBar.getDiffinter().setOnAction((event) -> { 
+			gameModel.setAIStrategy(new IntermediateAI());
+		});
+		menuBar.getDiffeasy().setOnAction((event) -> { 
+			gameModel.setAIStrategy(new EasyAI());
 		});
 	}
 
@@ -203,7 +248,6 @@ public class TicTacToeControllerView extends GridPane implements Observer, GameJ
 	 */
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		moveSound.play();
 		char[][] board = gameModel.getBoard();
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -215,50 +259,105 @@ public class TicTacToeControllerView extends GridPane implements Observer, GameJ
 					HBox box = new HBox();
 					box.getChildren().add(imageView);
 					box.setStyle(placeholder[j][i].getStyle());
-					this.getChildren().remove(placeholder[j][i]);
-					this.add(box, j, i);
+					_primarypane.getChildren().remove(placeholder[j][i]);
+					_primarypane.add(box, j, i);
 				}
 			}
 		}
-		System.out.println(gameModel.toString());
+		
+		Gamejam.DPrint("----------");
+		Gamejam.DPrint(gameModel.toString());
+		Gamejam.DPrint("----------");
+		if(!gameModel.isStillRunning()) {
+			System.out.println("Score is " + getScore());
+		}
 		if (gameModel.tied()) {
-			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 2, 1);
+			//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
+			statsManager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0, getScore());
 			tieSound.play();
 		} else if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
-				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 0, 1);
+				//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
+				statsManager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1, getScore());
 				winSound.play();
 			} else {
-				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", 1, 1);
+				//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
+				statsManager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1, getScore());
 				loseSound.play();
 			}
-
-			/*
-			 * *****Old code to figure out a stroke for the winning row/col/diagonal****
-			 * String winningDirection = gameModel.getWinningDirection(); Point[]
-			 * winningSquares = gameModel.getWinningSquares(winningDirection);
-			 * gc.setStroke(Color.BLUE);
-			 * 
-			 * switch (winningDirection) { case "horizontal": gc.strokeLine(0,
-			 * winningSquares[0].x*200+100, 600, winningSquares[2].x*200+100); break; case
-			 * "vertical": gc.strokeLine(winningSquares[0].y*200+100, 0,
-			 * winningSquares[2].y*200+100, 600); break; case "diagonal": if
-			 * (winningSquares[0].x == 0) { gc.strokeLine(0, 0, 600, 600); } else {
-			 * gc.strokeLine(0, 600, 600, 0); } break; } gc.setStroke(Color.BLACK);
-			 */
 		}
+		Gamejam.DPrint("current directory = " + System.getProperty("user.dir"));
 	}
 
 	@Override
-	public boolean loadSaveGame(String filepath) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean saveGame() {
+		Gamejam.DPrint(accountManager.getCurUsername());
+		if(accountManager.isGuest()) {
+			return false;
+		}
+		// Don't save if the game was completed
+		if(!gameModel.isStillRunning()) {
+			gameModel.clearBoard();
+		}
+		FileOutputStream fos;
+		ObjectOutputStream oos;
+		try {
+			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
+			String sep = System.getProperty("file.separator");
+			String filepath = System.getProperty("user.dir") + sep + "save-data";
+			if(!new File(filepath).exists()) {
+				new File(filepath).mkdir();
+			}
+			filepath += sep + fname;
+			fos = new FileOutputStream(filepath);			
+			oos = new ObjectOutputStream(fos);
+			oos.writeObject(gameModel);
+			oos.close();
+			Gamejam.DPrint("Saved the game");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;		
 	}
-
+	
 	@Override
-	public boolean saveGame(String filepath) {
-		// TODO Auto-generated method stub
-		return false;
+	/**
+	 * loads a saved game from the given filepath
+	 * 
+	 * @param filepath the location from which to load the game
+	 * @return true if the load was successful, false otherwise
+	 */
+	public boolean loadSaveGame() {
+		FileInputStream fis;
+		ObjectInputStream ois;
+		boolean retVal = true;
+		try {
+			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
+			String sep = System.getProperty("file.separator");
+			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
+			File file = new File(filepath);
+			if(file.exists()) {
+				fis = new FileInputStream(file);
+				ois = new ObjectInputStream(fis);
+				gameModel = (TicTacToeModel) ois.readObject();
+				ois.close();
+				update(gameModel, this);
+				file.delete();
+			} else {
+				retVal = newGame();
+			}
+		} catch(IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		}
+		clearView();
+		setupBoard();
+		setupListeners();
+		gameModel.addObserver(this);
+		update(gameModel, this);
+		return true;	
 	}
 
 	@Override
@@ -284,11 +383,45 @@ public class TicTacToeControllerView extends GridPane implements Observer, GameJ
 	@Override
 	public boolean newGame() {
 		try {
-			initializeGame();
+			gameModel.clearBoard();
+			clearView();
+			setupBoard();
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			return false;
 		}
 		return true;
 	}
+	private void clearView() {		
+		ArrayList<Object> al = new ArrayList<Object>();
+		for(Object o : _primarypane.getChildren()) {
+			al.add(o);
+		}
+		_primarypane.getChildren().removeAll(al);		
+	}
 
+	@Override
+	protected void updateStatistics() {
+		if (!(gameModel.won('X') || gameModel.won('O')) && gameModel.maxMovesRemaining() > 0) {
+			//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+			statsManager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1, getScore());
+		}
+	}
+
+	@Override
+	public int getScore() {
+		if(gameModel.isStillRunning()) {
+			return 0;
+		}
+		int baseScore;
+		double difficultyModifier = gameModel.getTicTacToeAI().getStrategy() instanceof EasyAI ? 1.0 : 1.5;
+		if(gameModel.tied()) {
+			return (int) (difficultyModifier * 35);
+		}
+		int temp = gameModel.maxMovesRemaining();
+		int winModifier = 1 * (gameModel.won('O') ? -1 : 1);
+		temp = temp * winModifier + 3;
+		baseScore = temp * 14 + 2;
+		return (int) (baseScore * difficultyModifier);
+	}
 }

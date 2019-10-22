@@ -1,5 +1,9 @@
 package connectFour;
 
+import java.io.Serializable;
+
+import ticTacToe.EasyAI;
+
 /**
 * This class lets a person choose from a variety of different AIs to play
 * against in Connect Four. Dependent on TODO insert connect four strategy name
@@ -7,8 +11,12 @@ package connectFour;
 * @author Wes Rodgers
 *
 */
-public class ConnectFourAI {
+public class ConnectFourAI implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ConnectFourStrategy AIStrategy;
 
 	/**
@@ -34,6 +42,11 @@ public class ConnectFourAI {
 	 */
 	public int nextMove(ConnectFourModel connectFourModel) {      
 	    return AIStrategy.desiredMove(connectFourModel);
+	}
+
+	public ConnectFourStrategy getStrategy() {
+		// TODO Auto-generated method stub
+		return AIStrategy;
 	}
 
 }
