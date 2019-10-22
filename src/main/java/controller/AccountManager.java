@@ -104,7 +104,7 @@ public class AccountManager extends Observable {
      * @param incomplete Whether the game is incomplete
      * @param time The amount of time that elapsed the game
      */
-    public void logGameInDB(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time) {
+    public void logGameInDB(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time, int score) {
         if (this.isGuest) {
             // Do nothing if this is a guest account.
             Gamejam.DPrint("logGameStat, not doing anything!");
@@ -115,7 +115,7 @@ public class AccountManager extends Observable {
             int gameid = getGameIdFromString(game);
             Gamejam.DPrint(gameid);
             String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
-            conn.execute(transaction, userStatsIDs.get(gameid), win, loss, tie, incomplete, time, 0);
+            conn.execute(transaction, userStatsIDs.get(gameid), win, loss, tie, incomplete, time, score);
 
         } catch (SQLException se) {
             se.printStackTrace();

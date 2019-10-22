@@ -12,7 +12,6 @@ import java.util.Observable;
 import Gamejam.Gamejam;
 import controller.*;
 import Gamejam.RegionColors;
-import connectFour.ConnectFourModel;
 import controller.AccountManager;
 import controller.GameControllerView;
 import controller.GameMenu;
@@ -272,16 +271,16 @@ public class TicTacToeControllerView extends GameControllerView {
 		}
 		if (gameModel.tied()) {
 			//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
-			statsManager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
+			statsManager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0, getScore());
 			tieSound.play();
 		} else if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
 				//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
-				statsManager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1);
+				statsManager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1, getScore());
 				winSound.play();
 			} else {
 				//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
-				statsManager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1);
+				statsManager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1, getScore());
 				loseSound.play();
 			}
 		}
@@ -290,8 +289,8 @@ public class TicTacToeControllerView extends GameControllerView {
 
 	@Override
 	public boolean saveGame() {
-		Gamejam.DPrint(accountmanager.getCurUsername());
-		if(accountmanager.isGuest()) {
+		Gamejam.DPrint(accountManager.getCurUsername());
+		if(accountManager.isGuest()) {
 			return false;
 		}
 		// Don't save if the game was completed
@@ -403,7 +402,7 @@ public class TicTacToeControllerView extends GameControllerView {
 	protected void updateStatistics() {
 		if (!(gameModel.won('X') || gameModel.won('O')) && gameModel.maxMovesRemaining() > 0) {
 			//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
-			statsManager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+			statsManager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1, getScore());
 		}
 	}
 
