@@ -10,4 +10,5 @@ public class logStatType {
 	public static final int TIE = 2;
 	public static final int INCOMPLETE = 3;
 	public static final int TIMEPLAYED = 4;
+	public static final int SCORE = 5;
 }
