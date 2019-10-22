@@ -2,6 +2,7 @@ package Gamejam;
 import controller.logStatType;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 /**
  * Implementation of the Gamejam project. Acts as the Init class.
@@ -15,6 +16,7 @@ import javafx.stage.Stage;
 public class Gamejam extends Application {
 	// Print everything debug related.
 	public static final boolean ShowDebugOutput = true;
+	private GamejamMainScreen screen;
 	public static void main(String args[]) {
 		launch(args);
 	}
@@ -22,12 +24,12 @@ public class Gamejam extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		stage.setTitle("Game Jam");
-		GamejamMainScreen screen = new GamejamMainScreen();
-		Scene scene = new Scene(screen, 1280, 720);
+		this.screen = new GamejamMainScreen();
+		Scene scene = new Scene(this.screen, 1280, 720);
 		stage.setScene(scene);
-		stage.setOnCloseRequest((event)->{
+		stage.setOnCloseRequest((event)-> {
 			// On Application close, run this
-			System.out.println("Closing App");
+			onAppClose();
 		});
 		stage.show();
 		
@@ -53,5 +55,12 @@ public class Gamejam extends Application {
 		if (ShowDebugOutput) {
 			System.out.println(num);
 		}
+	}
+	/**
+	 * Handler for the closing of the app.
+	 */
+	private void onAppClose() {
+		DPrint("Closing App");
+		this.screen.stopAndSaveCurrentGame();
 	}
 }

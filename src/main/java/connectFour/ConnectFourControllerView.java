@@ -72,7 +72,7 @@ public class ConnectFourControllerView extends GameControllerView {
 		this.setHeight(HEIGHT);
 		_primarypane.setPrefHeight(HEIGHT);
 		_primarypane.setPrefWidth(WIDTH);
-		addCustomUIOptions();
+		addThemeUIOptions();
 	}
 
 	/**
@@ -170,6 +170,10 @@ public class ConnectFourControllerView extends GameControllerView {
 	public boolean saveGame() {
 		if(accountmanager.isGuest()) {
 			return false;
+		}
+		// Don't save if the game was completed
+		if(!gameModel.isStillRunning()) {
+			gameModel.clearBoard();
 		}
 		FileOutputStream fos;
 		ObjectOutputStream oos;
@@ -309,7 +313,7 @@ public class ConnectFourControllerView extends GameControllerView {
 	@Override
 	protected void updateStatistics() {
 		if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
-			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 1);
+			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 0);
 			accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
 		}
 	}
@@ -342,9 +346,9 @@ public class ConnectFourControllerView extends GameControllerView {
 		}
 	}
 	/**
-	 * 
+	 * Generates the Theme menu and adds it to the Menu bar for Connect-4
 	 */
-	private void addCustomUIOptions() {
+	private void addThemeUIOptions() {
 		Menu thememenu = new Menu("Theme Menu");
 		MenuItem opt1 = new MenuItem("Set Default Theme");
 		opt1.setOnAction((event) -> {
