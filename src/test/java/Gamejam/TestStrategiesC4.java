@@ -1,12 +1,13 @@
 package Gamejam;
 
 
-import org.junit.Test;
+
 
 import connectFour.ConnectFourAI;
 import connectFour.ConnectFourEasyAI;
 import connectFour.ConnectFourHardAI;
 import connectFour.ConnectFourModel;
+import org.junit.Test;
 
 public class TestStrategiesC4 {
 	  @Test

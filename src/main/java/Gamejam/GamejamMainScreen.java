@@ -14,6 +14,8 @@ import controller.DBGameManager;
 import controller.GameControllerView;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -34,7 +36,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import model.Leaderboard;
 import model.SanityCheckFailedException;
+import model.Score;
 import ticTacToe.TicTacToeControllerView;
 
 /**
@@ -43,6 +47,7 @@ import ticTacToe.TicTacToeControllerView;
  * 
  * @author Joey McMaster
  * @author Wes Rodgers
+ * @author Nicholas Fiegel
  *
  */
 public class GamejamMainScreen extends BorderPane implements Observer {
@@ -57,8 +62,12 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private Label leftBarMsg;
 	private Label leftBarStats;
 	private VBox initCreateAccountMenu;
+	private VBox leaderScreen;
+	private TableView<Score> scoresTable;
+	private ComboBox<String> leaderBoardSelection;
 	private AccountManager acctMgr;
 	private DBGameManager dbGameManager;
+	private Leaderboard leaderboard;
 	private TicTacToeControllerView tictactoegameview;
 	private ConnectFourControllerView connectFourGameView;
 	private String loggedinusername;
@@ -85,6 +94,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.acctMgr = AccountManager.getInstance();
 		this.acctMgr.addObserver(this);
 		this.dbGameManager = DBGameManager.getInstance();
+		leaderboard = Leaderboard.getInstance();
 		
 		// Init Collections
 		this.initbuttonlist = new Button[70];
@@ -94,6 +104,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initTopBar = initTopBar();
 		this.initGameselectonboxarea = initGamePanel();
 		this.initLeftBar = initLeftBar();
+		leaderScreen = initLeaderScreen();
 		
 		// Not in user parts that can be used later
 		this.initCreateAccountMenu = initCreateAccountScreen();
@@ -176,8 +187,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		newacc.setOnMouseClicked((click) -> {
 			createNewAccountButtonClick();
 		});
+
+		// Leaderboard button
+		Button viewLeaderboard = new Button("View Leaderboard");
+		viewLeaderboard.setOnAction( (ae) -> viewLeaderboardClick());
+
 		// Add to Left Hbox
-		leftbox.getChildren().add(newacc);
+		leftbox.getChildren().addAll(newacc, viewLeaderboard);
 		leftbox.setPrefWidth(758);
 		leftbox.setPrefHeight(25);
 		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
@@ -204,7 +220,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Add buttons to button collection
 		this.initbuttonlist[1] = newacc;
 		this.initbuttonlist[2] = login;
-		
+    
 		retval.getChildren().addAll(username, password, login);
 		retval.setPrefWidth(600);
 		retval.setPrefHeight(25);
@@ -359,6 +375,40 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			grid.add(gamebutton, x % 4, x / 4);
 		}
 		return grid;
+	}
+
+	private VBox initLeaderScreen() {
+		VBox screen = new VBox();
+		scoresTable = new TableView<>();
+		leaderBoardSelection = new ComboBox();
+
+		// Fill the combobox to select leaderboard statistics
+		leaderBoardSelection.getItems().add("All Scores");
+
+		for (String game : dbGameManager.getGameListByName().keySet()) {
+			leaderBoardSelection.getItems().add(game);
+		}
+
+		leaderBoardSelection.getSelectionModel().selectFirst();
+
+		leaderBoardSelection.setOnAction( (ae) -> {
+			handleLeaderBoardSelectionChange();
+		});
+
+		TableColumn<Score, String> username = new TableColumn<>("Username");
+		username.setCellValueFactory(new PropertyValueFactory<>("username"));
+
+		TableColumn<Score, String> gameName = new TableColumn<>("Game");
+		gameName.setCellValueFactory(new PropertyValueFactory<>("gameName"));
+
+		TableColumn<Score, Integer> score = new TableColumn<>("Score");
+		score.setCellValueFactory(new PropertyValueFactory<>("score"));
+
+		scoresTable.getColumns().addAll(username, gameName, score);
+		handleLeaderBoardSelectionChange();
+		screen.getChildren().addAll(leaderBoardSelection, scoresTable);
+
+		return screen;
 	}
 	/**
 	 * Gets the item that is the theme menu for the main GUI
@@ -613,6 +663,17 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.setCenter(this.connectFourGameView);
 		}
 	}
+
+	private void viewLeaderboardClick() {
+		this.setCenter(leaderScreen);
+
+		if (userLoggedIn) {
+			this.setTop(initLoggedInInGameBar);
+		} else {
+			this.setTop(initCreateAccountMenuBar);
+		}
+	}
+
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
 	/**
 	 * Updates the GUI after a new account is made succesfuly,
@@ -653,14 +714,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.leftBarMsg.setText("Welcome to Gamejam, " + this.acctMgr.getCurUsername());
 			this.leftBarStats.setText("\n\nLevel: " + this.acctMgr.getLevel() + "\nExp: " + this.acctMgr.getExp());
 
-			ArrayList<String> games = new ArrayList<>(dbGameManager.getGameList().keySet());
+			ArrayList<String> games = new ArrayList<>(dbGameManager.getGameListByName().keySet());
 			Collections.sort(games);
 
 			leftBarStats.setText(leftBarStats.getText() + "\n");
 
 			for (String game : games) {
-				Integer id = dbGameManager.getGameList().get(game);
-				Integer numPlayed = acctMgr.getNumGamesPlayed().get(dbGameManager.getGameList().get(game));
+				Integer id = dbGameManager.getGameListByName().get(game);
+				Integer numPlayed = acctMgr.getNumGamesPlayed().get(dbGameManager.getGameListByName().get(game));
 				leftBarStats.setText(leftBarStats.getText() + "\n" + game + ":");
 				leftBarStats.setText(leftBarStats.getText() + "\nWins: " + acctMgr.getGameWins().get(id));
 				leftBarStats.setText(leftBarStats.getText() + "\nLosses: " + acctMgr.getGameLosses().get(id));
@@ -727,6 +788,23 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			return this.acctMgr.login(username, password);
 		}
 	}
+
+	private void handleLeaderBoardSelectionChange() {
+		String choice = leaderBoardSelection.getValue();
+
+		scoresTable.getItems().clear();
+
+		if (choice.equals("All Scores")) {
+			for (Score cur : leaderboard.getAllScores()) {
+				scoresTable.getItems().add(cur);
+			}
+		} else {
+			for (Score cur : leaderboard.getTopTen(choice)) {
+				scoresTable.getItems().add(cur);
+			}
+		}
+	}
+
 ////////////////////////Other function types go here ////////////////////////////////////////////////////
 	/**
 	 * Updates the theme of mainGUI
