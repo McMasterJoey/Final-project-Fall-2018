@@ -8,10 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Observable;
 
-import controller.AccountManager;
-import controller.GameControllerView;
-import controller.GameMenu;
-import controller.logStatType;
+import controller.*;
 import javafx.geometry.Pos;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -66,7 +63,8 @@ public class ConnectFourControllerView extends GameControllerView {
 		this.setTop(menuBar);
 		initializeGame();
 		setupResources();
-		accountmanager = AccountManager.getInstance();
+		accountManager = AccountManager.getInstance();
+		statsManager = StatsManager.getInstance();
 
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
@@ -168,7 +166,7 @@ public class ConnectFourControllerView extends GameControllerView {
 	 * @return true if the save was successful, false otherwise
 	 */
 	public boolean saveGame() {
-		if(accountmanager.isGuest()) {
+		if(accountManager.isGuest()) {
 			return false;
 		}
 		// Don't save if the game was completed
@@ -178,7 +176,7 @@ public class ConnectFourControllerView extends GameControllerView {
 		FileOutputStream fos;
 		ObjectOutputStream oos;
 		try {
-			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
+			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
 			String filepath = System.getProperty("user.dir") + sep + "save-data";
 			if(!new File(filepath).exists()) {
@@ -206,7 +204,7 @@ public class ConnectFourControllerView extends GameControllerView {
 	public boolean loadSaveGame() {
 		boolean retVal = true;
 		try {
-			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
+			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
 			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
 			File file = new File(filepath);
@@ -294,18 +292,18 @@ public class ConnectFourControllerView extends GameControllerView {
 		//System.out.println("--------------");
 		
 		if (gameModel.tied()) {
-			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
-			accountmanager.logGameStat("Connect-Four", logStatType.TIE, 0);
+			//accountManager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
+			statsManager.logGameStat("Connect-Four", logStatType.TIE, 0);
 			tieSound.play();
 		} else if (gameModel.won('R') || gameModel.won('Y')) {
 			disableListeners();
 			if (gameModel.won('R')) {
-				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
-				accountmanager.logGameStat("Connect-Four", logStatType.WIN, 0);
+				//accountManager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
+				statsManager.logGameStat("Connect-Four", logStatType.WIN, 0);
 				winSound.play();
 			} else {
-				accountmanager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
-				accountmanager.logGameStat("Connect-Four", logStatType.LOSS, 0);
+				//accountManager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
+				statsManager.logGameStat("Connect-Four", logStatType.LOSS, 0);
 				loseSound.play();
 			}
 		}
