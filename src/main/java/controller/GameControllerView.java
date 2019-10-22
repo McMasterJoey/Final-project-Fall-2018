@@ -11,7 +11,8 @@ import model.GameModel;
  *
  */
 public abstract class GameControllerView extends BorderPane implements Observer {
-	protected AccountManager accountmanager;
+	protected AccountManager accountManager;
+	protected StatsManager statsManager;
 	protected String gameName;
 	protected GameModel gameModel;
 
@@ -35,16 +36,16 @@ public abstract class GameControllerView extends BorderPane implements Observer 
 	 * 
 	 * @return
 	 */
-	public AccountManager getAccountmanager() {
-		return accountmanager;
+	public AccountManager getAccountManager() {
+		return accountManager;
 	}
 
 	/**
 	 * 
-	 * @param accountmanager
+	 * @param accountManager
 	 */
-	public void setAccountmanager(AccountManager accountmanager) {
-		this.accountmanager = accountmanager;
+	public void setAccountManager(AccountManager accountManager) {
+		this.accountManager = accountManager;
 	}
 
 	/**

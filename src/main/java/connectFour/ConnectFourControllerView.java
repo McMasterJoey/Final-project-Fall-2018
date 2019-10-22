@@ -18,7 +18,6 @@ import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import ticTacToe.EasyAI;
 import ticTacToe.TicTacToeControllerView;
 
 /**
@@ -296,18 +295,18 @@ public class ConnectFourControllerView extends GameControllerView {
 			System.out.println("\nGame score is " + getScore());
 		}
 		if (gameModel.tied()) {
-			accountManager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
-			statsManager.logGameStat("Connect-Four", logStatType.TIE, 0);
+			//accountManager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
+			statsManager.logGameStat("Connect-Four", logStatType.TIE, 0, getScore());
 			tieSound.play();
 		} else if (gameModel.won('R') || gameModel.won('Y')) {
 			disableListeners();
 			if (gameModel.won('R')) {
-				accountManager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
-				statsManager.logGameStat("Connect-Four", logStatType.WIN, 0);
+				//accountManager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
+				statsManager.logGameStat("Connect-Four", logStatType.WIN, 0, getScore());
 				winSound.play();
 			} else {
-				accountManager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
-				statsManager.logGameStat("Connect-Four", logStatType.LOSS, 0);
+				//accountManager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
+				statsManager.logGameStat("Connect-Four", logStatType.LOSS, 0, getScore());
 				loseSound.play();
 			}
 		}
@@ -315,8 +314,8 @@ public class ConnectFourControllerView extends GameControllerView {
 	@Override
 	protected void updateStatistics() {
 		if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
-			accountManager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 0);
-			statsManager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
+			//accountManager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 0);
+			statsManager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1, getScore());
 		}
 	}
 	/**
