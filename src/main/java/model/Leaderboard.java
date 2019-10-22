@@ -97,6 +97,8 @@ public class Leaderboard {
                 String username = rs.getString("username");
                 int gameID = gameMgr.getGameListByName().get(gameName);
                 scores.add(new Score(gameID, gameName, accountID, username, score));
+                Collections.sort(scores);
+                Collections.reverse(scores);
             } else {
                 System.err.println("accountid " + accountID + " not found in the database");
             }
