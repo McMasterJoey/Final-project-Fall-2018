@@ -227,7 +227,7 @@ public class ConnectFourControllerView extends GameControllerView {
 		setupListeners();
 		gameModel.addObserver(this);
 		update(gameModel, this);
-		return true;
+		return retVal;
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import java.util.Observable;
 
 import Gamejam.Gamejam;
 import Gamejam.RegionColors;
+import connectFour.ConnectFourModel;
 import controller.AccountManager;
 import controller.GameControllerView;
 import controller.GameMenu;
