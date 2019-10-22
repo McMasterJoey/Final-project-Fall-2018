@@ -49,6 +49,8 @@ public class TicTacToeControllerView extends GameControllerView {
 	// Updated version uses a border pane with original grid pane set to its center to add game speific options
 	// Should look and play the exact same way as before.
 	private GridPane _primarypane;
+	private AccountManager accountManager;
+	private StatsManager statsManager;
 	GameMenu menuBar;
 	
 	public TicTacToeControllerView() {
@@ -271,16 +273,16 @@ public class TicTacToeControllerView extends GameControllerView {
 			System.out.println("Score is " + getScore());
 		}
 		if (gameModel.tied()) {
-			//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
+			accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
 			statsManager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
 			tieSound.play();
 		} else if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
-				//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
+				accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
 				statsManager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1);
 				winSound.play();
 			} else {
-				//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
+				accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
 				statsManager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1);
 				loseSound.play();
 			}

@@ -147,7 +147,7 @@ public class AccountManager extends Observable {
 	 * @param stattype The id of the stat type (refer to the enum LogStatType)
 	 * @param value The value to be added/set 
 	 */
-	private void logGlobalStat(boolean update, String game, int stattype, int value) {
+	public void logGlobalStat(boolean update, String game, int stattype, int value) {
 		// Arg Check
 		if (stattype < 0 || stattype > 4 || value < 0) {
 			throw new IllegalArgumentException("Invalid stattype was out of range or value was below 0.");

@@ -43,6 +43,8 @@ public class ConnectFourControllerView extends GameControllerView {
 	// Should look and play the exact same way as before.
 	private GridPane _primarypane;
 	private GameMenu menuBar;
+	private AccountManager accountManager;
+	private StatsManager statsManager;
 	// Size of 5: 0 = Overall color, 1 = Blank Circle color, 2 = Circle outline color 
 	//            3 = Player Piece color, 4 = AI Piece color 
 	private Color[] themesettings; // Used to
@@ -294,17 +296,17 @@ public class ConnectFourControllerView extends GameControllerView {
 			System.out.println("\nGame score is " + getScore());
 		}
 		if (gameModel.tied()) {
-			//accountManager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
+			accountManager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
 			statsManager.logGameStat("Connect-Four", logStatType.TIE, 0);
 			tieSound.play();
 		} else if (gameModel.won('R') || gameModel.won('Y')) {
 			disableListeners();
 			if (gameModel.won('R')) {
-				//accountManager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
+				accountManager.logGlobalStat(true, "Connect-Four", logStatType.WIN, 1);
 				statsManager.logGameStat("Connect-Four", logStatType.WIN, 0);
 				winSound.play();
 			} else {
-				//accountManager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
+				accountManager.logGlobalStat(true, "Connect-Four", logStatType.LOSS, 1);
 				statsManager.logGameStat("Connect-Four", logStatType.LOSS, 0);
 				loseSound.play();
 			}
@@ -313,8 +315,8 @@ public class ConnectFourControllerView extends GameControllerView {
 	@Override
 	protected void updateStatistics() {
 		if (!(gameModel.won('R') || gameModel.won('Y')) && gameModel.maxMovesRemaining() > 0) {
-			accountmanager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 0);
-			accountmanager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
+			accountManager.logGlobalStat(true, "Connect-Four", logStatType.INCOMPLETE, 0);
+			statsManager.logGameStat("Connect-Four", logStatType.INCOMPLETE, 1);
 		}
 	}
 	/**
