@@ -48,6 +48,8 @@ public class TicTacToeControllerView extends GameControllerView {
 	// Updated version uses a border pane with original grid pane set to its center to add game speific options
 	// Should look and play the exact same way as before.
 	private GridPane _primarypane;
+	private AccountManager accountManager;
+	private StatsManager statsManager;
 	GameMenu menuBar;
 	
 	public TicTacToeControllerView() {

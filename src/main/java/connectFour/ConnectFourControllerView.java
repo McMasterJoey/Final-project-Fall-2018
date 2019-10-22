@@ -42,6 +42,8 @@ public class ConnectFourControllerView extends GameControllerView {
 	// Should look and play the exact same way as before.
 	private GridPane _primarypane;
 	private GameMenu menuBar;
+	private AccountManager accountManager;
+	private StatsManager statsManager;
 	// Size of 5: 0 = Overall color, 1 = Blank Circle color, 2 = Circle outline color 
 	//            3 = Player Piece color, 4 = AI Piece color 
 	private Color[] themesettings; // Used to

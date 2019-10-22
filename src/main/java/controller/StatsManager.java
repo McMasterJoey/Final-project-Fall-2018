@@ -26,7 +26,6 @@ public class StatsManager {
 
         return singleton;
     }
-
     /**
      * Logs a game played for the given user, Alternate function
      * @param game The name of the game that was played
@@ -46,7 +45,6 @@ public class StatsManager {
             throw new IllegalArgumentException("Invalid stattype was out of range or value was below 0.");
         }
     }
-
     public void logGameStat(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time, int score) {
         acctMgr.logGameInDB(game, win, loss, tie, incomplete, time, score);
         leaderboard.addScore(acctMgr.getAccountID(), game, score);
