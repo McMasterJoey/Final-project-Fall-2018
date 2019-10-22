@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Observable;
 
 import Gamejam.Gamejam;
+import Gamejam.RegionColors;
 import controller.AccountManager;
 import controller.GameControllerView;
 import controller.GameMenu;
@@ -60,6 +61,8 @@ public class TicTacToeControllerView extends GameControllerView {
 		this.setHeight(HEIGHT);
 		_primarypane.setPrefWidth(WIDTH);
 		_primarypane.setPrefHeight(HEIGHT);
+		_primarypane.setBackground(RegionColors.BDEFAULTBACKGROUND);
+		
 	}
 
 	/**
