@@ -283,7 +283,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		logout.setOnMouseClicked((click) -> {
 			BackToMainMenuButtonClickLoggedIn();
 		});
-		this.initbuttonlist[14] = logout;
+		this.initbuttonlist[10] = logout;
 		// Add to Left Hbox
 		leftbox.getChildren().add(logout);
 		leftbox.setPrefWidth(1100);
@@ -449,8 +449,25 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.initbuttonlist[6].setGraphic(themeimages[3]);
 			updateTheme();
 		});
-		this.initbuttonlist[10] = theme1;
+		this.initbuttonlist[14] = theme1;
 		left.getChildren().add(theme1);
+		Button theme2 = new Button("USA Theme");
+		theme2.setOnMouseClicked((click) -> {
+			this.themeSettings[0] = RegionColors.WHITE;   // Button Backgrounds
+			this.themeSettings[1] = RegionColors.RED;  // Left Panel Upper Text color 
+			this.themeSettings[2] = RegionColors.BLUE;   // Upper bars background
+			this.themeSettings[3] = RegionColors.BLUE;   // Middle Area background / Overall background
+			this.themeSettings[4] = RegionColors.BLUE;   // Left Panel background
+			this.themeSettings[5] = RegionColors.RED;  // New account/Back/Logout button text
+			this.themeSettings[6] = RegionColors.RED;  // Left Panel Lower text color
+			this.themeSettings[7] = RegionColors.RED;    // Login button text color
+			this.themeSettings[8] = RegionColors.RED;    // Default Settings Text color
+			this.initbuttonlist[4].setGraphic(themeimages[0]);
+			this.initbuttonlist[6].setGraphic(themeimages[1]);
+			updateTheme();
+		});
+		this.initbuttonlist[15] = theme2;
+		left.getChildren().add(theme2);
 		updateTheme();
 		retval.add(left, 0, 0);
 		retval.add(right,1, 0);
@@ -833,7 +850,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initbuttonlist[7].setTextFill(RegionColors.getColor(this.themeSettings[5]));
 		this.initbuttonlist[8].setTextFill(RegionColors.getColor(this.themeSettings[5]));
 		this.initbuttonlist[9].setTextFill(RegionColors.getColor(this.themeSettings[5]));
-		this.initbuttonlist[14].setTextFill(RegionColors.getColor(this.themeSettings[5]));
+		this.initbuttonlist[10].setTextFill(RegionColors.getColor(this.themeSettings[5]));
 		
 		Label l0 = (Label) this.initLoggedInBar.getChildren().get(1);
 		l0.setTextFill(RegionColors.getColor(this.themeSettings[5]));
@@ -846,9 +863,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		
 		Label l = (Label) this.initUserSettingsMainMenu.getChildren().get(0);
 		l.setTextFill(RegionColors.getColor(this.themeSettings[8]));
-		for(int x = 10; x < 14; x++) {
+		for(int x = 11; x < 16; x++) {
 			this.initbuttonlist[x].setTextFill(RegionColors.getColor(this.themeSettings[8]));
 		}
+		
 	}
 	/**
 	 * Stops and saves the current game so the user can go back the main menu.
