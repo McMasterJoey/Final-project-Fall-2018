@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Observable;
 
 import Gamejam.Gamejam;
+import controller.*;
+import Gamejam.RegionColors;
 import connectFour.ConnectFourModel;
 import controller.AccountManager;
 import controller.GameControllerView;
@@ -56,11 +58,14 @@ public class TicTacToeControllerView extends GameControllerView {
 		_primarypane = new GridPane();
 		initializeGame();
 		setupResources();		
-		accountmanager = AccountManager.getInstance();
+		accountManager = AccountManager.getInstance();
+		statsManager = StatsManager.getInstance();
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
 		_primarypane.setPrefWidth(WIDTH);
 		_primarypane.setPrefHeight(HEIGHT);
+		_primarypane.setBackground(RegionColors.BDEFAULTBACKGROUND);
+		
 	}
 
 	/**
@@ -190,9 +195,9 @@ public class TicTacToeControllerView extends GameControllerView {
 		});
 
 		midCenter.setOnMouseClicked((click) -> {
-			System.out.println("what what");
+			Gamejam.DPrint("what what");
 			gameModel.humanMove(1, 1, false);
-			System.out.println(gameModel.toString());
+			Gamejam.DPrint(gameModel.toString());
 			moveSound.play();
 		});
 
@@ -262,19 +267,21 @@ public class TicTacToeControllerView extends GameControllerView {
 		Gamejam.DPrint("----------");
 		Gamejam.DPrint(gameModel.toString());
 		Gamejam.DPrint("----------");
-		
+		if(!gameModel.isStillRunning()) {
+			System.out.println("Score is " + getScore());
+		}
 		if (gameModel.tied()) {
-			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
-			accountmanager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
+			//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
+			statsManager.logGameStat("Tic-Tac-Toe", logStatType.TIE, 0);
 			tieSound.play();
 		} else if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
-				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
-				accountmanager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1);
+				//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
+				statsManager.logGameStat("Tic-Tac-Toe",  logStatType.WIN, 1);
 				winSound.play();
 			} else {
-				accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
-				accountmanager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1);
+				//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
+				statsManager.logGameStat("Tic-Tac-Toe", logStatType.LOSS, 1);
 				loseSound.play();
 			}
 		}
@@ -283,14 +290,18 @@ public class TicTacToeControllerView extends GameControllerView {
 
 	@Override
 	public boolean saveGame() {
-		System.out.println(accountmanager.getCurUsername());
+		Gamejam.DPrint(accountmanager.getCurUsername());
 		if(accountmanager.isGuest()) {
 			return false;
+		}
+		// Don't save if the game was completed
+		if(!gameModel.isStillRunning()) {
+			gameModel.clearBoard();
 		}
 		FileOutputStream fos;
 		ObjectOutputStream oos;
 		try {
-			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
+			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
 			String filepath = System.getProperty("user.dir") + sep + "save-data";
 			if(!new File(filepath).exists()) {
@@ -322,7 +333,7 @@ public class TicTacToeControllerView extends GameControllerView {
 		ObjectInputStream ois;
 		boolean retVal = true;
 		try {
-			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
+			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
 			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
 			File file = new File(filepath);
@@ -391,8 +402,25 @@ public class TicTacToeControllerView extends GameControllerView {
 	@Override
 	protected void updateStatistics() {
 		if (!(gameModel.won('X') || gameModel.won('O')) && gameModel.maxMovesRemaining() > 0) {
-			accountmanager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
-			accountmanager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+			//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
+			statsManager.logGameStat("Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
 		}
+	}
+
+	@Override
+	public int getScore() {
+		if(gameModel.isStillRunning()) {
+			return 0;
+		}
+		int baseScore;
+		double difficultyModifier = gameModel.getTicTacToeAI().getStrategy() instanceof EasyAI ? 1.0 : 1.5;
+		if(gameModel.tied()) {
+			return (int) (difficultyModifier * 35);
+		}
+		int temp = gameModel.maxMovesRemaining();
+		int winModifier = 1 * (gameModel.won('O') ? -1 : 1);
+		temp = temp * winModifier + 3;
+		baseScore = temp * 14 + 2;
+		return (int) (baseScore * difficultyModifier);
 	}
 }

@@ -66,6 +66,8 @@ public abstract class GameControllerView extends BorderPane implements Observer,
 
 	protected abstract void updateStatistics();
 
+	public abstract int getScore();
+	
 	// Takes a path, loads the save game linked
 	// Sets the state of that save game to current state of game.
 	public abstract boolean loadSaveGame();
