@@ -1,13 +1,9 @@
 package Gamejam;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Observer;
-
 import connectFour.ConnectFourControllerView;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Observable;
 import controller.AccountManager;
 import controller.DBGameManager;
@@ -18,18 +14,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -191,9 +181,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Leaderboard button
 		Button viewLeaderboard = new Button("View Leaderboard");
 		viewLeaderboard.setOnAction( (ae) -> viewLeaderboardClick());
-
+		this.initbuttonlist[8] = viewLeaderboard;
 		// Add to Left Hbox
 		leftbox.getChildren().addAll(newacc, viewLeaderboard);
+		
 		leftbox.setPrefWidth(758);
 		leftbox.setPrefHeight(25);
 		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
@@ -245,8 +236,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		logout.setOnMouseClicked((click) -> {
 			logoutButtonClick();
 		});
+		// Leaderboard button
+		Button viewLeaderboard = new Button("View Leaderboard");
+		viewLeaderboard.setOnAction( (ae) -> viewLeaderboardClick());
+		this.initbuttonlist[9] = viewLeaderboard;
+				
 		// Add to Left Hbox
-		leftbox.getChildren().add(logout);
+		leftbox.getChildren().addAll(logout, viewLeaderboard);
 		leftbox.setPrefWidth(1100);
 		leftbox.setPrefHeight(25);
 		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
@@ -287,6 +283,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		logout.setOnMouseClicked((click) -> {
 			BackToMainMenuButtonClickLoggedIn();
 		});
+		this.initbuttonlist[10] = logout;
 		// Add to Left Hbox
 		leftbox.getChildren().add(logout);
 		leftbox.setPrefWidth(1100);
@@ -447,13 +444,30 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.themeSettings[5] = RegionColors.WHITE;  // New account/Back/Logout button text
 			this.themeSettings[6] = RegionColors.WHITE;  // Left Panel Lower text color
 			this.themeSettings[7] = RegionColors.RED;    // Login button text color
-			this.themeSettings[8] = RegionColors.WHITE;    // Defalt Settings Text color
+			this.themeSettings[8] = RegionColors.WHITE;    // Default Settings Text color
 			this.initbuttonlist[4].setGraphic(themeimages[2]);
 			this.initbuttonlist[6].setGraphic(themeimages[3]);
 			updateTheme();
 		});
 		this.initbuttonlist[14] = theme1;
 		left.getChildren().add(theme1);
+		Button theme2 = new Button("USA Theme");
+		theme2.setOnMouseClicked((click) -> {
+			this.themeSettings[0] = RegionColors.WHITE;   // Button Backgrounds
+			this.themeSettings[1] = RegionColors.RED;  // Left Panel Upper Text color 
+			this.themeSettings[2] = RegionColors.BLUE;   // Upper bars background
+			this.themeSettings[3] = RegionColors.BLUE;   // Middle Area background / Overall background
+			this.themeSettings[4] = RegionColors.BLUE;   // Left Panel background
+			this.themeSettings[5] = RegionColors.RED;  // New account/Back/Logout button text
+			this.themeSettings[6] = RegionColors.RED;  // Left Panel Lower text color
+			this.themeSettings[7] = RegionColors.RED;    // Login button text color
+			this.themeSettings[8] = RegionColors.RED;    // Default Settings Text color
+			this.initbuttonlist[4].setGraphic(themeimages[0]);
+			this.initbuttonlist[6].setGraphic(themeimages[1]);
+			updateTheme();
+		});
+		this.initbuttonlist[15] = theme2;
+		left.getChildren().add(theme2);
 		updateTheme();
 		retval.add(left, 0, 0);
 		retval.add(right,1, 0);
@@ -487,14 +501,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		grid.getColumnConstraints().add(new ColumnConstraints(272));
 		grid.getColumnConstraints().add(new ColumnConstraints(272));
 		grid.getColumnConstraints().add(new ColumnConstraints(272));
-		Button returnmenu = new Button();
-		Image icon0 = new Image(getClass().getResourceAsStream("/usersettingsmainmenubuttonbackground.png"));
-		returnmenu.setGraphic(new ImageView(icon0));
-		returnmenu.setOnMouseClicked((click) -> {
-			this.setCenter(this.initGameselectonboxarea);
-		});
-		this.initbuttonlist[10] = returnmenu;
-		grid.add(returnmenu,0,0);
 		Button thememenu = new Button();
 		Image icon1 = new Image(getClass().getResourceAsStream("/usersettingsthememenubuttonbackground.png"));
 		thememenu.setGraphic(new ImageView(icon1));
@@ -502,7 +508,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			swapToThemeMenuButtonClick();
 		});
 		this.initbuttonlist[11] = thememenu;
-		grid.add(thememenu,1,0);
+		grid.add(thememenu,0,0);
 		pane.getChildren().addAll(info,grid);
 		return pane;
 	}
@@ -537,7 +543,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * Handles the event were the user is logged in and is in a game and wants to go back to the main menu.
 	 */
 	private void BackToMainMenuButtonClickLoggedIn() {
-		stopAndSaveCurrentGame();
+		boolean fromgame = justInGame();
+		if (fromgame) {
+			stopAndSaveCurrentGame();
+		}
 		this.setTop(this.initLoggedInBar);
 		this.setCenter(this.initGameselectonboxarea);
 		updateLeftPane();
@@ -560,8 +569,11 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * already logged in.
 	 */
 	private void userSettingsButtonClick() {
+		this.gameInUseIndex = -1;
+		this.agamewasloaded = false;
 		Label l = (Label) this.initUserSettingsMainMenu.getChildren().get(0);
 		l.setText(this.loggedinusername + ": Account Settings");
+		this.setTop(this.initLoggedInInGameBar);
 		this.setCenter(this.initUserSettingsMainMenu);
 	}
 	/**
@@ -663,11 +675,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.setCenter(this.connectFourGameView);
 		}
 	}
-
+	/**
+	 * 	Handles when the leaderboard button is clicked by the user.
+	 */
 	private void viewLeaderboardClick() {
 		this.setCenter(leaderScreen);
-
-		if (userLoggedIn) {
+		this.gameInUseIndex = -1;
+		this.agamewasloaded = false;
+		if (this.userLoggedIn) {
 			this.setTop(initLoggedInInGameBar);
 		} else {
 			this.setTop(initCreateAccountMenuBar);
@@ -833,6 +848,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initbuttonlist[1].setTextFill(RegionColors.getColor(this.themeSettings[5]));
 		this.initbuttonlist[3].setTextFill(RegionColors.getColor(this.themeSettings[5]));
 		this.initbuttonlist[7].setTextFill(RegionColors.getColor(this.themeSettings[5]));
+		this.initbuttonlist[8].setTextFill(RegionColors.getColor(this.themeSettings[5]));
+		this.initbuttonlist[9].setTextFill(RegionColors.getColor(this.themeSettings[5]));
+		this.initbuttonlist[10].setTextFill(RegionColors.getColor(this.themeSettings[5]));
+		
 		Label l0 = (Label) this.initLoggedInBar.getChildren().get(1);
 		l0.setTextFill(RegionColors.getColor(this.themeSettings[5]));
 		Label l1 = (Label)  initLoggedInInGameBar.getChildren().get(1);
@@ -844,9 +863,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		
 		Label l = (Label) this.initUserSettingsMainMenu.getChildren().get(0);
 		l.setTextFill(RegionColors.getColor(this.themeSettings[8]));
-		for(int x = 10; x < 15; x++) {
+		for(int x = 11; x < 16; x++) {
 			this.initbuttonlist[x].setTextFill(RegionColors.getColor(this.themeSettings[8]));
 		}
+		
 	}
 	/**
 	 * Stops and saves the current game so the user can go back the main menu.
@@ -906,6 +926,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			return (GameControllerView) this.connectFourGameView;
 		}
 		return null;
+	}
+	/**
+	 * Determines if a game was just played or is being played.
+	 * @return True if a game is being played or a game was the last major menu used. Otherwise false.
+	 */
+	private boolean justInGame() {
+		return this.gameInUseIndex >= 0;
 	}
 	/**
 	 * Fetches the array of Theme Images stored within this object. Enables other objects that want to reuse some files to not have to generate duplicates.

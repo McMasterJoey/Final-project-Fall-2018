@@ -2,6 +2,7 @@ package Gamejam;
 import controller.logStatType;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 /**
@@ -27,6 +28,7 @@ public class Gamejam extends Application {
 		this.screen = new GamejamMainScreen();
 		Scene scene = new Scene(this.screen, 1280, 720);
 		stage.setScene(scene);
+		stage.getIcons().add(new Image(getClass().getResourceAsStream("/gamejamapplicationicon.png")));
 		stage.setOnCloseRequest((event)-> {
 			// On Application close, run this
 			onAppClose();
