@@ -308,17 +308,19 @@ public class AccountManager extends Observable {
 		fillUserStats();
 	}
 	
-	// Attempt to delete an account
-	// Return codes:
-	// 1: Success
-	// 2: No such user 
-	//
+	/**
+	 * Attempts to delete an account:
+	 * Returns 1 on success, 2 on no such user.
+	 * @param username
+	 * @return 1 on success, 2 on no such user
+	 */
 	public int deleteAccount(String username) {
 
 		try {
 			conn.execute("DELETE from accounts where username = '"+ username + "'");
 		} catch (SQLException se) {
 			Gamejam.DPrint("Delete account threw an SQLExecption!");
+			return 2;
 		}
 
 		return 1;
@@ -326,51 +328,87 @@ public class AccountManager extends Observable {
 	
 	//---
 	// Getters for account information
-	
+	/**
+	 * Gets the current username of the logged in player
+	 * @return The user name of the logged in player
+	 */
 	public String getCurUsername() {
 		return curUsername;
 	}
-	
+	/**
+	 * Determines if the player is an admin or not.
+	 * @return True if player is admin, false if not.
+	 */
 	public boolean isAdmin() {
 		return isAdmin;
 	}
-	
+	/**
+	 * Determines if a player is a guest or not.
+	 * @return True if someone isn't logged in or the user is a guest.
+	 */
 	public boolean isGuest() {
 		return isGuest;
 	}
-	
+	/**
+	 * Fetches the current XP a player has.
+	 * @return The XP the player has
+	 */
 	public int getExp() {
 		return exp;
 	}
-	
+	/**
+	 * Fetches the current level of the player.
+	 * @return The current level of the player.
+	 */
 	public int getLevel() {
 		return level;
 	}
-
+	/**
+	 * Fetches the account ID of the player
+	 * @return The account id of the player.
+	 */
 	public int getAccountID() {
 		return accountID;
 	}
-
+	/**
+	 * Fetches the hashmap containing mappings of the userstat ids and the user ids.
+	 * @return The userStatsIDs hashmap
+	 */
 	public HashMap<Integer, Integer> getUserStatsIDs() {
 		return userStatsIDs;
 	}
-
+	/**
+	 * Fetches the 
+	 * @return
+	 */
 	public HashMap<Integer, Integer> getGameWins() {
 		return gameWins;
 	}
-
+	/**
+	 * 
+	 * @return
+	 */
 	public HashMap<Integer, Integer> getGameLosses() {
 		return gameLosses;
 	}
-
+	/**
+	 * 
+	 * @return
+	 */
 	public HashMap<Integer, Integer> getGameTies() {
 		return gameTies;
 	}
-
+	/**
+	 * 
+	 * @return
+	 */
 	public HashMap<Integer, Integer> getGameIncompletes() {
 		return gameIncompletes;
 	}
-
+	/**
+	 * 
+	 * @return
+	 */
 	public HashMap<Integer, Integer> getNumGamesPlayed() {
 		return numGamesPlayed;
 	}

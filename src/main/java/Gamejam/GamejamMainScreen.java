@@ -70,6 +70,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private Button[] initbuttonlist;
 	private ImageView[] themeimages;
 	private int[] themeSettings;
+	private GamejamMainScreenTheme initthemes;
+	private int initthemeinuseid = 0;
 	public GamejamMainScreen() {
 		super();
 		init();
@@ -79,12 +81,15 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * Inits the Object
 	 */
 	private void init() {
+		// Init themes
+		this.initthemes = new GamejamMainScreenTheme();
+		
 		// Get the references to the database connector classes
 		// KEEP THESE AT TOP OR YOU WILL HAVE FUN WITH NULL POINTER EXECPTIONS!
 		this.acctMgr = AccountManager.getInstance();
 		this.acctMgr.addObserver(this);
 		this.dbGameManager = DBGameManager.getInstance();
-		leaderboard = Leaderboard.getInstance();
+		this.leaderboard = Leaderboard.getInstance();
 		
 		// Init Collections
 		this.initbuttonlist = new Button[70];
@@ -94,7 +99,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initTopBar = initTopBar();
 		this.initGameselectonboxarea = initGamePanel();
 		this.initLeftBar = initLeftBar();
-		leaderScreen = initLeaderScreen();
+		this.leaderScreen = initLeaderScreen();
 		
 		// Not in user parts that can be used later
 		this.initCreateAccountMenu = initCreateAccountScreen();
@@ -110,7 +115,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initUserSettingsMainMenu = initUserSettingsGUI();
 		this.initThemeMenu = initThemeMenu();
 		
-		// Set currently in user views
+		// Set currently inuse views
 		this.setTop(this.initTopBar);
 		this.setCenter(this.initGameselectonboxarea);
 		this.setLeft(this.initLeftBar);
@@ -412,7 +417,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * @return The Gridpane to put into a control structure.
 	 */
 	private GridPane initThemeMenu() {
-		initDefaultTheme();
 		GridPane retval = new GridPane();
 		retval.getColumnConstraints().add(new ColumnConstraints(544));
 		retval.getColumnConstraints().add(new ColumnConstraints(544));
@@ -427,7 +431,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		
 		Button theme0 = new Button("Default Theme");
 		theme0.setOnMouseClicked((click) -> {
-			initDefaultTheme();
+			this.initthemeinuseid = 0;
 			this.initbuttonlist[4].setGraphic(themeimages[0]);
 			this.initbuttonlist[6].setGraphic(themeimages[1]);
 			updateTheme();
@@ -436,6 +440,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		left.getChildren().add(theme0);
 		Button theme1 = new Button("Night Theme");
 		theme1.setOnMouseClicked((click) -> {
+			this.initthemeinuseid = 1;
 			this.themeSettings[0] = RegionColors.BLACK;   // Button Backgrounds
 			this.themeSettings[1] = RegionColors.BLACK;  // Left Panel Upper Text color 
 			this.themeSettings[2] = RegionColors.BLACK;   // Upper bars background
@@ -453,6 +458,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		left.getChildren().add(theme1);
 		Button theme2 = new Button("USA Theme");
 		theme2.setOnMouseClicked((click) -> {
+			this.initthemeinuseid = 2;
 			this.themeSettings[0] = RegionColors.WHITE;   // Button Backgrounds
 			this.themeSettings[1] = RegionColors.RED;  // Left Panel Upper Text color 
 			this.themeSettings[2] = RegionColors.BLUE;   // Upper bars background
@@ -830,41 +836,60 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			if (this.initbuttonlist[x] == null) {
 				continue;
 			}
-			this.initbuttonlist[x].setBackground(RegionColors.getBackgroundColor(this.themeSettings[0]));
+			this.initbuttonlist[x].setBackground(this.initthemes.getThemeData(this.initthemeinuseid,0).getBackground());
+			this.initbuttonlist[x].setBorder(this.initthemes.getThemeData(this.initthemeinuseid,0).getBorder());
+			this.initbuttonlist[x].setStyle(this.initthemes.getThemeData(this.initthemeinuseid,0).getCSS());
 		}
 		
-		this.leftBarMsg.setTextFill(RegionColors.getColor(this.themeSettings[1]));
+		this.leftBarMsg.setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,1).getColor());
 		
-		this.initTopBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
-		this.initLoggedInInGameBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
-		this.initLoggedInBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
-		this.initCreateAccountMenuBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[2]));
 		
-		this.setBackground(RegionColors.getBackgroundColor(this.themeSettings[3]));
+		this.initTopBar.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,2).getBackground());
+		this.initTopBar.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,2).getBorder());
+		this.initTopBar.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,2).getCSS());
 		
-		this.initLeftBar.setBackground(RegionColors.getBackgroundColor(this.themeSettings[4]));
+		this.initLoggedInInGameBar.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,2).getBackground());
+		this.initLoggedInInGameBar.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,2).getBorder());
+		this.initLoggedInInGameBar.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,2).getCSS());
 		
-		this.initbuttonlist[0].setTextFill(RegionColors.getColor(this.themeSettings[5]));
-		this.initbuttonlist[1].setTextFill(RegionColors.getColor(this.themeSettings[5]));
-		this.initbuttonlist[3].setTextFill(RegionColors.getColor(this.themeSettings[5]));
-		this.initbuttonlist[7].setTextFill(RegionColors.getColor(this.themeSettings[5]));
-		this.initbuttonlist[8].setTextFill(RegionColors.getColor(this.themeSettings[5]));
-		this.initbuttonlist[9].setTextFill(RegionColors.getColor(this.themeSettings[5]));
-		this.initbuttonlist[10].setTextFill(RegionColors.getColor(this.themeSettings[5]));
+		this.initLoggedInBar.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,2).getBackground());
+		this.initLoggedInBar.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,2).getBorder());
+		this.initLoggedInBar.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,2).getCSS());
+		
+		this.initCreateAccountMenuBar.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,2).getBackground());
+		this.initCreateAccountMenuBar.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,2).getBorder());
+		this.initCreateAccountMenuBar.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,2).getCSS());
+		
+		this.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,3).getBackground());
+		this.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,3).getBorder());
+		this.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,3).getCSS());
+		
+		
+		this.initLeftBar.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,4).getBackground());
+		this.initLeftBar.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,4).getBorder());
+		this.initLeftBar.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,4).getCSS());
+		
+		this.initbuttonlist[0].setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,5).getColor());
+		this.initbuttonlist[1].setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,5).getColor());
+		this.initbuttonlist[3].setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,5).getColor());
+		this.initbuttonlist[7].setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,5).getColor());
+		this.initbuttonlist[8].setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,5).getColor());
+		this.initbuttonlist[9].setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,5).getColor());
+		this.initbuttonlist[10].setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,5).getColor());
 		
 		Label l0 = (Label) this.initLoggedInBar.getChildren().get(1);
-		l0.setTextFill(RegionColors.getColor(this.themeSettings[5]));
+		l0.setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,5).getColor());
 		Label l1 = (Label)  initLoggedInInGameBar.getChildren().get(1);
-		l1.setTextFill(RegionColors.getColor(this.themeSettings[5]));
+		l1.setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,5).getColor());
 		
-		this.leftBarStats.setTextFill(RegionColors.getColor(this.themeSettings[6]));
+		this.leftBarStats.setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,6).getColor());
 		
-		this.initbuttonlist[2].setTextFill(RegionColors.getColor(this.themeSettings[7]));
+		this.initbuttonlist[2].setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,7).getColor());
 		
 		Label l = (Label) this.initUserSettingsMainMenu.getChildren().get(0);
-		l.setTextFill(RegionColors.getColor(this.themeSettings[8]));
+		l.setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,8).getColor());
 		for(int x = 11; x < 16; x++) {
-			this.initbuttonlist[x].setTextFill(RegionColors.getColor(this.themeSettings[8]));
+			this.initbuttonlist[x].setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,8).getColor());
 		}
 		
 	}
