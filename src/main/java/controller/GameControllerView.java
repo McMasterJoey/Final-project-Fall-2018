@@ -3,15 +3,15 @@ package controller;
 import java.util.Observer;
 
 import javafx.scene.layout.BorderPane;
-import model.GameJamGameInterface;
 
 /**
  * 
  * @author
  *
  */
-public abstract class GameControllerView extends BorderPane implements Observer, GameJamGameInterface {
-	protected AccountManager accountmanager;
+public abstract class GameControllerView extends BorderPane implements Observer {
+	protected AccountManager accountManager;
+	protected StatsManager statsManager;
 	protected String gameName;
 
 	/**
@@ -34,20 +34,22 @@ public abstract class GameControllerView extends BorderPane implements Observer,
 	 * 
 	 * @return
 	 */
-	public AccountManager getAccountmanager() {
-		return accountmanager;
+	public AccountManager getAccountManager() {
+		return accountManager;
 	}
 
 	/**
 	 * 
-	 * @param accountmanager
+	 * @param accountManager
 	 */
-	public void setAccountmanager(AccountManager accountmanager) {
-		this.accountmanager = accountmanager;
+	public void setAccountManager(AccountManager accountManager) {
+		this.accountManager = accountManager;
 	}
 
 	protected abstract void updateStatistics();
 
+	public abstract int getScore();
+	
 	// Takes a path, loads the save game linked
 	// Sets the state of that save game to current state of game.
 	public abstract boolean loadSaveGame();

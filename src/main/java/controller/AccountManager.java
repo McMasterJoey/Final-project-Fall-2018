@@ -1,15 +1,20 @@
 package controller;
 
+import Gamejam.Gamejam;
+import model.SanityCheckFailedException;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Observable;
 
-import Gamejam.Gamejam;
-import model.SanityCheckFailedException;
-
-import javax.management.remote.rmi._RMIConnection_Stub;
-
+/**
+ * Manager user accounts such as logging in, creating accounts, and updating user
+ * statistics in the database.
+ *
+ * @Author Nicholas Fiegel
+ * @Author Joey McMaster
+ */
 public class AccountManager extends Observable {
 
 	private String curUsername;
@@ -17,7 +22,6 @@ public class AccountManager extends Observable {
 	private boolean isGuest;
 	private int exp, level;
 	private DBConnection conn;
-	private DBGameManager gameManager;
 	private int accountID;
 	private HashMap<Integer, Integer> userStatsIDs; // maps gameid (key) to statsid (value)
 	private HashMap<String, Integer> databaseGameID;
@@ -45,7 +49,6 @@ public class AccountManager extends Observable {
 		gameIncompletes = null;
 		numGamesPlayed = null;
 		conn = DBConnection.getInstance();
-		gameManager.getInstance();
 		this.databaseGameID = new HashMap<String, Integer>();
 	}
 	
@@ -69,12 +72,12 @@ public class AccountManager extends Observable {
 			if (rs.next()) {
 				
 				if (password.equals(rs.getString("password"))) {
-					this.curUsername = username;
-					this.isAdmin = rs.getBoolean("admin");
-					this.isGuest = rs.getBoolean("guest");
-					this.exp = rs.getInt("exp");
-					this.level = rs.getInt("level");
-					this.accountID = rs.getInt("accountid");
+					curUsername = username;
+					isAdmin = rs.getBoolean("admin");
+					isGuest = rs.getBoolean("guest");
+					exp = rs.getInt("exp");
+					level = rs.getInt("level");
+					accountID = rs.getInt("accountid");
 					fillUserStats();
 					
 					System.out.println("Login: " + curUsername + " " + isAdmin + " " + isGuest);
@@ -90,52 +93,47 @@ public class AccountManager extends Observable {
 		
 		return false;
 	}
-	/**
-	 * Logs a game played for the given user, Alternate function
-	 * @param game The name of the game that was played
-	 * @param stattype The type of stat being recorded see logStatType. 
-	 * @param time The amount of time passed during this run of the game.
-	 */
-	public void logGameStat(String game, int stattype, int time) {
-		if (stattype == 0) {
-			this.logGameStat(game,true,false,false,false,time);
-		} else if (stattype == 1) {
-			this.logGameStat(game,false,true,false,false,time);
-		} else if (stattype == 2) {
-			this.logGameStat(game,false,false,true,false,time);
-		} else if (stattype == 3) {
-			this.logGameStat(game,false,false,false,true,time);
-		} else {
-			throw new IllegalArgumentException("Invalid stattype was out of range or value was below 0.");
-		}
-	}
-	/**
-	 * Logs a game played for the given user
-	 * 
-	 * @param game The name of the game that was played
-	 * @param win Whether the game was won
-	 * @param loss Whether the game was lost
-	 * @param tie Whether the game was a tie
-	 * @param incomplete Whether the game is incomplete
-	 * @param time The amount of time that elapsed the game
-	 */
-	public void logGameStat(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time) {
-		if (this.isGuest) {
-			// Do nothing if this is a guest account.
-			Gamejam.DPrint("logGameStat, not doing anything!");
-			return;
-		}
-		try {
-			Gamejam.DPrint("\nFetching game from a string!");
-			int gameid = getGameIdFromString(game);
-			Gamejam.DPrint(gameid);
-			String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
-			conn.execute(transaction, userStatsIDs.get(gameid), win, loss, tie, incomplete, time, 0);
-			
-		} catch (SQLException se) {
-			se.printStackTrace();
-		}
-	}
+
+    /**
+     * Logs a game played for the given user
+     *
+     * @param game The name of the game that was played
+     * @param win Whether the game was won
+     * @param loss Whether the game was lost
+     * @param tie Whether the game was a tie
+     * @param incomplete Whether the game is incomplete
+     * @param time The amount of time that elapsed the game
+     */
+    public void logGameInDB(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time, int score) {
+        if (this.isGuest) {
+            // Do nothing if this is a guest account.
+            Gamejam.DPrint("logGameStat, not doing anything!");
+            return;
+        }
+        try {
+            Gamejam.DPrint("\nFetching game from a string!");
+            int gameid = getGameIdFromString(game);
+            Gamejam.DPrint(gameid);
+            String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
+            conn.execute(transaction, userStatsIDs.get(gameid), win, loss, tie, incomplete, time, score);
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+        }
+
+        if (win) {
+            logGlobalStat(true, game, 0, 1);
+        } else if (loss) {
+            logGlobalStat(true, game, 1, 1);
+        } else if (tie) {
+            logGlobalStat(true, game, 2, 1);
+        } else if (incomplete) {
+            logGlobalStat(true, game, 3, 1);
+        } else {
+            System.err.println("logGameInDB: invalid call, not a win, loss, tie, or incomplete game");
+        }
+    }
+
 	/**
 	 * Logs a stat for the logged in user
 	 * stattype: 
@@ -144,12 +142,12 @@ public class AccountManager extends Observable {
 	 * 2 = ties
 	 * 3 = incomplete
 	 * 4 = time played (in seconds)
-	 * @param mode Set to true if adding the value to the pre existing value, set to false if setting. 
+	 * @param update Set to true if adding the value to the pre existing value, set to false if setting.
 	 * @param game The name of the game whose stats are being set
 	 * @param stattype The id of the stat type (refer to the enum LogStatType)
 	 * @param value The value to be added/set 
 	 */
-	public void logGlobalStat(boolean mode, String game, int stattype, int value) {
+	public void logGlobalStat(boolean update, String game, int stattype, int value) {
 		// Arg Check
 		if (stattype < 0 || stattype > 4 || value < 0) {
 			throw new IllegalArgumentException("Invalid stattype was out of range or value was below 0.");
@@ -171,7 +169,7 @@ public class AccountManager extends Observable {
 				
 				int[] dv = new int[]{rs.getInt("wins"), rs.getInt("losses"), rs.getInt("ties"), rs.getInt("incomplete"), time};
 				System.out.println(time);
-				if (mode) {
+				if (update) {
 					dv[stattype] += value;
 				} else {
 					dv[stattype] = value;
@@ -196,6 +194,7 @@ public class AccountManager extends Observable {
 			se.printStackTrace();
 		}
 	}
+
 	// logout, ie switch to the guest account
 	public void logout() {
 		curUsername = "guest";
@@ -375,7 +374,6 @@ public class AccountManager extends Observable {
 	public HashMap<Integer, Integer> getNumGamesPlayed() {
 		return numGamesPlayed;
 	}
-
 
 	// End getters for account information
 	// ---

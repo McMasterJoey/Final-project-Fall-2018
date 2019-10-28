@@ -57,7 +57,7 @@ public class BattleshipControllerView extends GameControllerView {
 		this.setTop(menuBar);
 		setupResources();
 		initializeGame();
-		accountmanager = AccountManager.getInstance();
+		accountManager = AccountManager.getInstance();
 
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
@@ -101,13 +101,13 @@ public class BattleshipControllerView extends GameControllerView {
 	 * @return true if the save was successful, false otherwise
 	 */
 	public boolean saveGame() {
-		if(accountmanager.isGuest()) {
+		if(accountManager.isGuest()) {
 			return false;
 		}
 		FileOutputStream fos;
 		ObjectOutputStream oos;
 		try {
-			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
+			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
 			String filepath = System.getProperty("user.dir") + sep + "save-data";
 			if(!new File(filepath).exists()) {
@@ -134,7 +134,7 @@ public class BattleshipControllerView extends GameControllerView {
 	public boolean loadSaveGame() {
 		boolean retVal = true;
 		try {
-			String fname = accountmanager.getCurUsername() + "-" + gameName + ".dat";
+			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
 			String filepath = System.getProperty("user.dir") + sep + "save-data" + sep + fname;
 			File file = new File(filepath);
@@ -203,8 +203,8 @@ public class BattleshipControllerView extends GameControllerView {
 	@Override
 	protected void updateStatistics() {
 		if (!(gameModel.won(true) || gameModel.won(false)) && gameModel.maxMovesRemaining() > 0) {
-			accountmanager.logGlobalStat(true, "Battleship", logStatType.INCOMPLETE, 1);
-			accountmanager.logGameStat("Battleship", logStatType.INCOMPLETE, 1);
+			//accountManager.logGlobalStat(true, "Battleship", logStatType.INCOMPLETE, 1);
+			statsManager.logGameStat("Battleship", logStatType.INCOMPLETE, 1, getScore());
 		}
 	}
 	
@@ -212,5 +212,11 @@ public class BattleshipControllerView extends GameControllerView {
 	public void update(Observable arg0, Object arg1) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public int getScore() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

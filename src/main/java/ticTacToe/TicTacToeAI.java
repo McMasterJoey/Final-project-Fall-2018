@@ -43,5 +43,9 @@ public class TicTacToeAI implements Serializable{
         
         return AIStrategy.desiredMove(ticTacToeModel);
     }
+    
+    public TicTacToeStrategy getStrategy() {
+    	return AIStrategy;
+    }
 
 }
