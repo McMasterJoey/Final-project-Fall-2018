@@ -33,8 +33,10 @@ public class AccountManager extends Observable {
 
 	// Use the singleton pattern for this class
 	private static AccountManager singleton = null;
-	
-	// Constructor for the class, private because of the singleton pattern
+
+	/**
+	 * Constructor for the class, private because of the singleton pattern.
+	 */
 	private AccountManager() {
 		curUsername = "guest";
 		isAdmin = false;
@@ -51,8 +53,12 @@ public class AccountManager extends Observable {
 		conn = DBConnection.getInstance();
 		this.databaseGameID = new HashMap<String, Integer>();
 	}
-	
-	// Getter for the class
+
+	/**
+	 * Getter for the class, due to singleton pattern.
+	 *
+	 * @return The AccountManager single instance of the class
+	 */
 	synchronized public static AccountManager getInstance() {
 		
 		if (singleton == null) {
@@ -61,8 +67,14 @@ public class AccountManager extends Observable {
 		
 		return singleton;
 	}
-	
-	// Attempt to login a user
+
+	/**
+	 * Attempts to login a user.
+	 *
+	 * @param username A String indicating the username
+	 * @param password A String indicating the password
+	 * @return A boolean true if successful, false if not
+	 */
 	public boolean login(String username, String password) {
 		ResultSet rs = null;
 
@@ -110,7 +122,7 @@ public class AccountManager extends Observable {
             Gamejam.DPrint("logGameStat, not doing anything!");
             return;
         }
-        try {
+        try { // Attempt to log the game in the gamelog table
             Gamejam.DPrint("\nFetching game from a string!");
             int gameid = getGameIdFromString(game);
             Gamejam.DPrint(gameid);
@@ -121,6 +133,7 @@ public class AccountManager extends Observable {
             se.printStackTrace();
         }
 
+        // Update the statistics table with the game outcome
         if (win) {
             logGlobalStat(true, game, 0, 1);
         } else if (loss) {
@@ -147,7 +160,7 @@ public class AccountManager extends Observable {
 	 * @param stattype The id of the stat type (refer to the enum LogStatType)
 	 * @param value The value to be added/set 
 	 */
-	public void logGlobalStat(boolean update, String game, int stattype, int value) {
+	private void logGlobalStat(boolean update, String game, int stattype, int value) {
 		// Arg Check
 		if (stattype < 0 || stattype > 4 || value < 0) {
 			throw new IllegalArgumentException("Invalid stattype was out of range or value was below 0.");
@@ -195,7 +208,9 @@ public class AccountManager extends Observable {
 		}
 	}
 
-	// logout, ie switch to the guest account
+	/**
+	 * Logout the current user, that is, switch to the guest account
+ 	 */
 	public void logout() {
 		curUsername = "guest";
 		isAdmin = false;
@@ -208,12 +223,18 @@ public class AccountManager extends Observable {
 		setChanged();
 		notifyObservers();
 	}
-	
-	// Attempt to create an account.
-	// Return codes:
-	// 1: Success
-	// 2: Username already in use
-	// 3: Other unknown error
+
+	/**
+	 * Attempt to create an account.
+	 *
+	 * Return codes:
+	 * 1: Success
+	 * 2: Username already in use
+	 * 3: Other error
+	 * @param username A String indicating the username to create
+	 * @param password A String indicating the password to associate with the username
+	 * @return An int indicating the result of the attempt: 1 success, 2 username already in use, 3 other error
+	 */
 	public int createAccount(String username, String password) {
 		ResultSet rs = null;
 		try {
@@ -241,8 +262,10 @@ public class AccountManager extends Observable {
 		return 1;
 	}
 
-	// Helper for createAccount, generates the appropriate entries in the statistics table
-	// for the new user
+	/**
+	 * Helper for createAccount, generates the appropriate entries in the statistics table
+	 * for the new user.
+	 */
 	private void createStatisticsEntries() {
 		ResultSet rs = null;
 
@@ -266,8 +289,10 @@ public class AccountManager extends Observable {
 
 	}
 
-	// Fills the userStatsIDs, gameWins, gameLosses, gameTies, gameIncompletes, and numGamesPlayed
-	// HashMaps with the current users statistics
+	/**
+	 * Fills the userStatsIDs, gameWins, gameLosses, gameTies, gameIncompletes, and numGamesPlayed
+	 * HashMaps with the current users statistics.
+	 */
 	private void fillUserStats() {
 		ResultSet rs = null;
 		userStatsIDs = new HashMap<>();
@@ -302,17 +327,22 @@ public class AccountManager extends Observable {
 		}
 	}
 
-
-	// Public method to trigger fillUserStats
+	/**
+	 * Public method to trigger fillUserStats.
+	 */
 	public void refreshUserStats() {
 		fillUserStats();
 	}
-	
-	// Attempt to delete an account
-	// Return codes:
-	// 1: Success
-	// 2: No such user 
-	//
+
+	/**
+	 * Attempt to delete an account.
+	 *
+	 * Return codes:
+	 * 1: Success
+	 * 2: No such user
+	 * @param username A String indicating the user to delete
+	 * @return An int indicating the result: 1 success, 2 no such user
+	 */
 	public int deleteAccount(String username) {
 
 		try {
@@ -377,6 +407,7 @@ public class AccountManager extends Observable {
 
 	// End getters for account information
 	// ---
+	
 	/**
 	 * Returns the gameid in the data base for the given game name
 	 * @param game The string that is the name of the game
