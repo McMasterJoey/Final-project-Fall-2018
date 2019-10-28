@@ -20,7 +20,7 @@ public class AccountManager extends Observable {
 	private String curUsername;
 	private boolean isAdmin;
 	private boolean isGuest;
-	private int exp, level;
+	private int totalExp, expInLevel, level;
 	private DBConnection conn;
 	private int accountID;
 	private HashMap<Integer, Integer> userStatsIDs; // maps gameid (key) to statsid (value)
@@ -41,7 +41,8 @@ public class AccountManager extends Observable {
 		curUsername = "guest";
 		isAdmin = false;
 		isGuest = true;
-		exp = 0;
+		totalExp = 0;
+		expInLevel = 0;
 		level = 1;
 		accountID = -1;
 		userStatsIDs = null;
@@ -87,7 +88,8 @@ public class AccountManager extends Observable {
 					curUsername = username;
 					isAdmin = rs.getBoolean("admin");
 					isGuest = rs.getBoolean("guest");
-					exp = rs.getInt("exp");
+					expInLevel = rs.getInt("exp");
+					totalExp = getExpForLevel(level) + expInLevel;
 					level = rs.getInt("level");
 					accountID = rs.getInt("accountid");
 					fillUserStats();
@@ -142,9 +144,10 @@ public class AccountManager extends Observable {
 				System.err.println("logGameInDB: invalid call, not a win, loss, tie, or incomplete game");
 			}
 
+			awardExp(score);
 			fillUserStats();
-			this.setChanged();
-			this.notifyObservers();
+			setChanged();
+			notifyObservers();
 
         } catch (SQLException se) {
             se.printStackTrace();
@@ -221,7 +224,8 @@ public class AccountManager extends Observable {
 		curUsername = "guest";
 		isAdmin = false;
 		isGuest = true;
-		exp = 0;
+		totalExp = 0;
+		expInLevel = 0;
 		level = 1;
 		accountID = -1;
 		userStatsIDs = null;
@@ -251,11 +255,11 @@ public class AccountManager extends Observable {
 			curUsername = username;
 			isAdmin = false;
 			isGuest = false;
-			exp = 0;
+			totalExp = 0;
 			level = 1;
 			accountID = rs.getInt("accountid");
-			this.setChanged();
-			this.notifyObservers();
+			setChanged();
+			notifyObservers();
 
 			createStatisticsEntries();
 			fillUserStats();
@@ -348,6 +352,67 @@ public class AccountManager extends Observable {
 	}
 
 	/**
+	 * Add exp to the user's account, then check to see if the should level up,
+	 * and if so level them up.
+	 *
+	 * @param exp An int indicating the amount of exp the user should receive
+	 */
+	public void awardExp(int exp) {
+		totalExp += exp;
+
+		while (totalExp >= getTotalExpForLevel(level + 1)) {
+			level++;
+		}
+
+		expInLevel = totalExp - getTotalExpForLevel(level);
+
+		try {
+			conn.execute("UPDATE accounts SET exp = ?, level = ? WHERE accountID = ?", expInLevel, level, accountID);
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+
+		setChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * Returns the total amount of exp a user needs to reach a given level.
+	 *
+	 * @param level An int indicating the desired level
+	 * @return An int indicating the total amount of exp needed to reach that level
+	 */
+	public int getTotalExpForLevel(int level) {
+
+		if (level == 2) {
+			return 1000;
+		} else if (level < 2) {
+			return 0;
+		}
+
+		return getExpForLevel(level) + getTotalExpForLevel(level - 1);
+	}
+
+	/**
+	 * Returns the amount of exp needed to go from level - 1, to level.
+	 *
+	 * @param level An int indicating the desired level
+	 * @return An int indicating the amount of exp needed to go from level - 1 to level
+	 */
+	public int getExpForLevel(int level) {
+
+		if (level == 2) {
+			return 1000;
+		} else if (level < 2) {
+			return 0;
+		}
+
+		double percentageMultiplier = (20 * Math.log10(0.2 * level + 1)) / 100;
+		return (int) Math.round(getExpForLevel(level - 1) * (1 + percentageMultiplier));
+	}
+
+	/**
 	 * Attempt to delete an account.
 	 *
 	 * Return codes:
@@ -382,8 +447,12 @@ public class AccountManager extends Observable {
 		return isGuest;
 	}
 	
-	public int getExp() {
-		return exp;
+	public int getTotalExp() {
+		return totalExp;
+	}
+
+	public int getExpInLevel() {
+		return expInLevel;
 	}
 	
 	public int getLevel() {

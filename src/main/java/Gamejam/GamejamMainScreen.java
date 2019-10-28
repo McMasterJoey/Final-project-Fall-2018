@@ -41,6 +41,7 @@ import ticTacToe.TicTacToeControllerView;
  *
  */
 public class GamejamMainScreen extends BorderPane implements Observer {
+	private Button testButton; // For testing a large exp addition to test AccountManager.awardExp()
 	private GridPane initGameselectonboxarea;
 	private GridPane initThemeMenu;
 	private HBox initTopBar;
@@ -51,6 +52,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private VBox initLeftBar;
 	private Label leftBarMsg;
 	private Label leftBarStats;
+	private ProgressBar expBar;
+	private Label expBarLabel;
 	private VBox initCreateAccountMenu;
 	private VBox leaderScreen;
 	private TableView<Score> scoresTable;
@@ -128,9 +131,11 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.leftBarMsg = new Label();
 		this.leftBarMsg.setWrapText(true);
 		this.leftBarStats = new Label();
+		expBarLabel = new Label();
+		expBar = new ProgressBar(0.0);
 		setGuestMessage();
 		
-		retval.getChildren().addAll(leftBarMsg, leftBarStats);
+		retval.getChildren().addAll(leftBarMsg, expBarLabel, expBar, leftBarStats);
 		return retval;
 	}
 
@@ -240,9 +245,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Button viewLeaderboard = new Button("View Leaderboard");
 		viewLeaderboard.setOnAction( (ae) -> viewLeaderboardClick());
 		this.initbuttonlist[9] = viewLeaderboard;
-				
+
+		// Test add exp button
+		testButton = new Button ("Add 5000 exp");
+		testButton.setOnAction(( (ae) -> acctMgr.awardExp(5000)));
+
 		// Add to Left Hbox
-		leftbox.getChildren().addAll(logout, viewLeaderboard);
+		leftbox.getChildren().addAll(logout, viewLeaderboard, testButton);
 		leftbox.setPrefWidth(1100);
 		leftbox.setPrefHeight(25);
 		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
@@ -700,14 +709,18 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.setCenter(this.initGameselectonboxarea);
 		updateLeftPane();
 	}
+
 	/**
 	 * Sets the message to the left panel.
 	 * Assumes the user is a guest.
 	 */
 	private void setGuestMessage() {
-		this.leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in, you could see your stats!");
-		this.leftBarStats.setText("\n\nLevel: 0\nExp: 0");
+		this.leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in, you could see your stats!\n\n");
+		expBar.setProgress(0.0);
+		expBarLabel.setText("Exp: 0/0");
+		this.leftBarStats.setText("Level: 0\nExp: 0");
 	}
+
 	/**
 	 * Updates the object when the objects it observes changes.
 	 */
@@ -715,35 +728,40 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	public void update(Observable o, Object obj) {
 		updateLeftPane();
 	}
+
 	/**
 	 * Updates left pane
 	 */
 	private void updateLeftPane() {
-		if (this.acctMgr.isGuest()) {
+
+		if (acctMgr.isGuest()) {
 			setGuestMessage();
 		} else if (acctMgr.isAdmin()) {
-			this.leftBarMsg.setText("Administrator Account");
-			this.leftBarStats.setText("");
+			leftBarMsg.setText("Administrator Account");
+			leftBarStats.setText("");
 		} else {
-			this.leftBarMsg.setText("Welcome to Gamejam, " + this.acctMgr.getCurUsername());
-			this.leftBarStats.setText("\n\nLevel: " + this.acctMgr.getLevel() + "\nExp: " + this.acctMgr.getExp());
+			leftBarMsg.setText("Welcome to Gamejam, " + acctMgr.getCurUsername());
+			expBarLabel.setText("Exp: " + acctMgr.getExpInLevel() + "/" + acctMgr.getExpForLevel(acctMgr.getLevel() + 1));
+			expBar.setProgress( (double) acctMgr.getExpInLevel() / acctMgr.getExpForLevel(acctMgr.getLevel() + 1) );
+			leftBarStats.setText("\n\nLevel: " + acctMgr.getLevel() + "\nExp: " + acctMgr.getExpInLevel() +
+					"\nTotal Exp: " + acctMgr.getTotalExp() + "\n");
 
 			ArrayList<String> games = new ArrayList<>(dbGameManager.getGameListByName().keySet());
 			Collections.sort(games);
-
-			leftBarStats.setText(leftBarStats.getText() + "\n");
 
 			for (String game : games) {
 				Integer id = dbGameManager.getGameListByName().get(game);
 				Integer numPlayed = acctMgr.getNumGamesPlayed().get(dbGameManager.getGameListByName().get(game));
 				leftBarStats.setText(leftBarStats.getText() + "\n" + game + ":");
-				leftBarStats.setText(leftBarStats.getText() + "\nWins: " + acctMgr.getGameWins().get(id));
-				leftBarStats.setText(leftBarStats.getText() + "\nLosses: " + acctMgr.getGameLosses().get(id));
-				leftBarStats.setText(leftBarStats.getText() + "\nTies: " + acctMgr.getGameTies().get(id));
-				leftBarStats.setText(leftBarStats.getText() + "\nIncomplete: " + acctMgr.getGameIncompletes().get(id) + "\n");
+				leftBarStats.setText(leftBarStats.getText() + "\n  Wins: " + acctMgr.getGameWins().get(id));
+				leftBarStats.setText(leftBarStats.getText() + "\n  Losses: " + acctMgr.getGameLosses().get(id));
+				leftBarStats.setText(leftBarStats.getText() + "\n  Ties: " + acctMgr.getGameTies().get(id));
+				leftBarStats.setText(leftBarStats.getText() + "\n  Incomplete: " + acctMgr.getGameIncompletes().get(id));
+				leftBarStats.setText((leftBarStats.getText() + "\n   Total: " + numPlayed) + "\n");
 			}
 		}
 	}
+
 	/**
 	 * Updates all the GUI elements that use the username of the current user.
 	 */
