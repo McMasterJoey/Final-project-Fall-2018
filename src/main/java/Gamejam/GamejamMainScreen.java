@@ -441,15 +441,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Button theme1 = new Button("Night Theme");
 		theme1.setOnMouseClicked((click) -> {
 			this.initthemeinuseid = 1;
-			this.themeSettings[0] = RegionColors.BLACK;   // Button Backgrounds
-			this.themeSettings[1] = RegionColors.BLACK;  // Left Panel Upper Text color 
-			this.themeSettings[2] = RegionColors.BLACK;   // Upper bars background
-			this.themeSettings[3] = RegionColors.BLACK;   // Middle Area background / Overall background
-			this.themeSettings[4] = RegionColors.BLACK;   // Left Panel background
-			this.themeSettings[5] = RegionColors.WHITE;  // New account/Back/Logout button text
-			this.themeSettings[6] = RegionColors.WHITE;  // Left Panel Lower text color
-			this.themeSettings[7] = RegionColors.RED;    // Login button text color
-			this.themeSettings[8] = RegionColors.WHITE;    // Default Settings Text color
 			this.initbuttonlist[4].setGraphic(themeimages[2]);
 			this.initbuttonlist[6].setGraphic(themeimages[3]);
 			updateTheme();
@@ -459,15 +450,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Button theme2 = new Button("USA Theme");
 		theme2.setOnMouseClicked((click) -> {
 			this.initthemeinuseid = 2;
-			this.themeSettings[0] = RegionColors.WHITE;   // Button Backgrounds
-			this.themeSettings[1] = RegionColors.RED;  // Left Panel Upper Text color 
-			this.themeSettings[2] = RegionColors.BLUE;   // Upper bars background
-			this.themeSettings[3] = RegionColors.BLUE;   // Middle Area background / Overall background
-			this.themeSettings[4] = RegionColors.BLUE;   // Left Panel background
-			this.themeSettings[5] = RegionColors.RED;  // New account/Back/Logout button text
-			this.themeSettings[6] = RegionColors.RED;  // Left Panel Lower text color
-			this.themeSettings[7] = RegionColors.RED;    // Login button text color
-			this.themeSettings[8] = RegionColors.RED;    // Default Settings Text color
 			this.initbuttonlist[4].setGraphic(themeimages[0]);
 			this.initbuttonlist[6].setGraphic(themeimages[1]);
 			updateTheme();
@@ -478,21 +460,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		retval.add(left, 0, 0);
 		retval.add(right,1, 0);
 		return retval;
-	}
-	/**
-	 * Creates the theme array and inits it, then updates the theme.
-	 */
-	private void initDefaultTheme() {
-		this.themeSettings = new int[9];
-		this.themeSettings[0] = RegionColors.DEFAULT_BUTTON_BACKGROUND;   // Button Backgrounds
-		this.themeSettings[1] = RegionColors.BLACK;  // Left Panel Upper Text color 
-		this.themeSettings[2] = RegionColors.DEFAULT_BACKGROUND;   // Upper bars background
-		this.themeSettings[3] = RegionColors.DEFAULT_BACKGROUND;   // Middle Area background / Overall background
-		this.themeSettings[4] = RegionColors.DEFAULT_BACKGROUND;   // Left Panel background
-		this.themeSettings[5] = RegionColors.BLACK;  // New account/Back/Logout button text
-		this.themeSettings[6] = RegionColors.BLACK;  // Left Panel Lower text color
-		this.themeSettings[7] = RegionColors.RED;    // Login button text color
-		this.themeSettings[8] = RegionColors.BLACK;    // Defalt Settings Text color
 	}
 	/**
 	 * Creates the Usersettings menu that pops up when the user clicks the gear icon.
