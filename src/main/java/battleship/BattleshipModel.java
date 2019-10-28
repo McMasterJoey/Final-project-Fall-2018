@@ -37,6 +37,9 @@ public class BattleshipModel extends Observable implements Serializable {
 	}
 	
 	private void initializeShips() {
+		humanShips = new HashMap<String, Ship>();
+		computerShips = new HashMap<String, Ship>();
+		
 		humanShips.put("Carrier", new Ship(5));
 		humanShips.put("Battleship", new Ship(4));
 		humanShips.put("Destroyer", new Ship(3));

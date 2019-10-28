@@ -14,6 +14,8 @@ import controller.GameControllerView;
 import controller.GameMenu;
 import controller.logStatType;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 
 /**
  * Combined Controller and View for Battleship game. Manipulates the counterpart
@@ -31,17 +33,30 @@ public class BattleshipControllerView extends GameControllerView {
 	private static final int WIDTH = 450;
 	private boolean shipsSet = false;
 	private Canvas humanBoard;
+	private GraphicsContext hbgc;
 	private Canvas computerBoard;
+	private GraphicsContext cbgc;
 	private Canvas shipSelector;
+	private GraphicsContext ssgc;
+	private Image carrierImage, battleshipImage, destroyerImage, submarineImage, patrolBoatImage;
 	
 	public BattleshipControllerView() {
 		gameModel = new BattleshipModel();
+		humanBoard = new Canvas(WIDTH, HEIGHT);
+		hbgc = humanBoard.getGraphicsContext2D();
+		computerBoard = new Canvas(WIDTH, HEIGHT);
+		cbgc = computerBoard.getGraphicsContext2D();
+		shipSelector = new Canvas(WIDTH/2, HEIGHT);
+		ssgc = shipSelector.getGraphicsContext2D();
 		
-		gameName = "connect-four";
+		this.setRight(humanBoard);
+		this.setLeft(shipSelector);
+		
+		gameName = "battleship";
 		menuBar = GameMenu.getMenuBar(this);
 		this.setTop(menuBar);
-		initializeGame();
 		setupResources();
+		initializeGame();
 		accountmanager = AccountManager.getInstance();
 
 		this.setWidth(WIDTH);
@@ -56,16 +71,26 @@ public class BattleshipControllerView extends GameControllerView {
 		} else {
 			gameModel.clearBoard();
 		}
-		setupBoard();
+		renderBoard();
+		setupListeners();
 		
 	}
 
 	private void setupResources() {
-		// TODO Auto-generated method stub		
+		carrierImage = new Image(BattleshipControllerView.class.getResource("/carrier.png").toString());
+		battleshipImage = new Image(BattleshipControllerView.class.getResource("/battleship.png").toString());
+		destroyerImage = new Image(BattleshipControllerView.class.getResource("/destroyer.png").toString());
+		submarineImage = new Image(BattleshipControllerView.class.getResource("/submarine.png").toString());
+		patrolBoatImage = new Image(BattleshipControllerView.class.getResource("/patrolBoat.png").toString());
 	}
 	
-	private void setupBoard() {
-		// TODO Auto-generated method stub		
+	private void renderBoard() {
+		
+		if(!shipsSet) {	
+			
+		} else {
+			
+		}
 	}
 	
 	@Override
@@ -126,7 +151,7 @@ public class BattleshipControllerView extends GameControllerView {
 		} catch(IOException | ClassNotFoundException e) {
 			return false;
 		}
-		setupBoard();
+		renderBoard();
 		setupListeners();
 		gameModel.addObserver(this);
 		update(gameModel, this);
@@ -167,7 +192,8 @@ public class BattleshipControllerView extends GameControllerView {
 	public boolean newGame() {
 		try {
 			gameModel.clearBoard();
-			setupBoard();
+			shipsSet = false;
+			renderBoard();
 		} catch (Exception ex) {
 			return false;
 		}

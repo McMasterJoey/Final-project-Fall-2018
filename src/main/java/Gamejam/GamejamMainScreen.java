@@ -3,6 +3,7 @@ package Gamejam;
 import java.util.Collections;
 import java.util.Observer;
 
+import battleship.BattleshipControllerView;
 import connectFour.ConnectFourControllerView;
 
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private boolean userLoggedIn = false;
 	private boolean userisAdmin = false;
 	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
+	private BattleshipControllerView battleshipGameView;
 	public GamejamMainScreen() {
 		super();
 		init();
@@ -84,6 +86,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Set up Game Views
 		this.tictactoegameview = new TicTacToeControllerView();
 		this.connectFourGameView = new ConnectFourControllerView();
+		this.battleshipGameView = new BattleshipControllerView();
 		
 		// Set currently in user views
 		this.setTop(this.initTopBar);
@@ -442,6 +445,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.setCenter(this.connectFourGameView);
 			//connectFourGameView.setAlignment(Pos.CENTER);
 		}
+		if (name.equals("Battleship")) {
+			if(userLoggedIn) {
+				this.setTop(this.initLoggedInInGameBar);
+			} else {
+				this.setTop(this.initCreateAccountMenuBar);
+			}
+			this.setCenter(this.battleshipGameView);
+		}
 	}
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
 
@@ -518,6 +529,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			GameIconItem[] retval = new GameIconItem[2];
 			retval[0] = new GameIconItem("Tic-Tac-Toe", "/tictactoeicon.png", 0);
 			retval[1] = new GameIconItem("Connect-Four", "/connectFourIcon.png", 1);
+			retval[2] = new GameIconItem("Battleship", "/battleshipIcon.png", 2);
 			return retval;
 		}
 		ArrayList<GameIconItem> allgames = this.dbGameManager.fetchAllGameSetUpInfo();
