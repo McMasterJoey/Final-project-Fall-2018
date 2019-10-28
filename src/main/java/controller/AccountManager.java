@@ -129,22 +129,28 @@ public class AccountManager extends Observable {
             String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
             conn.execute(transaction, userStatsIDs.get(gameid), win, loss, tie, incomplete, time, score);
 
+			// Update the statistics table with the game outcome
+			if (win) {
+				logGlobalStat(true, game, 0, 1);
+			} else if (loss) {
+				logGlobalStat(true, game, 1, 1);
+			} else if (tie) {
+				logGlobalStat(true, game, 2, 1);
+			} else if (incomplete) {
+				logGlobalStat(true, game, 3, 1);
+			} else {
+				System.err.println("logGameInDB: invalid call, not a win, loss, tie, or incomplete game");
+			}
+
+			fillUserStats();
+			this.setChanged();
+			this.notifyObservers();
+
         } catch (SQLException se) {
             se.printStackTrace();
         }
 
-        // Update the statistics table with the game outcome
-        if (win) {
-            logGlobalStat(true, game, 0, 1);
-        } else if (loss) {
-            logGlobalStat(true, game, 1, 1);
-        } else if (tie) {
-            logGlobalStat(true, game, 2, 1);
-        } else if (incomplete) {
-            logGlobalStat(true, game, 3, 1);
-        } else {
-            System.err.println("logGameInDB: invalid call, not a win, loss, tie, or incomplete game");
-        }
+
     }
 
 	/**
@@ -248,6 +254,9 @@ public class AccountManager extends Observable {
 			exp = 0;
 			level = 1;
 			accountID = rs.getInt("accountid");
+			this.setChanged();
+			this.notifyObservers();
+
 			createStatisticsEntries();
 			fillUserStats();
 			
@@ -301,8 +310,9 @@ public class AccountManager extends Observable {
 		gameTies = new HashMap<>();
 		gameIncompletes = new HashMap<>();
 		numGamesPlayed = new HashMap<>();
+
 		try {
-			Gamejam.DPrint("fillUserStatsIDs: accountID = " + accountID);
+			Gamejam.DPrint("\nfillUserStatsIDs: accountID = " + accountID);
 			rs = conn.executeQuery("SELECT * FROM statistics WHERE statistics.accountid = ?", accountID);
 
 			while (rs.next()) {
@@ -319,9 +329,12 @@ public class AccountManager extends Observable {
 				gameIncompletes.put(gameID, incomplete);
 				numGamesPlayed.put(gameID, wins + losses + ties + incomplete);
 			}
+
 			userStatsIDs.forEach((key, value) -> 
 				Gamejam.DPrint("gameID: " + key + "  statsID: " + value)
 			);
+			System.out.println();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -407,7 +420,7 @@ public class AccountManager extends Observable {
 
 	// End getters for account information
 	// ---
-	
+
 	/**
 	 * Returns the gameid in the data base for the given game name
 	 * @param game The string that is the name of the game

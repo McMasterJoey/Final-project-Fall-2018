@@ -725,7 +725,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.leftBarMsg.setText("Administrator Account");
 			this.leftBarStats.setText("");
 		} else {
-			acctMgr.refreshUserStats();
 			this.leftBarMsg.setText("Welcome to Gamejam, " + this.acctMgr.getCurUsername());
 			this.leftBarStats.setText("\n\nLevel: " + this.acctMgr.getLevel() + "\nExp: " + this.acctMgr.getExp());
 
