@@ -110,15 +110,19 @@ public class BattleshipControllerView extends GameControllerView {
 	private void renderBoard() {
 		drawBoard(hbgc);
 		if(!shipsSet) {	
+			int count = 0;
 			for(Ship ship : gameModel.getHumanShips()) {
 				Image boatImage = null;
 				boatImage = getImage(ship);
 				ShipView sv = new ShipView(boatImage, ship);
 				int length = ship.getSize();
-				sv.setFitWidth(WIDTH/10*length);
-				sv.setFitHeight(HEIGHT/10);				
+				sv.setFitWidth(WIDTH/10*length-4);
+				sv.setFitHeight(HEIGHT/10-4);				
 				makeDraggable(sv);
 				((Pane) this.getCenter()).getChildren().add(sv);
+				sv.setLayoutY(count*2*HEIGHT/10 + 50);
+				sv.setLayoutX(WIDTH/2 - sv.getShip().getSize()*WIDTH/10/2);
+				count++;
 			}
 		} else {
 			drawBoard(cbgc);
@@ -325,9 +329,9 @@ private void drawBoard(GraphicsContext pbgc) {
 						Direction.VERTICAL : Direction.HORIZONTAL);
 				sv.setImage(getImage(sv.getShip()));
 				sv.setFitWidth(sv.getShip().getDirection() == Direction.HORIZONTAL ? 
-						WIDTH/10*sv.getShip().getSize() : WIDTH/10);
+						WIDTH/10*sv.getShip().getSize()-4 : WIDTH/10-4);
 				sv.setFitHeight(sv.getShip().getDirection() == Direction.HORIZONTAL ? 
-						HEIGHT/10 : HEIGHT/10*sv.getShip().getSize());	
+						HEIGHT/10-4 : HEIGHT/10*sv.getShip().getSize()-4);	
 			}
         });
         node.setOnMouseReleased(me -> {
