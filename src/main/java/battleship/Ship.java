@@ -34,6 +34,10 @@ public class Ship {
 		return name;
 	}
 	
+	public Point[] getPoints() {
+		return points;
+	}
+	
 	public void setDirection(Direction direction) {
 		this.direction = direction;
 	}

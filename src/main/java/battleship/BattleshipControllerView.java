@@ -22,6 +22,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -108,7 +109,7 @@ public class BattleshipControllerView extends GameControllerView {
 	}
 	
 	private void renderBoard() {
-		drawBoard(hbgc);
+		drawBoard(hbgc, true);
 		if(!shipsSet) {	
 			int count = 0;
 			for(Ship ship : gameModel.getHumanShips()) {
@@ -119,16 +120,121 @@ public class BattleshipControllerView extends GameControllerView {
 				sv.setFitWidth(WIDTH/10*length-4);
 				sv.setFitHeight(HEIGHT/10-4);				
 				makeDraggable(sv);
-				((Pane) this.getCenter()).getChildren().add(sv);
+				gamePane.getChildren().add(sv);
 				sv.setLayoutY(count*2*HEIGHT/10 + 50);
 				sv.setLayoutX(WIDTH/2 - sv.getShip().getSize()*WIDTH/10/2);
 				count++;
 			}
+			addSetButton();
 		} else {
-			drawBoard(cbgc);
+			drawBoard(cbgc, false);
 		}
 	}
 	
+	private void addSetButton() {
+		Button setShips = new Button("Ready to play!");
+		setShipsButtonStyle(setShips);
+		setShipsButtonListener(setShips);
+		BorderPane.setAlignment(setShips, Pos.CENTER);
+		this.setBottom(setShips);
+		
+	}
+
+	private void setShipsButtonStyle(Button setShips) {
+		String buttonStyle = "-fx-padding: 8 15 15 15;" + 
+				" -fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;" + 
+				" -fx-background-radius: 8;" + 
+				" -fx-background-color: linear-gradient(from 0% 93% to 0% 100%, #a34313 0%, #903b12 100%)," + 
+				" #9d4024, #d86e3a, radial-gradient(center 50% 50%, radius 100%, #d86e3a, #c54e2c);" + 
+				" -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );" + 
+				" -fx-font-weight: bold;" + 
+				" -fx-font-size: 1.1em;";
+		setShips.setStyle(buttonStyle);
+		
+		setShips.setOnMouseEntered((me) -> {
+			String bStyle = "-fx-padding: 8 15 15 15;" + 
+					" -fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;" + 
+					" -fx-background-radius: 8;" + 
+					" -fx-background-color: linear-gradient(from 0% 93% to 0% 100%, #a3431a 0%, #903b19 100%)," + 
+					" #9d402c, #d86e40, radial-gradient(center 50% 50%, radius 100%, #d86e3a, #c54e2c);" + 
+					" -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );" + 
+					" -fx-font-weight: bold;" + 
+					" -fx-font-size: 1.6em;";;
+			setShips.setStyle(bStyle);
+		});
+		
+		setShips.setOnMouseExited((me) -> {
+			String bStyle = "-fx-padding: 8 15 15 15;" + 
+					" -fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;" + 
+					" -fx-background-radius: 8;" + 
+					" -fx-background-color: linear-gradient(from 0% 93% to 0% 100%, #a34313 0%, #903b12 100%)," + 
+					" #9d4024, #d86e3a, radial-gradient(center 50% 50%, radius 100%, #d86e3a, #c54e2c);" + 
+					" -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );" + 
+					" -fx-font-weight: bold;" + 
+					" -fx-font-size: 1.1em;";
+			setShips.setStyle(bStyle);
+		});
+	}
+
+	private void setShipsButtonListener(Button setShips) {
+		setShips.setOnMouseClicked((click) -> {
+			for(Node node : gamePane.getChildren()) {
+				if(node instanceof ShipView) {
+					if(((ShipView) node).getLayoutX() < humanBoard.getLayoutX() - WIDTH/10/4 ||
+							((ShipView) node).getLayoutY() < humanBoard.getLayoutY() - HEIGHT/10/4){
+						showNotPlacedMessage();
+					}
+				}
+			}
+			
+			for(Node node : gamePane.getChildren()) {
+				if(node instanceof ShipView) {
+					ShipView sv = (ShipView) node;
+					Ship ship = sv.getShip();
+					adjustShipPosition(sv);
+					int row = ((int) (sv.getLayoutX() - humanBoard.getLayoutX())) / ((int) WIDTH/10);
+					int col = ((int) (sv.getLayoutY() - humanBoard.getLayoutY())) / ((int) WIDTH/10);
+					int endRow = row + (ship.getDirection() == Direction.HORIZONTAL ? 0 : ship.getSize());
+					int endCol = col + (ship.getDirection() == Direction.HORIZONTAL ? ship.getSize() : 0);
+					ship.setPosition(new Point(col, row), new Point(endCol, endRow));
+				}
+			}
+			
+			boolean set = showVerifyPositionMessage();
+			if(!set) {
+				return;
+			}
+			
+			for(Node node : gamePane.getChildren()) {
+				if(node instanceof ShipView) {
+					ShipView sv = (ShipView) node;
+					Ship ship = sv.getShip();
+					int row = ((int) (sv.getLayoutX() - humanBoard.getLayoutX())) / ((int) WIDTH/10);
+					int col = ((int) (sv.getLayoutY() - humanBoard.getLayoutY())) / ((int) WIDTH/10);
+					int endRow = row + (ship.getDirection() == Direction.HORIZONTAL ? 0 : ship.getSize());
+					int endCol = col + (ship.getDirection() == Direction.HORIZONTAL ? ship.getSize() : 0);
+					ship.setPosition(new Point(col, row), new Point(endCol, endRow));
+				}
+			}
+		});
+		
+	}
+
+	private boolean showVerifyPositionMessage() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private void adjustShipPosition(ShipView sv) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void showNotPlacedMessage() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private Image getImage(Ship ship) {
 		Image boatImage = null;
 		Direction dir = ship.getDirection();
@@ -153,7 +259,7 @@ public class BattleshipControllerView extends GameControllerView {
 	}
 	return boatImage;
 }
-private void drawBoard(GraphicsContext pbgc) {
+private void drawBoard(GraphicsContext pbgc, boolean human) {
 		pbgc.setFill(Color.LIGHTSTEELBLUE);
 		pbgc.fillRect(0,0,WIDTH,HEIGHT);
 		pbgc.setStroke(Color.BLACK);
@@ -168,7 +274,14 @@ private void drawBoard(GraphicsContext pbgc) {
 			pbgc.strokeLine(0, i*(HEIGHT/10), WIDTH, i*(HEIGHT/10));
 		}
 		
-		//TODO draw ships to board
+		if(shipsSet) {
+			for(Ship ship : human ? gameModel.getHumanShips() : gameModel.getComputerShips()) {
+				Image shipImage = getImage(ship);
+				pbgc.drawImage(shipImage, ship.getPoints()[0].getY() * WIDTH/10, ship.getPoints()[0].getX() * HEIGHT/10,
+					ship.getDirection() == Direction.HORIZONTAL ? ship.getSize()*WIDTH/10 : WIDTH/10,
+					ship.getDirection() == Direction.HORIZONTAL ? HEIGHT/10 : ship.getSize()*HEIGHT/10);
+			}
+		}
 	}
 
 	@Override
