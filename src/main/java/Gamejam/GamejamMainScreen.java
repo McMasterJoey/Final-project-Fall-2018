@@ -2,19 +2,17 @@ package Gamejam;
 
 import java.util.Collections;
 import java.util.Observer;
-import connectFour.ConnectFourControllerView;
 import java.util.ArrayList;
 import java.util.Observable;
-import controller.AccountManager;
-import controller.DBGameManager;
-import controller.GameControllerView;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -22,10 +20,15 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import connectFour.ConnectFourControllerView;
+import controller.AccountManager;
+import controller.DBGameManager;
+import controller.GameControllerView;
 import model.Leaderboard;
 import model.SanityCheckFailedException;
 import model.Score;
@@ -68,8 +71,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private int gameInUseIndex = -1;
 	private GameIconItem[] initgamelist;
 	private Button[] initbuttonlist;
-	private ImageView[] themeimages;
-	private int[] themeSettings;
 	private GamejamMainScreenTheme initthemes;
 	private int initthemeinuseid = 0;
 	public GamejamMainScreen() {
@@ -93,7 +94,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		
 		// Init Collections
 		this.initbuttonlist = new Button[70];
-		this.themeimages = initThemeImages();
 				
 		// Set up GUI Elements
 		this.initTopBar = initTopBar();
@@ -260,7 +260,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Button settings = new Button();
 		settings.setPrefWidth(25);
 		settings.setPrefHeight(25);
-		settings.setGraphic(themeimages[0]);
+		settings.setGraphic(this.initthemes.getTheme(0).getImage(0));
 		settings.setOnMouseClicked((click) -> {
 			userSettingsButtonClick();
 		});
@@ -303,7 +303,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Button settings = new Button();
 		settings.setPrefWidth(25);
 		settings.setPrefHeight(25);
-		settings.setGraphic(this.themeimages[1]);
+		settings.setGraphic(this.initthemes.getTheme(0).getImage(1));
 		settings.setOnMouseClicked((click) -> {
 			userSettingsButtonClickInGame();
 		});
@@ -429,29 +429,31 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initbuttonlist[12] = backtosettings;
 		left.getChildren().add(backtosettings);
 		
-		Button theme0 = new Button("Default Theme");
+		Button theme0 = new Button();
+		//this.initthemes
+		theme0.setGraphic(this.initthemes.getTheme(0).getIcon());
 		theme0.setOnMouseClicked((click) -> {
 			this.initthemeinuseid = 0;
-			this.initbuttonlist[4].setGraphic(themeimages[0]);
-			this.initbuttonlist[6].setGraphic(themeimages[1]);
+			//this.initbuttonlist[4].setGraphic(themeimages[0]);
+			//this.initbuttonlist[6].setGraphic(themeimages[1]);
 			updateTheme();
 		});
 		this.initbuttonlist[13] = theme0;
 		left.getChildren().add(theme0);
-		Button theme1 = new Button("Night Theme");
+		Button theme1 = new Button();
+		theme1.setGraphic(this.initthemes.getTheme(1).getIcon());
 		theme1.setOnMouseClicked((click) -> {
 			this.initthemeinuseid = 1;
-			this.initbuttonlist[4].setGraphic(themeimages[2]);
-			this.initbuttonlist[6].setGraphic(themeimages[3]);
+			//this.initbuttonlist[4].setGraphic(themeimages[2]);
+			//this.initbuttonlist[6].setGraphic(themeimages[3]);
 			updateTheme();
 		});
 		this.initbuttonlist[14] = theme1;
 		left.getChildren().add(theme1);
-		Button theme2 = new Button("USA Theme");
+		Button theme2 = new Button();
+		theme2.setGraphic(this.initthemes.getTheme(2).getIcon());
 		theme2.setOnMouseClicked((click) -> {
 			this.initthemeinuseid = 2;
-			this.initbuttonlist[4].setGraphic(themeimages[0]);
-			this.initbuttonlist[6].setGraphic(themeimages[1]);
 			updateTheme();
 		});
 		this.initbuttonlist[15] = theme2;
@@ -484,19 +486,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		grid.add(thememenu,0,0);
 		pane.getChildren().addAll(info,grid);
 		return pane;
-	}
-	/**
-	 * Loads all images that can be used more than once in the GUI such as for themes. 
-	 * @return An array of all image objects that can be used more than once in the GUI
-	 */
-	private ImageView[] initThemeImages() {
-		ImageView[] retval = new ImageView[4];
-		// Without duplicating these, the settings button graphic wouldn't display always.
-		retval[0] = new ImageView(new Image(getClass().getResourceAsStream("/usersettingsbuttonbackground.png")));
-		retval[1] = new ImageView(new Image(getClass().getResourceAsStream("/usersettingsbuttonbackground.png")));
-		retval[2] = new ImageView(new Image(getClass().getResourceAsStream("/usersettingsbuttonbackgroundnighttheme.png")));
-		retval[3] = new ImageView(new Image(getClass().getResourceAsStream("/usersettingsbuttonbackgroundnighttheme.png")));
-		return retval;
 	}
 //////////////////////// Button Click Handlers go here  /////////////////////////////////////////////
 	/**
@@ -803,38 +792,17 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			if (this.initbuttonlist[x] == null) {
 				continue;
 			}
-			this.initbuttonlist[x].setBackground(this.initthemes.getThemeData(this.initthemeinuseid,0).getBackground());
-			this.initbuttonlist[x].setBorder(this.initthemes.getThemeData(this.initthemeinuseid,0).getBorder());
-			this.initbuttonlist[x].setStyle(this.initthemes.getThemeData(this.initthemeinuseid,0).getCSS());
+			_updateRegionUtil(this.initbuttonlist[x],0);
 		}
 		
 		this.leftBarMsg.setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,1).getColor());
 		
-		
-		this.initTopBar.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,2).getBackground());
-		this.initTopBar.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,2).getBorder());
-		this.initTopBar.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,2).getCSS());
-		
-		this.initLoggedInInGameBar.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,2).getBackground());
-		this.initLoggedInInGameBar.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,2).getBorder());
-		this.initLoggedInInGameBar.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,2).getCSS());
-		
-		this.initLoggedInBar.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,2).getBackground());
-		this.initLoggedInBar.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,2).getBorder());
-		this.initLoggedInBar.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,2).getCSS());
-		
-		this.initCreateAccountMenuBar.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,2).getBackground());
-		this.initCreateAccountMenuBar.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,2).getBorder());
-		this.initCreateAccountMenuBar.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,2).getCSS());
-		
-		this.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,3).getBackground());
-		this.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,3).getBorder());
-		this.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,3).getCSS());
-		
-		
-		this.initLeftBar.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,4).getBackground());
-		this.initLeftBar.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,4).getBorder());
-		this.initLeftBar.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,4).getCSS());
+		_updateRegionUtil(this.initTopBar,2);
+		_updateRegionUtil(this.initLoggedInInGameBar,2);
+		_updateRegionUtil(this.initLoggedInBar,2);
+		_updateRegionUtil(this.initCreateAccountMenuBar,2);
+		_updateRegionUtil(this,3);
+		_updateRegionUtil(this.initLeftBar,4);
 		
 		this.initbuttonlist[0].setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,5).getColor());
 		this.initbuttonlist[1].setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,5).getColor());
@@ -858,7 +826,19 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		for(int x = 11; x < 16; x++) {
 			this.initbuttonlist[x].setTextFill(this.initthemes.getThemeData(this.initthemeinuseid,8).getColor());
 		}
-		
+		// Update Images
+		this.initbuttonlist[4].setGraphic(this.initthemes.getTheme(this.initthemeinuseid).getImage(0));
+		this.initbuttonlist[6].setGraphic(this.initthemes.getTheme(this.initthemeinuseid).getImage(1));
+	}
+	/**
+	 * Updates a Region objects look.
+	 * @param r An object that is a region or a child of region.
+	 * @param index The index of the value to be fetched to theme.
+	 */
+	private void _updateRegionUtil(Region r, int index) {
+		r.setBackground(this.initthemes.getThemeData(this.initthemeinuseid,index).getBackground());
+		r.setBorder(this.initthemes.getThemeData(this.initthemeinuseid,index).getBorder());
+		r.setStyle(this.initthemes.getThemeData(this.initthemeinuseid,index).getCSS());
 	}
 	/**
 	 * Stops and saves the current game so the user can go back the main menu.
@@ -925,12 +905,5 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private boolean justInGame() {
 		return this.gameInUseIndex >= 0;
-	}
-	/**
-	 * Fetches the array of Theme Images stored within this object. Enables other objects that want to reuse some files to not have to generate duplicates.
-	 * @return The array of image objects that are used more than once in this view object.
-	 */
-	public ImageView[] getThemeImages() {
-		return this.themeimages;
 	}
 }
