@@ -422,7 +422,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		retval.getColumnConstraints().add(new ColumnConstraints(544));
 		VBox left = new VBox();  // Used for Pre-made Themes Buttons
 		VBox right = new VBox(); // Used for Custom made themes.
-		Button backtosettings = new Button("Back to Settings Menu");
+		Button backtosettings = new Button();
+		backtosettings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/themeBackButtonMenuIcon.png"))));
 		backtosettings.setOnMouseClicked((click) -> {
 			this.setCenter(this.initUserSettingsMainMenu);
 		});
@@ -430,12 +431,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		left.getChildren().add(backtosettings);
 		
 		Button theme0 = new Button();
-		//this.initthemes
 		theme0.setGraphic(this.initthemes.getTheme(0).getIcon());
 		theme0.setOnMouseClicked((click) -> {
 			this.initthemeinuseid = 0;
-			//this.initbuttonlist[4].setGraphic(themeimages[0]);
-			//this.initbuttonlist[6].setGraphic(themeimages[1]);
 			updateTheme();
 		});
 		this.initbuttonlist[13] = theme0;
@@ -444,8 +442,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		theme1.setGraphic(this.initthemes.getTheme(1).getIcon());
 		theme1.setOnMouseClicked((click) -> {
 			this.initthemeinuseid = 1;
-			//this.initbuttonlist[4].setGraphic(themeimages[2]);
-			//this.initbuttonlist[6].setGraphic(themeimages[3]);
 			updateTheme();
 		});
 		this.initbuttonlist[14] = theme1;
@@ -458,6 +454,15 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		});
 		this.initbuttonlist[15] = theme2;
 		left.getChildren().add(theme2);
+		
+		Button theme3 = new Button();
+		theme3.setGraphic(this.initthemes.getTheme(3).getIcon());
+		theme3.setOnMouseClicked((click) -> {
+			this.initthemeinuseid = 3;
+			updateTheme();
+		});
+		this.initbuttonlist[16] = theme3;
+		left.getChildren().add(theme3);
 		updateTheme();
 		retval.add(left, 0, 0);
 		retval.add(right,1, 0);
