@@ -2,6 +2,7 @@ package battleship;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 
@@ -10,8 +11,8 @@ public class BattleshipModel extends Observable implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private boolean[][] humanBoard;
 	private boolean[][] computerBoard;
-	private HashMap<String, Ship> humanShips;
-	private HashMap<String, Ship> computerShips;
+	private ArrayList<Ship> humanShips;
+	private ArrayList<Ship> computerShips;
 	private static final int WIDTH = 10;
 	private static final int HEIGHT = 10;
 	private BattleshipAI computer;
@@ -37,26 +38,25 @@ public class BattleshipModel extends Observable implements Serializable {
 	}
 	
 	private void initializeShips() {
-		humanShips = new HashMap<String, Ship>();
-		computerShips = new HashMap<String, Ship>();
+		humanShips = new ArrayList<Ship>();
+		computerShips = new ArrayList<Ship>();
 		
-		humanShips.put("Carrier", new Ship(5));
-		humanShips.put("Battleship", new Ship(4));
-		humanShips.put("Destroyer", new Ship(3));
-		humanShips.put("Submarine", new Ship(3));
-		humanShips.put("Patrol Boat", new Ship(2));
+		humanShips.add(new Ship(5, "carrier"));
+		humanShips.add(new Ship(4, "battleship"));
+		humanShips.add(new Ship(3, "destroyer"));
+		humanShips.add(new Ship(3, "submarine"));
+		humanShips.add(new Ship(2, "patrolBoat"));
 		
-		computerShips.put("Carrier", new Ship(5));
-		computerShips.put("Battleship", new Ship(4));
-		computerShips.put("Destroyer", new Ship(3));
-		computerShips.put("Submarine", new Ship(3));
-		computerShips.put("Patrol Boat", new Ship(2));
+		computerShips.add(new Ship(5, "carrier"));
+		computerShips.add(new Ship(4, "battleship"));
+		computerShips.add(new Ship(3, "destroyer"));
+		computerShips.add(new Ship(3, "submarine"));
+		computerShips.add(new Ship(2, "patrolBoat"));
 		
 	}
 	
-	public void setShip(String shipName, int rowStart, int colStart, int rowEnd, int colEnd, Boolean human) {
-		HashMap<String, Ship> currMap = human ? humanShips : computerShips;
-		currMap.get(shipName).setPosition(new Point(colStart, rowStart), new Point(colEnd, rowEnd));
+	public void setShip(Ship ship, int rowStart, int colStart, int rowEnd, int colEnd, Boolean human) {
+		ship.setPosition(new Point(colStart, rowStart), new Point(colEnd, rowEnd));
 	}
 
 	public void setAIStrategy(BattleshipStrategy AI) {
@@ -81,7 +81,7 @@ public class BattleshipModel extends Observable implements Serializable {
 		if(available(row, col, true)) {
 			Point move = new Point(col, row);
 			computerBoard[row][col] = true;
-			for(Ship s : computerShips.values()) {
+			for(Ship s : computerShips) {
 				if(s.wasHit(move)) {
 					setChanged();
 					notifyObservers();
@@ -98,7 +98,7 @@ public class BattleshipModel extends Observable implements Serializable {
 		if(available(row, col, false)) {
 			Point move = new Point(col, row);
 			humanBoard[row][col] = true;
-			for(Ship s : humanShips.values()) {
+			for(Ship s : humanShips) {
 				if(s.wasHit(move)) {
 					setChanged();
 					notifyObservers();
@@ -117,8 +117,8 @@ public class BattleshipModel extends Observable implements Serializable {
 	}
 
 	public boolean won(boolean human) {
-		HashMap<String, Ship> map = human ? computerShips : humanShips;
-		for(Ship s : map.values()) {
+		ArrayList<Ship> list = human ? computerShips : humanShips;
+		for(Ship s : list) {
 			if(!s.isDestroyed()) {
 				return false;
 			}
@@ -161,5 +161,13 @@ public class BattleshipModel extends Observable implements Serializable {
 			computerShips.clear();
 			initializeShips();
 		}
+	}
+	
+	public ArrayList<Ship> getHumanShips() {
+		return humanShips;
+	}
+
+	public ArrayList<Ship> getComputerShips() {
+		return computerShips;
 	}
 }

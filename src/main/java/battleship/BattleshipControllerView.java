@@ -1,5 +1,6 @@
  package battleship;
 
+import java.awt.Point;
 import java.io.File;
 
 import java.io.FileInputStream;
@@ -9,13 +10,25 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Observable;
 
+import battleship.Ship.Direction;
 import controller.AccountManager;
 import controller.GameControllerView;
 import controller.GameMenu;
+import controller.StatsManager;
 import controller.logStatType;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 
 /**
  * Combined Controller and View for Battleship game. Manipulates the counterpart
@@ -29,16 +42,17 @@ import javafx.scene.image.Image;
 public class BattleshipControllerView extends GameControllerView {
 	private BattleshipModel gameModel;
 	private GameMenu menuBar;
-	private static final int HEIGHT = 450;
-	private static final int WIDTH = 450;
+	private static final int HEIGHT = 525;
+	private static final int WIDTH = 525;
 	private boolean shipsSet = false;
 	private Canvas humanBoard;
 	private GraphicsContext hbgc;
 	private Canvas computerBoard;
 	private GraphicsContext cbgc;
-	private Canvas shipSelector;
-	private GraphicsContext ssgc;
-	private Image carrierImage, battleshipImage, destroyerImage, submarineImage, patrolBoatImage;
+	private Image carrierImage, battleshipImage, destroyerImage, submarineImage, patrolBoatImage, 
+		carrierVerticalImage, battleshipVerticalImage, destroyerVerticalImage, 
+		submarineVerticalImage, patrolBoatVerticalImage;
+	private AnchorPane gamePane;
 	
 	public BattleshipControllerView() {
 		gameModel = new BattleshipModel();
@@ -46,11 +60,14 @@ public class BattleshipControllerView extends GameControllerView {
 		hbgc = humanBoard.getGraphicsContext2D();
 		computerBoard = new Canvas(WIDTH, HEIGHT);
 		cbgc = computerBoard.getGraphicsContext2D();
-		shipSelector = new Canvas(WIDTH/2, HEIGHT);
-		ssgc = shipSelector.getGraphicsContext2D();
 		
-		this.setRight(humanBoard);
-		this.setLeft(shipSelector);
+		gamePane = new AnchorPane();
+		gamePane.setMinWidth(WIDTH*2 + 50);
+		this.setCenter(gamePane);
+		AnchorPane.setTopAnchor(humanBoard, 50.0);
+		AnchorPane.setRightAnchor(humanBoard, 25.0);
+		AnchorPane.setTopAnchor(computerBoard, 50.0);
+		gamePane.getChildren().add(humanBoard);
 		
 		gameName = "battleship";
 		menuBar = GameMenu.getMenuBar(this);
@@ -58,6 +75,7 @@ public class BattleshipControllerView extends GameControllerView {
 		setupResources();
 		initializeGame();
 		accountManager = AccountManager.getInstance();
+		statsManager = StatsManager.getInstance();
 
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
@@ -82,17 +100,73 @@ public class BattleshipControllerView extends GameControllerView {
 		destroyerImage = new Image(BattleshipControllerView.class.getResource("/destroyer.png").toString());
 		submarineImage = new Image(BattleshipControllerView.class.getResource("/submarine.png").toString());
 		patrolBoatImage = new Image(BattleshipControllerView.class.getResource("/patrolBoat.png").toString());
+		carrierVerticalImage = new Image(BattleshipControllerView.class.getResource("/carrierVertical.png").toString());
+		battleshipVerticalImage = new Image(BattleshipControllerView.class.getResource("/battleshipVertical.png").toString());
+		destroyerVerticalImage = new Image(BattleshipControllerView.class.getResource("/destroyerVertical.png").toString());
+		submarineVerticalImage = new Image(BattleshipControllerView.class.getResource("/submarineVertical.png").toString());
+		patrolBoatVerticalImage = new Image(BattleshipControllerView.class.getResource("/patrolBoatVertical.png").toString());
 	}
 	
 	private void renderBoard() {
-		
+		drawBoard(hbgc);
 		if(!shipsSet) {	
-			
+			for(Ship ship : gameModel.getHumanShips()) {
+				Image boatImage = null;
+				boatImage = getImage(ship);
+				ShipView sv = new ShipView(boatImage, ship);
+				int length = ship.getSize();
+				sv.setFitWidth(WIDTH/10*length);
+				sv.setFitHeight(HEIGHT/10);				
+				makeDraggable(sv);
+				((Pane) this.getCenter()).getChildren().add(sv);
+			}
 		} else {
-			
+			drawBoard(cbgc);
 		}
 	}
 	
+	private Image getImage(Ship ship) {
+		Image boatImage = null;
+		Direction dir = ship.getDirection();
+		switch(ship.getName()) {
+		case "carrier":
+			boatImage = dir == Direction.HORIZONTAL ? carrierImage : carrierVerticalImage;
+			break;
+		case "battleship":
+			boatImage = dir == Direction.HORIZONTAL ? battleshipImage : battleshipVerticalImage;
+			break;
+		case "destroyer":
+			boatImage = dir == Direction.HORIZONTAL ? destroyerImage : destroyerVerticalImage;
+			break;
+		case "submarine":
+			boatImage = dir == Direction.HORIZONTAL ? submarineImage : submarineVerticalImage;
+			break;
+		case "patrolBoat":
+			boatImage = dir == Direction.HORIZONTAL ? patrolBoatImage : patrolBoatVerticalImage;
+			break;
+		default:
+			break;
+	}
+	return boatImage;
+}
+private void drawBoard(GraphicsContext pbgc) {
+		pbgc.setFill(Color.LIGHTSTEELBLUE);
+		pbgc.fillRect(0,0,WIDTH,HEIGHT);
+		pbgc.setStroke(Color.BLACK);
+		pbgc.strokeLine(0, 0, 0, HEIGHT);
+		pbgc.strokeLine(0, 0, WIDTH, 0);
+		pbgc.strokeLine(WIDTH, HEIGHT, 0, HEIGHT);
+		pbgc.strokeLine(WIDTH, HEIGHT, WIDTH, 0);
+		for(int i = 0; i < 10; i++) {
+			pbgc.strokeLine(i*(WIDTH/10) , 0, i*(WIDTH/10) , HEIGHT);
+		}
+		for(int i = 0; i < 10; i++) {
+			pbgc.strokeLine(0, i*(HEIGHT/10), WIDTH, i*(HEIGHT/10));
+		}
+		
+		//TODO draw ships to board
+	}
+
 	@Override
 	/**
 	 * saves the game to the given filepath
@@ -169,7 +243,6 @@ public class BattleshipControllerView extends GameControllerView {
 	}
 
 	private void disableListeners() {
-		shipSelector.setOnMouseClicked((click) ->{});
 		computerBoard.setOnMouseClicked((click) ->{});		
 	}
 
@@ -219,4 +292,56 @@ public class BattleshipControllerView extends GameControllerView {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
+	
+	//lifted almost wholesale from a stackoverflow answer from user jewelsea
+	//https://stackoverflow.com/questions/17312734/how-to-make-a-draggable-node-in-javafx-2-0
+	//just altered a little to look better here.
+	private void makeDraggable(Node node) {
+        final Point dragDelta = new Point();
+
+        node.setOnMouseEntered(me -> {
+            if (!me.isPrimaryButtonDown()) {
+                node.getScene().setCursor(Cursor.OPEN_HAND);
+            }
+        });
+        node.setOnMouseExited(me -> {
+            if (!me.isPrimaryButtonDown()) {
+                node.getScene().setCursor(Cursor.DEFAULT);
+            }
+        });
+        node.setOnMousePressed(me -> {
+        	ShipView sv = (ShipView) node;
+            if (me.isPrimaryButtonDown()) {
+                node.getScene().setCursor(Cursor.DEFAULT);
+            }
+            dragDelta.x = (int) me.getX();
+            System.out.println("dragDelta x = " + dragDelta.x);
+            dragDelta.y = (int) me.getY();
+            System.out.println("dragDelta y = " + dragDelta.y);
+            node.getScene().setCursor(Cursor.CLOSED_HAND);
+            if(me.isSecondaryButtonDown()) {
+				sv.getShip().setDirection(sv.getShip().getDirection() == Direction.HORIZONTAL ? 
+						Direction.VERTICAL : Direction.HORIZONTAL);
+				sv.setImage(getImage(sv.getShip()));
+				sv.setFitWidth(sv.getShip().getDirection() == Direction.HORIZONTAL ? 
+						WIDTH/10*sv.getShip().getSize() : WIDTH/10);
+				sv.setFitHeight(sv.getShip().getDirection() == Direction.HORIZONTAL ? 
+						HEIGHT/10 : HEIGHT/10*sv.getShip().getSize());	
+			}
+        });
+        node.setOnMouseReleased(me -> {
+            if (!me.isPrimaryButtonDown()) {
+                node.getScene().setCursor(Cursor.DEFAULT);
+            }
+            System.out.println("Node x" + node.getLayoutX());
+            System.out.println("Node y" + node.getLayoutY());
+        });
+        node.setOnMouseDragged(me -> {
+            node.setLayoutX(node.getLayoutX() + me.getX() - dragDelta.x);
+            node.setLayoutY(node.getLayoutY() + me.getY() - dragDelta.y);
+            System.out.println("mouse x" + me.getX());
+            System.out.println("mouse y" + me.getY());
+        });
+    }
 }

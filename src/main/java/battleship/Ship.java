@@ -8,12 +8,38 @@ public class Ship {
 	private boolean set;
 	private boolean[] slots;
 	private Point[] points;
+	private Direction direction = Direction.HORIZONTAL;
+	private String name;
 	
-	public Ship(int size) {
+	public enum Direction
+	{
+		HORIZONTAL, VERTICAL;
+	}
+	
+
+	public Ship(int size, String name) {
 		this.size = size;
+		this.name = name;
+		direction = Direction.HORIZONTAL;
 		set = false;
 		slots = new boolean[this.size];
 		points = new Point[this.size];
+	}
+	
+	public Direction getDirection() {
+		return direction;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setDirection(Direction direction) {
+		this.direction = direction;
+	}
+	
+	public int getSize() {
+		return size;
 	}
 	
 	public boolean isSet() {
