@@ -20,9 +20,9 @@ public class AccountManager extends Observable {
 	private String curUsername;
 	private boolean isAdmin;
 	private boolean isGuest;
-	private int totalExp, expInLevel, level;
+	private int totalExp, expInLevel, level, accountID;
 	private DBConnection conn;
-	private int accountID;
+	private DBGameManager dbGameManager;
 	private HashMap<Integer, Integer> userStatsIDs; // maps gameid (key) to statsid (value)
 	private HashMap<String, Integer> databaseGameID;
 	private HashMap<Integer, Integer> gameWins; // maps gameid to # of wins
@@ -52,6 +52,7 @@ public class AccountManager extends Observable {
 		gameIncompletes = null;
 		numGamesPlayed = null;
 		conn = DBConnection.getInstance();
+		dbGameManager = DBGameManager.getInstance();
 		this.databaseGameID = new HashMap<String, Integer>();
 	}
 
@@ -345,6 +346,36 @@ public class AccountManager extends Observable {
 	}
 
 	/**
+	 * Returns the high score for given game for the current user.
+	 *
+	 * @param gameName A String indicating the name of the game to retrieve a high score for
+	 * @return An int representing the user's high score, a negative value indicates an error occurred
+	 */
+	public int getHighScore(String gameName) {
+		ResultSet rs = null;
+		int gameID = dbGameManager.getGameListByName().get(gameName);
+		int statsID = userStatsIDs.get(gameID);
+
+		// Admin and guest accounts don't have a high score
+		if (isAdmin || isGuest) {
+			return 0;
+		}
+
+		try {
+			rs = conn.executeQuery("SELECT score FROM gamelog WHERE statsid = ? ORDER BY score DESC", statsID);
+
+			if (rs.next()) {
+				return rs.getInt("score");
+			} else {
+				return 0;
+			}
+		} catch (SQLException se) {
+			se.printStackTrace();
+			return -1;
+		}
+	}
+
+	/**
 	 * Public method to trigger fillUserStats.
 	 */
 	public void refreshUserStats() {
@@ -360,11 +391,17 @@ public class AccountManager extends Observable {
 	public void awardExp(int exp) {
 		totalExp += exp;
 
+		// Don't award exp to an admin or guest account
+		if (isAdmin || isGuest) {
+			return;
+		}
+
+		// Level up the user if appropriate
 		while (totalExp >= getTotalExpForLevel(level + 1)) {
 			level++;
 		}
 
-		expInLevel = totalExp - getTotalExpForLevel(level);
+		expInLevel = totalExp - getTotalExpForLevel(level); // Determine the remaining exp the user has after leveling
 
 		try {
 			conn.execute("UPDATE accounts SET exp = ?, level = ? WHERE accountID = ?", expInLevel, level, accountID);

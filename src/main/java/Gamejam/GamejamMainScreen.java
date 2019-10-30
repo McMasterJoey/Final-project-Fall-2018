@@ -41,7 +41,6 @@ import ticTacToe.TicTacToeControllerView;
  *
  */
 public class GamejamMainScreen extends BorderPane implements Observer {
-	private Button testButton; // For testing a large exp addition to test AccountManager.awardExp()
 	private GridPane initGameselectonboxarea;
 	private GridPane initThemeMenu;
 	private HBox initTopBar;
@@ -246,12 +245,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		viewLeaderboard.setOnAction( (ae) -> viewLeaderboardClick());
 		this.initbuttonlist[9] = viewLeaderboard;
 
-		// Test add exp button
-		testButton = new Button ("Add 5000 exp");
-		testButton.setOnAction(( (ae) -> acctMgr.awardExp(5000)));
-
 		// Add to Left Hbox
-		leftbox.getChildren().addAll(logout, viewLeaderboard, testButton);
+		leftbox.getChildren().addAll(logout, viewLeaderboard);
 		leftbox.setPrefWidth(1100);
 		leftbox.setPrefHeight(25);
 		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
@@ -740,11 +735,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			leftBarMsg.setText("Administrator Account");
 			leftBarStats.setText("");
 		} else {
-			leftBarMsg.setText("Welcome to Gamejam, " + acctMgr.getCurUsername());
-			expBarLabel.setText("Exp: " + acctMgr.getExpInLevel() + "/" + acctMgr.getExpForLevel(acctMgr.getLevel() + 1));
+			leftBarMsg.setText("Welcome to Gamejam,\n" + acctMgr.getCurUsername() + "!\n\n");
+			expBarLabel.setText("Account Statistics:\nExp: " + acctMgr.getExpInLevel() + "/" + acctMgr.getExpForLevel(acctMgr.getLevel() + 1));
 			expBar.setProgress( (double) acctMgr.getExpInLevel() / acctMgr.getExpForLevel(acctMgr.getLevel() + 1) );
-			leftBarStats.setText("\n\nLevel: " + acctMgr.getLevel() + "\nExp: " + acctMgr.getExpInLevel() +
-					"\nTotal Exp: " + acctMgr.getTotalExp() + "\n");
+			leftBarStats.setText("Level: " + acctMgr.getLevel() + "\nTotal Exp: " + acctMgr.getTotalExp() + "\n\nGame Statistics:");
 
 			ArrayList<String> games = new ArrayList<>(dbGameManager.getGameListByName().keySet());
 			Collections.sort(games);
@@ -753,11 +747,12 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 				Integer id = dbGameManager.getGameListByName().get(game);
 				Integer numPlayed = acctMgr.getNumGamesPlayed().get(dbGameManager.getGameListByName().get(game));
 				leftBarStats.setText(leftBarStats.getText() + "\n" + game + ":");
+				leftBarStats.setText(leftBarStats.getText() + "\n High Score: " + acctMgr.getHighScore(game) + "\n");
 				leftBarStats.setText(leftBarStats.getText() + "\n  Wins: " + acctMgr.getGameWins().get(id));
 				leftBarStats.setText(leftBarStats.getText() + "\n  Losses: " + acctMgr.getGameLosses().get(id));
 				leftBarStats.setText(leftBarStats.getText() + "\n  Ties: " + acctMgr.getGameTies().get(id));
 				leftBarStats.setText(leftBarStats.getText() + "\n  Incomplete: " + acctMgr.getGameIncompletes().get(id));
-				leftBarStats.setText((leftBarStats.getText() + "\n   Total: " + numPlayed) + "\n");
+				leftBarStats.setText((leftBarStats.getText() + "\n   Total: " + numPlayed));
 			}
 		}
 	}
