@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Observable;
 
 import battleship.Ship.Direction;
@@ -16,7 +17,6 @@ import controller.GameControllerView;
 import controller.GameMenu;
 import controller.StatsManager;
 import controller.logStatType;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -24,11 +24,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
 /**
@@ -109,6 +106,8 @@ public class BattleshipControllerView extends GameControllerView {
 	}
 	
 	private void renderBoard() {
+		gamePane.getChildren().removeAll(gamePane.getChildren());
+		gamePane.getChildren().add(humanBoard);
 		drawBoard(hbgc, true);
 		if(!shipsSet) {	
 			int count = 0;
@@ -127,6 +126,7 @@ public class BattleshipControllerView extends GameControllerView {
 			}
 			addSetButton();
 		} else {
+			gamePane.getChildren().add(computerBoard);
 			drawBoard(cbgc, false);
 		}
 	}
@@ -180,23 +180,10 @@ public class BattleshipControllerView extends GameControllerView {
 		setShips.setOnMouseClicked((click) -> {
 			for(Node node : gamePane.getChildren()) {
 				if(node instanceof ShipView) {
-					if(((ShipView) node).getLayoutX() < humanBoard.getLayoutX() - WIDTH/10/4 ||
-							((ShipView) node).getLayoutY() < humanBoard.getLayoutY() - HEIGHT/10/4){
+					if(((ShipView) node).getLayoutX() < humanBoard.getLayoutX() 
+							|| ((ShipView) node).getLayoutY() < humanBoard.getLayoutY()){
 						showNotPlacedMessage();
 					}
-				}
-			}
-			
-			for(Node node : gamePane.getChildren()) {
-				if(node instanceof ShipView) {
-					ShipView sv = (ShipView) node;
-					Ship ship = sv.getShip();
-					adjustShipPosition(sv);
-					int row = ((int) (sv.getLayoutX() - humanBoard.getLayoutX())) / ((int) WIDTH/10);
-					int col = ((int) (sv.getLayoutY() - humanBoard.getLayoutY())) / ((int) WIDTH/10);
-					int endRow = row + (ship.getDirection() == Direction.HORIZONTAL ? 0 : ship.getSize());
-					int endCol = col + (ship.getDirection() == Direction.HORIZONTAL ? ship.getSize() : 0);
-					ship.setPosition(new Point(col, row), new Point(endCol, endRow));
 				}
 			}
 			
@@ -205,6 +192,7 @@ public class BattleshipControllerView extends GameControllerView {
 				return;
 			}
 			
+			ArrayList<ShipView> toRemove = new ArrayList<ShipView>();
 			for(Node node : gamePane.getChildren()) {
 				if(node instanceof ShipView) {
 					ShipView sv = (ShipView) node;
@@ -214,20 +202,40 @@ public class BattleshipControllerView extends GameControllerView {
 					int endRow = row + (ship.getDirection() == Direction.HORIZONTAL ? 0 : ship.getSize());
 					int endCol = col + (ship.getDirection() == Direction.HORIZONTAL ? ship.getSize() : 0);
 					ship.setPosition(new Point(col, row), new Point(endCol, endRow));
+					toRemove.add(sv);
 				}
 			}
+			gamePane.getChildren().removeAll(toRemove);
+			gamePane.getChildren().add(computerBoard);
+			shipsSet = true;			
 		});
 		
 	}
 
 	private boolean showVerifyPositionMessage() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
-	private void adjustShipPosition(ShipView sv) {
-		// TODO Auto-generated method stub
-		
+	private void adjustShipPosition(ShipView sv, Point initialLocation) {
+		if(sv.getLayoutX() < humanBoard.getLayoutX() - WIDTH/10/4
+				|| sv.getLayoutY() < humanBoard.getLayoutY() - HEIGHT/10/4
+				|| sv.getLayoutX() > humanBoard.getLayoutX() + WIDTH
+				|| sv.getLayoutY() > humanBoard.getLayoutY() + HEIGHT) {
+			sv.setLayoutX(initialLocation.x);
+			sv.setLayoutY(initialLocation.y);
+		} else {
+			int xPosOnBoard = (int) (sv.getLayoutX() - humanBoard.getLayoutX());
+			System.out.println("X on board " + xPosOnBoard);
+			int yPosOnBoard = (int) (sv.getLayoutY() - humanBoard.getLayoutY());
+			System.out.println("Y on board " + yPosOnBoard);
+			int snapX = (int) (humanBoard.getLayoutX() + ((xPosOnBoard + WIDTH/10/4) / (WIDTH/10)) * (WIDTH/10));
+			System.out.println("snapX " + snapX);
+			int snapY = (int) (humanBoard.getLayoutY() + ((yPosOnBoard + HEIGHT/10/4) / (HEIGHT/10)) * (HEIGHT/10));
+			System.out.println("snapY " + snapY);
+			sv.setLayoutX(snapX);
+			sv.setLayoutY(snapY);
+		}
 	}
 
 	private void showNotPlacedMessage() {
@@ -274,8 +282,8 @@ private void drawBoard(GraphicsContext pbgc, boolean human) {
 			pbgc.strokeLine(0, i*(HEIGHT/10), WIDTH, i*(HEIGHT/10));
 		}
 		
-		if(shipsSet) {
-			for(Ship ship : human ? gameModel.getHumanShips() : gameModel.getComputerShips()) {
+		if(shipsSet && human) {
+			for(Ship ship : gameModel.getHumanShips()) {
 				Image shipImage = getImage(ship);
 				pbgc.drawImage(shipImage, ship.getPoints()[0].getY() * WIDTH/10, ship.getPoints()[0].getX() * HEIGHT/10,
 					ship.getDirection() == Direction.HORIZONTAL ? ship.getSize()*WIDTH/10 : WIDTH/10,
@@ -336,6 +344,7 @@ private void drawBoard(GraphicsContext pbgc, boolean human) {
 				ois.close();
 				update(gameModel, this);
 				file.delete();
+				shipsSet = true;
 			} else {
 				retVal = newGame();
 			}
@@ -393,7 +402,6 @@ private void drawBoard(GraphicsContext pbgc, boolean human) {
 	@Override
 	protected void updateStatistics() {
 		if (!(gameModel.won(true) || gameModel.won(false)) && gameModel.maxMovesRemaining() > 0) {
-			//accountManager.logGlobalStat(true, "Battleship", logStatType.INCOMPLETE, 1);
 			statsManager.logGameStat("Battleship", logStatType.INCOMPLETE, 1, getScore());
 		}
 	}
@@ -416,6 +424,7 @@ private void drawBoard(GraphicsContext pbgc, boolean human) {
 	//just altered a little to look better here.
 	private void makeDraggable(Node node) {
         final Point dragDelta = new Point();
+        final Point initialLocation = new Point();
 
         node.setOnMouseEntered(me -> {
             if (!me.isPrimaryButtonDown()) {
@@ -432,10 +441,10 @@ private void drawBoard(GraphicsContext pbgc, boolean human) {
             if (me.isPrimaryButtonDown()) {
                 node.getScene().setCursor(Cursor.DEFAULT);
             }
+            initialLocation.x = (int) sv.getLayoutX();
+            initialLocation.y = (int) sv.getLayoutY();
             dragDelta.x = (int) me.getX();
-            System.out.println("dragDelta x = " + dragDelta.x);
             dragDelta.y = (int) me.getY();
-            System.out.println("dragDelta y = " + dragDelta.y);
             node.getScene().setCursor(Cursor.CLOSED_HAND);
             if(me.isSecondaryButtonDown()) {
 				sv.getShip().setDirection(sv.getShip().getDirection() == Direction.HORIZONTAL ? 
@@ -451,14 +460,11 @@ private void drawBoard(GraphicsContext pbgc, boolean human) {
             if (!me.isPrimaryButtonDown()) {
                 node.getScene().setCursor(Cursor.DEFAULT);
             }
-            System.out.println("Node x" + node.getLayoutX());
-            System.out.println("Node y" + node.getLayoutY());
+            adjustShipPosition((ShipView) node, initialLocation);
         });
         node.setOnMouseDragged(me -> {
             node.setLayoutX(node.getLayoutX() + me.getX() - dragDelta.x);
             node.setLayoutY(node.getLayoutY() + me.getY() - dragDelta.y);
-            System.out.println("mouse x" + me.getX());
-            System.out.println("mouse y" + me.getY());
         });
     }
 }
