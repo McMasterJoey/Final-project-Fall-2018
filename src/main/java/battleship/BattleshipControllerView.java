@@ -268,10 +268,10 @@ public class BattleshipControllerView extends GameControllerView {
 		} else {
 			int xPosOnBoard = (int) (sv.getLayoutX() - humanBoard.getLayoutX());
 			int yPosOnBoard = (int) (sv.getLayoutY() - humanBoard.getLayoutY());
-			int snapX = (int) (humanBoard.getLayoutX()
-					+ ((xPosOnBoard + WIDTH / 10 / 3) / (WIDTH / 10)) * (WIDTH / 10));
-			int snapY = (int) (humanBoard.getLayoutY()
-					+ ((yPosOnBoard + HEIGHT / 10 / 3) / (HEIGHT / 10)) * (HEIGHT / 10));
+			double snapX = humanBoard.getLayoutX()
+					+ (((xPosOnBoard + (int)(52.5/3)) / 52) * 52.5);
+			double snapY = humanBoard.getLayoutY()
+					+ (((yPosOnBoard + (int)(52.5/3)) / 52) * 52.5);
 			sv.setLayoutX(snapX);
 			sv.setLayoutY(snapY);
 
@@ -287,9 +287,9 @@ public class BattleshipControllerView extends GameControllerView {
 			if (node instanceof ShipView && ((ShipView) node).getLayoutX() + WIDTH / 10 / 3 > humanBoard.getLayoutX()) {
 				ShipView sv = (ShipView) node;
 				int shipX = (int) (sv.getLayoutX() - humanBoard.getLayoutX()) / (WIDTH / 10)
-						+ (sv.getShip().getDirection() == Direction.HORIZONTAL ? sv.getShip().getSize() : 0);
+						+ (sv.getShip().getDirection() == Direction.HORIZONTAL ? sv.getShip().getSize()-1 : 0);
 				int shipY = (int) (sv.getLayoutY() - humanBoard.getLayoutY()) / (HEIGHT / 10)
-						+ (sv.getShip().getDirection() == Direction.HORIZONTAL ? 0 : sv.getShip().getSize());
+						+ (sv.getShip().getDirection() == Direction.HORIZONTAL ? 0 : sv.getShip().getSize()-1);
 				if (shipX >= 10 || shipY >= 10) {
 					return true;
 				}
@@ -539,7 +539,7 @@ public class BattleshipControllerView extends GameControllerView {
 			node.getScene().setCursor(Cursor.CLOSED_HAND);
 			if (me.isSecondaryButtonDown()) {
 				flipShip(sv);
-				if (shipsOverlapping()) {
+				if (shipsOverlapping() || shipsOffBoard()) {
 					flipShip(sv);
 				}
 			}
