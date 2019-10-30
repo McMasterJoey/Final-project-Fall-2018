@@ -234,7 +234,7 @@ public class BattleshipControllerView extends GameControllerView {
 			int snapY = (int) (humanBoard.getLayoutY() + ((yPosOnBoard + HEIGHT/10/4) / (HEIGHT/10)) * (HEIGHT/10));
 			System.out.println("snapY " + snapY);
 			sv.setLayoutX(snapX);
-			sv.setLayoutY(snapY);
+			sv.setLayoutY(snapY); 
 		}
 	}
 
