@@ -62,8 +62,9 @@ public class Ship {
 			}
 		}
 		else {
-			for(int i=start.x; i<=end.x; i++) {
-				points[i-start.x] = new Point(i, start.y); 
+			for(int i=start.x; i<start.x + size; i++) {
+				points[i-start.x] = new Point(i, start.y);
+				System.out.println(i-start.x);
 			}
 		}
 		set = true;

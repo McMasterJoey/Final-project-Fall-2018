@@ -183,6 +183,7 @@ public class BattleshipControllerView extends GameControllerView {
 					if(((ShipView) node).getLayoutX() < humanBoard.getLayoutX() 
 							|| ((ShipView) node).getLayoutY() < humanBoard.getLayoutY()){
 						showNotPlacedMessage();
+						return;
 					}
 				}
 			}
@@ -207,9 +208,48 @@ public class BattleshipControllerView extends GameControllerView {
 			}
 			gamePane.getChildren().removeAll(toRemove);
 			gamePane.getChildren().add(computerBoard);
-			shipsSet = true;			
+			shipsSet = true;
+			this.getChildren().remove(setShips);
+			renderBoard();
 		});
 		
+	}
+
+	private boolean shipsOverlapping() {
+		
+		for(Node node : gamePane.getChildren()) {
+			if(node instanceof ShipView) {
+				ShipView sv = (ShipView) node;
+				
+				for(Node node2 : gamePane.getChildren()) {
+					
+					if(node2 instanceof ShipView) {
+						ShipView sv2 = (ShipView) node2;
+						
+						if(sv != sv2) {
+							Point rect1 = new Point((int) sv.getLayoutX(), (int) sv.getLayoutY());
+							Point rect2 = new Point((int) sv2.getLayoutX(), (int) sv2.getLayoutY());
+							int rect1Width = WIDTH/10 * (sv.getShip().getDirection() == 
+									Direction.HORIZONTAL ? sv.getShip().getSize() : 1);
+							int rect1Height = HEIGHT/10 * (sv.getShip().getDirection() ==
+									Direction.HORIZONTAL ? 1 : sv.getShip().getSize());
+							int rect2Width = WIDTH/10 * (sv2.getShip().getDirection() == 
+									Direction.HORIZONTAL ? sv2.getShip().getSize() : 1);
+							int rect2Height = HEIGHT/10 * (sv2.getShip().getDirection() ==
+									Direction.HORIZONTAL ? 1 : sv2.getShip().getSize());
+							
+							if(rect1.x < rect2.x + rect2Width 
+									&& rect1.x + rect1Width > rect2.x
+									&& rect1.y < rect2.y + rect2Height
+									&& rect1.y + rect1Height > rect2.y) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	private boolean showVerifyPositionMessage() {
@@ -226,15 +266,16 @@ public class BattleshipControllerView extends GameControllerView {
 			sv.setLayoutY(initialLocation.y);
 		} else {
 			int xPosOnBoard = (int) (sv.getLayoutX() - humanBoard.getLayoutX());
-			System.out.println("X on board " + xPosOnBoard);
 			int yPosOnBoard = (int) (sv.getLayoutY() - humanBoard.getLayoutY());
-			System.out.println("Y on board " + yPosOnBoard);
 			int snapX = (int) (humanBoard.getLayoutX() + ((xPosOnBoard + WIDTH/10/4) / (WIDTH/10)) * (WIDTH/10));
-			System.out.println("snapX " + snapX);
 			int snapY = (int) (humanBoard.getLayoutY() + ((yPosOnBoard + HEIGHT/10/4) / (HEIGHT/10)) * (HEIGHT/10));
-			System.out.println("snapY " + snapY);
 			sv.setLayoutX(snapX);
-			sv.setLayoutY(snapY); 
+			sv.setLayoutY(snapY);
+			
+			if(shipsOverlapping()) {
+				sv.setLayoutX(initialLocation.x);
+				sv.setLayoutY(initialLocation.y);
+			}
 		}
 	}
 
@@ -285,9 +326,10 @@ private void drawBoard(GraphicsContext pbgc, boolean human) {
 		if(shipsSet && human) {
 			for(Ship ship : gameModel.getHumanShips()) {
 				Image shipImage = getImage(ship);
-				pbgc.drawImage(shipImage, ship.getPoints()[0].getY() * WIDTH/10, ship.getPoints()[0].getX() * HEIGHT/10,
-					ship.getDirection() == Direction.HORIZONTAL ? ship.getSize()*WIDTH/10 : WIDTH/10,
-					ship.getDirection() == Direction.HORIZONTAL ? HEIGHT/10 : ship.getSize()*HEIGHT/10);
+				pbgc.drawImage(shipImage, ship.getPoints()[0].getY() * WIDTH/10, 
+					ship.getPoints()[0].getX() * HEIGHT/10,
+					ship.getDirection() == Direction.HORIZONTAL ? ship.getSize()*WIDTH/10 - 4 : WIDTH/10 - 4,
+					ship.getDirection() == Direction.HORIZONTAL ? HEIGHT/10 - 4 : ship.getSize()*HEIGHT/10 - 4);
 			}
 		}
 	}
@@ -383,8 +425,11 @@ private void drawBoard(GraphicsContext pbgc, boolean human) {
 	}
 
 	private void setupListeners() {
-		// TODO Auto-generated method stub
-		
+		computerBoard.setOnMouseClicked((click) ->{
+			int clickX = (int) click.getX() / (WIDTH/10);
+			int clickY = (int) click.getY() / (HEIGHT/10);
+			gameModel.humanMove(clickY, clickX);
+		});		
 	}
 
 	@Override
@@ -447,13 +492,10 @@ private void drawBoard(GraphicsContext pbgc, boolean human) {
             dragDelta.y = (int) me.getY();
             node.getScene().setCursor(Cursor.CLOSED_HAND);
             if(me.isSecondaryButtonDown()) {
-				sv.getShip().setDirection(sv.getShip().getDirection() == Direction.HORIZONTAL ? 
-						Direction.VERTICAL : Direction.HORIZONTAL);
-				sv.setImage(getImage(sv.getShip()));
-				sv.setFitWidth(sv.getShip().getDirection() == Direction.HORIZONTAL ? 
-						WIDTH/10*sv.getShip().getSize()-4 : WIDTH/10-4);
-				sv.setFitHeight(sv.getShip().getDirection() == Direction.HORIZONTAL ? 
-						HEIGHT/10-4 : HEIGHT/10*sv.getShip().getSize()-4);	
+            	flipShip(sv);
+				if(shipsOverlapping()) {
+					flipShip(sv);
+				}
 			}
         });
         node.setOnMouseReleased(me -> {
@@ -467,4 +509,17 @@ private void drawBoard(GraphicsContext pbgc, boolean human) {
             node.setLayoutY(node.getLayoutY() + me.getY() - dragDelta.y);
         });
     }
+
+	private void flipShip(ShipView sv) {
+		sv.getShip().setDirection(sv.getShip().getDirection() == Direction.HORIZONTAL ? 
+				Direction.VERTICAL : Direction.HORIZONTAL);
+		
+		sv.setImage(getImage(sv.getShip()));
+		
+		sv.setFitWidth(sv.getShip().getDirection() == Direction.HORIZONTAL ? 
+				WIDTH/10*sv.getShip().getSize()-4 : WIDTH/10-4);
+		
+		sv.setFitHeight(sv.getShip().getDirection() == Direction.HORIZONTAL ? 
+				HEIGHT/10-4 : HEIGHT/10*sv.getShip().getSize()-4);		
+	}
 }
