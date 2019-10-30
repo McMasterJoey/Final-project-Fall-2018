@@ -3,7 +3,6 @@ package battleship;
 import java.awt.Point;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Observable;
 
 public class BattleshipModel extends Observable implements Serializable {
@@ -24,6 +23,10 @@ public class BattleshipModel extends Observable implements Serializable {
 		/*TODO computer.setStrategy(new <AIClassName>());*/
 		setChanged();
 		notifyObservers();
+	}
+
+	public void setComputer(BattleshipAI computer) {
+		this.computer = computer;
 	}
 
 	private void initializeBoard() {
@@ -87,38 +90,50 @@ public class BattleshipModel extends Observable implements Serializable {
 		return count;
 	}
 	
-	public Ship humanMove(int row, int col) {
-		if(available(row, col, true)) {
+	public void humanMove(int row, int col) {
+		if(available(row, col, false)) {
 			Point move = new Point(col, row);
 			computerBoard[row][col] = true;
 			for(Ship s : computerShips) {
 				if(s.wasHit(move)) {
 					setChanged();
 					notifyObservers();
-					return s;
+					return;
 				}
 			}
+			// TODO computerMove();
 		}
 		setChanged();
 		notifyObservers();
-		return null;
+		return;
 	}
 
-	public Ship computerMove(int row, int col) {
-		if(available(row, col, false)) {
+	public boolean isShip(int row, int col, boolean human) {
+		for(Ship s : (human ? humanShips : computerShips)) {
+			for(Point p : s.getPoints()) {
+				if(p!= null && p.x == col && p.y == row) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public void computerMove(int row, int col) {
+		if(available(row, col, true)) {
 			Point move = new Point(col, row);
 			humanBoard[row][col] = true;
 			for(Ship s : humanShips) {
 				if(s.wasHit(move)) {
 					setChanged();
 					notifyObservers();
-					return s;
+					return;
 				}
 			}
 		}
 		setChanged();
 		notifyObservers();
-		return null;
+		return;
 		
 	}
 
@@ -137,7 +152,7 @@ public class BattleshipModel extends Observable implements Serializable {
 	}
 
 	public boolean available(int row, int col, boolean human) {
-		boolean[][] board = human ? computerBoard : humanBoard;
+		boolean[][] board = human ? humanBoard : computerBoard;
 		return !board[row][col];
 	}
 
@@ -146,7 +161,11 @@ public class BattleshipModel extends Observable implements Serializable {
 		String retVal = "Human's board\n";
 		for(int row=0; row<HEIGHT; row++) {
 			for(int col=0; col<WIDTH; col++) {
-				retVal += humanBoard[row][col] ? "X " : "O ";
+				if(isShip(row, col, true)) {
+					retVal += "S ";
+				} else { 
+					retVal += humanBoard[row][col] ? "X " : "O ";
+				}
 			}
 			retVal += "\n";
 		}
