@@ -5,6 +5,7 @@ import model.SanityCheckFailedException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 
@@ -127,10 +128,15 @@ public class AccountManager extends Observable {
         }
         try { // Attempt to log the game in the gamelog table
             Gamejam.DPrint("\nFetching game from a string!");
-            int gameid = getGameIdFromString(game);
-            Gamejam.DPrint(gameid);
+            int gameID = getGameIdFromString(game);
+            Gamejam.DPrint(gameID);
             String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
-            conn.execute(transaction, userStatsIDs.get(gameid), win, loss, tie, incomplete, time, score);
+
+            if (!userStatsIDs.containsKey(gameID)) { // The game the user just played was added after the user's account creation
+            	createStatisticsEntries(); // So, create an entry in the DB for the user in the statistics table
+			}
+
+            conn.execute(transaction, userStatsIDs.get(gameID), win, loss, tie, incomplete, time, score);
 
 			// Update the statistics table with the game outcome
 			if (win) {
@@ -263,7 +269,6 @@ public class AccountManager extends Observable {
 			notifyObservers();
 
 			createStatisticsEntries();
-			fillUserStats();
 			
 		} catch (SQLException se) {
 			if (se.getErrorCode() == 1062) { // 1062 indicates username is already in the db
@@ -282,21 +287,39 @@ public class AccountManager extends Observable {
 	 */
 	private void createStatisticsEntries() {
 		ResultSet rs = null;
+		ArrayList<Integer> games = new ArrayList<>();
 
-		try
-		{
-			rs = conn.executeQuery("SELECT * FROM statistics WHERE statistics.accountid = ?", accountID);
+		try {
+			rs = conn.executeQuery("SELECT gameid FROM statistics WHERE accountid = ?", accountID);
 
-			if (rs.next()) { // An entry already exists for this user
-				return;
-			} else {
-				rs = conn.executeQuery("SELECT gameid FROM games");
+//			if (rs.next()) { // An entry already exists for this user
+//				return;
+//			} else {
+//				rs = conn.executeQuery("SELECT gameid FROM games");
+//
+//				while (rs.next()) {
+//					int gameID = rs.getInt("gameid");
+//					conn.execute("INSERT INTO statistics(accountid, gameid) VALUES(?, ?)", accountID, gameID);
+//				}
+//			}
 
-				while (rs.next()) {
-					int gameID = rs.getInt("gameid");
+			while (rs.next()) {
+				games.add(rs.getInt("gameid"));
+			}
+
+			rs = conn.executeQuery("SELECT gameid FROM  games");
+
+			while(rs.next()) {
+				int gameID = rs.getInt("gameid");
+				if (games.contains(gameID)) {
+					continue;
+				} else {
 					conn.execute("INSERT INTO statistics(accountid, gameid) VALUES(?, ?)", accountID, gameID);
 				}
 			}
+
+			fillUserStats();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -354,6 +377,11 @@ public class AccountManager extends Observable {
 	public int getHighScore(String gameName) {
 		ResultSet rs = null;
 		int gameID = dbGameManager.getGameListByName().get(gameName);
+
+		if (!userStatsIDs.containsKey(gameID)) { // The game might have been added after the user's account creation
+			createStatisticsEntries(); // If so, make sure the user has entries for every game in the DB statistics table
+		}
+
 		int statsID = userStatsIDs.get(gameID);
 
 		// Admin and guest accounts don't have a high score

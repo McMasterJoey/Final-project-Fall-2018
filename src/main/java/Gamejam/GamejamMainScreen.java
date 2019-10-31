@@ -8,6 +8,7 @@ import java.util.Observable;
 import controller.AccountManager;
 import controller.DBGameManager;
 import controller.GameControllerView;
+import controller.StatsManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -186,6 +187,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Button viewLeaderboard = new Button("View Leaderboard");
 		viewLeaderboard.setOnAction( (ae) -> viewLeaderboardClick());
 		this.initbuttonlist[8] = viewLeaderboard;
+
 		// Add to Left Hbox
 		leftbox.getChildren().addAll(newacc, viewLeaderboard);
 		
