@@ -8,7 +8,6 @@ import java.util.Observable;
 import controller.AccountManager;
 import controller.DBGameManager;
 import controller.GameControllerView;
-import controller.StatsManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -49,7 +48,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private HBox initCreateAccountMenuBar;
 	private HBox initLoggedInInGameBar;
 	private VBox initUserSettingsMainMenu;
-	private VBox initLeftBar;
+	private ScrollPane initLeftBar;
 	private Label leftBarMsg;
 	private Label leftBarStats;
 	private ProgressBar expBar;
@@ -96,7 +95,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Set up GUI Elements
 		this.initTopBar = initTopBar();
 		this.initGameselectonboxarea = initGamePanel();
-		this.initLeftBar = initLeftBar();
+		this.initLeftBar = initLeftPane();
 		leaderScreen = initLeaderScreen();
 		
 		// Not in user parts that can be used later
@@ -123,20 +122,24 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * 
 	 * @return A VBox that contains all the structures for the left bar.
 	 */
-	private VBox initLeftBar() {
-		VBox retval = new VBox();
-		retval.setPrefWidth(145);
-		retval.setPrefHeight(578);
-		retval.setPadding(new Insets(5));
+	private ScrollPane initLeftPane() {
+		VBox leftPane = new VBox();
+		ScrollPane leftPaneScroll = new ScrollPane(leftPane);
+		leftPane.setPrefWidth(145);
+		leftPane.setPrefHeight(578);
+		leftPane.setPadding(new Insets(5));
 		this.leftBarMsg = new Label();
 		this.leftBarMsg.setWrapText(true);
 		this.leftBarStats = new Label();
 		expBarLabel = new Label();
 		expBar = new ProgressBar(0.0);
+		leftPane.setPrefHeight(750);
+		leftPane.setPrefWidth(180);
+		leftPaneScroll.setFitToWidth(true);
 		setGuestMessage();
 		
-		retval.getChildren().addAll(leftBarMsg, expBarLabel, expBar, leftBarStats);
-		return retval;
+		leftPane.getChildren().addAll(leftBarMsg, expBarLabel, expBar, leftBarStats);
+		return leftPaneScroll;
 	}
 
 	/**
@@ -712,7 +715,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * Assumes the user is a guest.
 	 */
 	private void setGuestMessage() {
-		this.leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in, you could see your stats!\n\n");
+		this.leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in,\nyou could see your stats!\n\n");
 		expBar.setProgress(0.0);
 		expBarLabel.setText("Exp: 0/0");
 		this.leftBarStats.setText("Level: 0\nExp: 0");
@@ -749,12 +752,12 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 				Integer id = dbGameManager.getGameListByName().get(game);
 				Integer numPlayed = acctMgr.getNumGamesPlayed().get(dbGameManager.getGameListByName().get(game));
 				leftBarStats.setText(leftBarStats.getText() + "\n" + game + ":");
-				leftBarStats.setText(leftBarStats.getText() + "\n High Score: " + acctMgr.getHighScore(game) + "\n");
+				leftBarStats.setText(leftBarStats.getText() + "\n High Score: " + acctMgr.getHighScore(game));
 				leftBarStats.setText(leftBarStats.getText() + "\n  Wins: " + acctMgr.getGameWins().get(id));
 				leftBarStats.setText(leftBarStats.getText() + "\n  Losses: " + acctMgr.getGameLosses().get(id));
 				leftBarStats.setText(leftBarStats.getText() + "\n  Ties: " + acctMgr.getGameTies().get(id));
 				leftBarStats.setText(leftBarStats.getText() + "\n  Incomplete: " + acctMgr.getGameIncompletes().get(id));
-				leftBarStats.setText((leftBarStats.getText() + "\n   Total: " + numPlayed));
+				leftBarStats.setText((leftBarStats.getText() + "\n   Total: " + numPlayed) + "\n");
 			}
 		}
 	}

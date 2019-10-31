@@ -350,12 +350,13 @@ public class AccountManager extends Observable {
 				int losses = rs.getInt("losses");
 				int ties = rs.getInt("ties");
 				int incomplete = rs.getInt("incomplete");
+				int total = wins + losses + ties + incomplete;
 				userStatsIDs.put(gameID, statsID);
 				gameWins.put(gameID, wins);
 				gameLosses.put(gameID, losses);
 				gameTies.put(gameID, ties);
 				gameIncompletes.put(gameID, incomplete);
-				numGamesPlayed.put(gameID, wins + losses + ties + incomplete);
+				numGamesPlayed.put(gameID, total);
 			}
 
 			userStatsIDs.forEach((key, value) -> 
