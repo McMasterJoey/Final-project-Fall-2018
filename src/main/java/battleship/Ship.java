@@ -69,11 +69,6 @@ public class Ship implements Serializable{
 			}
 		}
 		set = true;
-		System.out.println("Ship: " + name);
-		System.out.println("Positions: ");
-		for(Point p : points) {
-			System.out.println(p.x + ", " + p.y);
-		}
 	}
 
 	public boolean wasHit(Point p) {

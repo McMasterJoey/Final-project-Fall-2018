@@ -43,27 +43,30 @@ import javafx.scene.paint.Color;
  */
 
 public class BattleshipControllerView extends GameControllerView {
-	private BattleshipModel gameModel;
-	private GameMenu menuBar;
 	private static final int HEIGHT = 525;
 	private static final int WIDTH = 525;
+	private BattleshipModel gameModel;
+	private GameMenu menuBar;
 	private boolean shipsSet = false;
-	private Canvas humanBoard;
-	private GraphicsContext hbgc;
-	private Canvas computerBoard;
-	private GraphicsContext cbgc;
+	private Canvas humanBoard, computerBoard;
+	private GraphicsContext hbgc, cbgc;
 	private Image carrierImage, battleshipImage, destroyerImage, submarineImage, patrolBoatImage, carrierVerticalImage,
 			battleshipVerticalImage, destroyerVerticalImage, submarineVerticalImage, patrolBoatVerticalImage;
 	private AnchorPane gamePane;
 
+	/**
+	 * Constructor for BattleshipControllerView. Initializes all of the fields
+	 * including creating a new BattleshipModel, sets up the view.
+	 */
 	public BattleshipControllerView() {
 		gameModel = new BattleshipModel();
 		gameModel.addObserver(this);
 		humanBoard = new Canvas(WIDTH, HEIGHT);
-		hbgc = humanBoard.getGraphicsContext2D();
 		computerBoard = new Canvas(WIDTH, HEIGHT);
+		hbgc = humanBoard.getGraphicsContext2D();
 		cbgc = computerBoard.getGraphicsContext2D();
 
+		// adjustments to how the game is displayed
 		gamePane = new AnchorPane();
 		gamePane.setMinWidth(WIDTH * 2 + 50);
 		this.setCenter(gamePane);
@@ -75,16 +78,20 @@ public class BattleshipControllerView extends GameControllerView {
 		gameName = "battleship";
 		menuBar = GameMenu.getMenuBar(this);
 		this.setTop(menuBar);
-		setupResources();
-		initializeGame();
+		
 		accountManager = AccountManager.getInstance();
 		statsManager = StatsManager.getInstance();
 
-		this.setWidth(WIDTH);
-		this.setHeight(HEIGHT);
+		setupResources();
+		initializeGame();
 	}
 
+	/**
+	 * Initializes the game by either creating a new model or clearing
+	 * the old one. Then renders the board and sets up the listeners.
+	 */
 	private void initializeGame() {
+		
 		if (gameModel == null) {
 			gameModel = new BattleshipModel();
 			/* gameModel.setAIStrategy(new <strategy/ai name>()); */
@@ -92,11 +99,14 @@ public class BattleshipControllerView extends GameControllerView {
 		} else {
 			gameModel.clearBoard();
 		}
+		
 		renderBoard();
 		setupListeners();
-
 	}
 
+	/**
+	 * Initializes all of the various image resources we need to play Battleship
+	 */
 	private void setupResources() {
 		carrierImage = new Image(BattleshipControllerView.class.getResource("/carrier.png").toString());
 		battleshipImage = new Image(BattleshipControllerView.class.getResource("/battleship.png").toString());
@@ -114,32 +124,45 @@ public class BattleshipControllerView extends GameControllerView {
 				BattleshipControllerView.class.getResource("/patrolBoatVertical.png").toString());
 	}
 
+	/**
+	 * Renders the board as it currently needs to be
+	 */
 	private void renderBoard() {
+		
+		//first, clear the board then add and draw the human side as it is always displayed
 		gamePane.getChildren().removeAll(gamePane.getChildren());
 		gamePane.getChildren().add(humanBoard);
 		drawBoard(hbgc, true);
+		
+		//if the ships haven't been set yet, create ShipViews for each gamepiece
+		//so the user can set their board with them
 		if (!shipsSet) {
 			int count = 0;
-			for (Ship ship : gameModel.getHumanShips()) {
-				Image boatImage = null;
-				boatImage = getImage(ship);
-				ShipView sv = new ShipView(boatImage, ship);
-				int length = ship.getSize();
-				sv.setFitWidth(WIDTH / 10 * length - 4);
+			
+			for (Ship ship : gameModel.getHumanShips()) {				
+				ShipView sv = new ShipView(getImage(ship), ship);
+				sv.setFitWidth(WIDTH / 10 * ship.getSize() - 4);
 				sv.setFitHeight(HEIGHT / 10 - 4);
 				makeDraggable(sv);
 				gamePane.getChildren().add(sv);
+				
+				//this is just code tweaking placement so the ships are centered justified
+				// on the left half of the screen
 				sv.setLayoutY(count * 2 * HEIGHT / 10 + 50);
 				sv.setLayoutX(WIDTH / 2 - sv.getShip().getSize() * WIDTH / 10 / 2);
 				count++;
 			}
 			addSetButton();
 		} else {
+			//otherwise, add the computer board and draw it
 			gamePane.getChildren().add(computerBoard);
 			drawBoard(cbgc, false);
 		}
 	}
 
+	/**
+	 * creates a button that allows user to set their ships and adds it to this view
+	 */
 	private void addSetButton() {
 		Button setShips = new Button("Ready to play!");
 		setShipsButtonStyle(setShips);
@@ -149,7 +172,13 @@ public class BattleshipControllerView extends GameControllerView {
 
 	}
 
+	/**
+	 * sets up the style for the setShips Button
+	 * @param setShips the Button for which we want to set the style
+	 */
 	private void setShipsButtonStyle(Button setShips) {
+		
+		//css styling for the setShips button
 		String buttonStyle = "-fx-padding: 8 15 15 15;" + " -fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;"
 				+ " -fx-background-radius: 8;"
 				+ " -fx-background-color: linear-gradient(from 0% 93% to 0% 100%, #a34313 0%, #903b12 100%),"
@@ -158,6 +187,7 @@ public class BattleshipControllerView extends GameControllerView {
 				+ " -fx-font-size: 1.1em;";
 		setShips.setStyle(buttonStyle);
 
+		//when we hover we want the button to expand a little bit
 		setShips.setOnMouseEntered((me) -> {
 			String bStyle = "-fx-padding: 8 15 15 15;" + " -fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;"
 					+ " -fx-background-radius: 8;"
@@ -169,19 +199,22 @@ public class BattleshipControllerView extends GameControllerView {
 			setShips.setStyle(bStyle);
 		});
 
+		//and when we exit we want it to look normal again
 		setShips.setOnMouseExited((me) -> {
-			String bStyle = "-fx-padding: 8 15 15 15;" + " -fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;"
-					+ " -fx-background-radius: 8;"
-					+ " -fx-background-color: linear-gradient(from 0% 93% to 0% 100%, #a34313 0%, #903b12 100%),"
-					+ " #9d4024, #d86e3a, radial-gradient(center 50% 50%, radius 100%, #d86e3a, #c54e2c);"
-					+ " -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );" + " -fx-font-weight: bold;"
-					+ " -fx-font-size: 1.1em;";
-			setShips.setStyle(bStyle);
+			setShips.setStyle(buttonStyle);
 		});
 	}
 
+	/**
+	 * Sets up the listener for clicks for the setShips Button
+	 * @param setShips the Button for which we want to set the setShips listener.
+	 */
 	private void setShipsButtonListener(Button setShips) {
+		
 		setShips.setOnMouseClicked((click) -> {
+			
+			//iterate through the ShipViews, if any aren't on the board give the user a message
+			//to place all their ships
 			for (Node node : gamePane.getChildren()) {
 				if (node instanceof ShipView) {
 					if (((ShipView) node).getLayoutX() < humanBoard.getLayoutX()
@@ -192,24 +225,35 @@ public class BattleshipControllerView extends GameControllerView {
 				}
 			}
 
+			//show an alert that verifies that the user wants to use this ship configuration. If not,
+			// break out of the listener.
 			boolean set = showVerifyPositionMessage();
 			if (!set) {
 				return;
 			}
 
+			//iterate through once more, setting all ships and removing their ShipView
 			ArrayList<ShipView> toRemove = new ArrayList<ShipView>();
 			for (Node node : gamePane.getChildren()) {
 				if (node instanceof ShipView) {
 					ShipView sv = (ShipView) node;
 					Ship ship = sv.getShip();
+					
+					//just math to figure out where on the board the ship currently is
 					int row = ((int) (sv.getLayoutY() - humanBoard.getLayoutY())) / ((int) HEIGHT / 10);
 					int col = ((int) (sv.getLayoutX() - humanBoard.getLayoutX())) / ((int) WIDTH / 10);
+					
+					//in determining the end location, we subtract 1 if we add any to compensate for the fact
+					//that the first location already has one unit of the ship's length in it.
 					int endRow = row + (ship.getDirection() == Direction.HORIZONTAL ? 0 : ship.getSize() - 1);
 					int endCol = col + (ship.getDirection() == Direction.HORIZONTAL ? ship.getSize() - 1 : 0);
 					ship.setPosition(new Point(col, row), new Point(endCol, endRow));
 					toRemove.add(sv);
 				}
 			}
+			//remove the now unnecessary ShipViews, add the computerBoard to view
+			//let the controller know that the ships have been set, remove the setShips button
+			//and redraw the game space.
 			gamePane.getChildren().removeAll(toRemove);
 			gamePane.getChildren().add(computerBoard);
 			shipsSet = true;
@@ -219,18 +263,27 @@ public class BattleshipControllerView extends GameControllerView {
 
 	}
 
+	/**
+	 * Returns true if any ships are overlapping currently, false otherwise
+	 * @return true if any ships are currently overlapping, false otherwise
+	 */
 	private boolean shipsOverlapping() {
 
+		//iterate through the ships
 		for (Node node : gamePane.getChildren()) {
 			if (node instanceof ShipView) {
 				ShipView sv = (ShipView) node;
 
+				//iterate through the ships again
 				for (Node node2 : gamePane.getChildren()) {
-
 					if (node2 instanceof ShipView) {
 						ShipView sv2 = (ShipView) node2;
 
+						//check every ship against every other ship that isn't itself
 						if (sv != sv2) {
+							
+							//determine ship width and height based on the size of the ship, the length
+							//in board units, and the size of a board unit
 							Point rect1 = new Point((int) sv.getLayoutX(), (int) sv.getLayoutY());
 							Point rect2 = new Point((int) sv2.getLayoutX(), (int) sv2.getLayoutY());
 							int rect1Width = WIDTH / 10
@@ -244,6 +297,9 @@ public class BattleshipControllerView extends GameControllerView {
 							int rect2Height = HEIGHT / 10 * (sv2.getShip().getDirection() == Direction.HORIZONTAL ? 1
 									: sv2.getShip().getSize());
 
+							//this is the actual collision check, it doesn't actually need to be
+							//checking on a pixel by pixel basis but it doesn't hurt anything and I already
+							//had code written to this effect elsewhere. HOORAY, RECYCLING!
 							if (rect1.x < rect2.x + rect2Width && rect1.x + rect1Width > rect2.x
 									&& rect1.y < rect2.y + rect2Height && rect1.y + rect1Height > rect2.y) {
 								return true;
@@ -256,6 +312,11 @@ public class BattleshipControllerView extends GameControllerView {
 		return false;
 	}
 
+	/**
+	 * Creates an alert to verify that the user wants to place their ships at
+	 * the current configuration
+	 * @return true if the user clicks OK, false otherwise
+	 */
 	private boolean showVerifyPositionMessage() {
 		Alert verifyAlert = new Alert(AlertType.CONFIRMATION);
 		verifyAlert.setTitle("Confirm ship placement");
@@ -267,16 +328,36 @@ public class BattleshipControllerView extends GameControllerView {
 		return false;
 	}
 
+	/**
+	 * Snaps the ShipView to the board's grid if it fits constraints
+	 * such as being on the board and not overlapping other ships, returns
+	 * it to its location before being dragged otherwise.
+	 * 
+	 * @param sv the ShipView object we want to snap to the grid
+	 * @param initialLocation the ShipView's location before being dragged
+	 */
 	private void adjustShipPosition(ShipView sv, Point initialLocation) {
-		if (sv.getLayoutX() < humanBoard.getLayoutX() - WIDTH / 10 / 4
-				|| sv.getLayoutY() < humanBoard.getLayoutY() - HEIGHT / 10 / 4
+		
+		//check that the ships top left corner has been placed on the board, reset to
+		//initial location if not
+		if (sv.getLayoutX() < humanBoard.getLayoutX() - WIDTH / 10 / 3
+				|| sv.getLayoutY() < humanBoard.getLayoutY() - HEIGHT / 10 / 3
 				|| sv.getLayoutX() > humanBoard.getLayoutX() + WIDTH
 				|| sv.getLayoutY() > humanBoard.getLayoutY() + HEIGHT) {
+			
 			sv.setLayoutX(initialLocation.x);
 			sv.setLayoutY(initialLocation.y);
+			
 		} else {
+			
+			//find where the ShipView is relative to the Canvas
 			int xPosOnBoard = (int) (sv.getLayoutX() - humanBoard.getLayoutX());
 			int yPosOnBoard = (int) (sv.getLayoutY() - humanBoard.getLayoutY());
+			
+			//exploit double and integer interaction to find the location the ShipView *should* be placed
+			// adding 1/3 of the total board size allows us to guess at intended location for sloppy placements
+			// then dividing by 52 gives us the actual unit on board. Multiplying again by 52.5, the proper unit
+			// size, will let us know the actual placement
 			double snapX = humanBoard.getLayoutX()
 					+ (((xPosOnBoard + (int)(52.5/3)) / 52) * 52.5);
 			double snapY = humanBoard.getLayoutY()
@@ -284,6 +365,7 @@ public class BattleshipControllerView extends GameControllerView {
 			sv.setLayoutX(snapX);
 			sv.setLayoutY(snapY);
 
+			//if the ships are overlapping or off the board after 
 			if (shipsOverlapping() || shipsOffBoard()) {
 				sv.setLayoutX(initialLocation.x);
 				sv.setLayoutY(initialLocation.y);
@@ -291,10 +373,19 @@ public class BattleshipControllerView extends GameControllerView {
 		}
 	}
 
+	/**
+	 * Checks to see if the ships are all on the board. Returns true if any is off board, false otherwise
+	 * @return true if any ships are off board currently, false otherwise
+	 */
 	private boolean shipsOffBoard() {
+		
+		//iterate through the shipviews
 		for (Node node : gamePane.getChildren()) {
 			if (node instanceof ShipView && ((ShipView) node).getLayoutX() + WIDTH / 10 / 3 > humanBoard.getLayoutX()) {
 				ShipView sv = (ShipView) node;
+				
+				//beginning location has already been checked and always will have been, so we
+				//just adjust to find the location of the *last* part of the ship.
 				int shipX = (int) (sv.getLayoutX() - humanBoard.getLayoutX()) / (WIDTH / 10)
 						+ (sv.getShip().getDirection() == Direction.HORIZONTAL ? sv.getShip().getSize()-1 : 0);
 				int shipY = (int) (sv.getLayoutY() - humanBoard.getLayoutY()) / (HEIGHT / 10)
@@ -307,6 +398,10 @@ public class BattleshipControllerView extends GameControllerView {
 		return false;
 	}
 
+	/**
+	 * Creates and shows an alert to let the user know that they haven't yet placed all
+	 * of their ships 
+	 */
 	private void showNotPlacedMessage() {
 		Alert verifyAlert = new Alert(AlertType.INFORMATION);
 		verifyAlert.setContentText(accountManager.getCurUsername() 
@@ -316,9 +411,16 @@ public class BattleshipControllerView extends GameControllerView {
 		verifyAlert.showAndWait();
 	}
 
+	/**
+	 * Finds the appropriate image resource for a given ship and returns it
+	 * @param ship
+	 * @return
+	 */
 	private Image getImage(Ship ship) {
 		Image boatImage = null;
 		Direction dir = ship.getDirection();
+		
+		//we return an image for the ship based on its name and its current direction
 		switch (ship.getName()) {
 		case "carrier":
 			boatImage = dir == Direction.HORIZONTAL ? carrierImage : carrierVerticalImage;
@@ -341,6 +443,11 @@ public class BattleshipControllerView extends GameControllerView {
 		return boatImage;
 	}
 
+	/**
+	 * draws to the passed in graphics context based on board situations
+	 * @param pbgc the graphics context we are drawing to
+	 * @param human true if we are using the human board, false otherwise
+	 */
 	private void drawBoard(GraphicsContext pbgc, boolean human) {
 		pbgc.setFill(Color.LIGHTSTEELBLUE);
 		pbgc.fillRect(0, 0, WIDTH, HEIGHT);
@@ -493,7 +600,7 @@ public class BattleshipControllerView extends GameControllerView {
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		// System.out.println(gameModel.toString());
+		System.out.println(gameModel.toString());
 		if (shipsSet) {
 			hbgc.clearRect(0, 0, WIDTH, HEIGHT);
 			cbgc.clearRect(0, 0, WIDTH, HEIGHT);

@@ -173,7 +173,11 @@ public class BattleshipModel extends Observable implements Serializable {
 		
 		for(int row=0; row<HEIGHT; row++) {
 			for(int col=0; col<WIDTH; col++) {
-				retVal += computerBoard[row][col] ? "X " : "O ";
+				if(isShip(row, col, false)) {
+					retVal += "S ";
+				} else { 
+					retVal += computerBoard[row][col] ? "X " : "O ";
+				}
 			}
 			retVal += "\n";
 		}
