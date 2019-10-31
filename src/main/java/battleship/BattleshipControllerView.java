@@ -449,6 +449,8 @@ public class BattleshipControllerView extends GameControllerView {
 	 * @param human true if we are using the human board, false otherwise
 	 */
 	private void drawBoard(GraphicsContext pbgc, boolean human) {
+		
+		//fill in the board and the grid
 		pbgc.setFill(Color.LIGHTSTEELBLUE);
 		pbgc.fillRect(0, 0, WIDTH, HEIGHT);
 		pbgc.setStroke(Color.BLACK);
@@ -464,6 +466,8 @@ public class BattleshipControllerView extends GameControllerView {
 					i * ((double) HEIGHT / (double) 10));
 		}
 
+		//if the ships have been set and we're on the human board, draw human ships to
+		//their positions
 		if (shipsSet && human) {
 			for (Ship ship : gameModel.getHumanShips()) {
 				Image shipImage = getImage(ship);
@@ -543,6 +547,9 @@ public class BattleshipControllerView extends GameControllerView {
 		return retVal;
 	}
 
+	/**
+	 * Pauses the game by disabling listeners
+	 */
 	@Override
 	public boolean pauseGame() {
 		try {
@@ -553,11 +560,17 @@ public class BattleshipControllerView extends GameControllerView {
 		}
 	}
 
+	/**
+	 * disables listeners
+	 */
 	private void disableListeners() {
 		computerBoard.setOnMouseClicked((click) -> {
 		});
 	}
 
+	/**
+	 * unpauses the game by reenabling the listeners
+	 */
 	@Override
 	public boolean unPauseGame() {
 		try {
@@ -568,7 +581,13 @@ public class BattleshipControllerView extends GameControllerView {
 		}
 	}
 
+	/**
+	 * Sets up the listener for user moves
+	 */
 	private void setupListeners() {
+		
+		//just finds where on the board the user clicked and attempts to make a
+		//move at that location
 		computerBoard.setOnMouseClicked((click) -> {
 			int clickX = (int) click.getX() / (WIDTH / 10);
 			int clickY = (int) click.getY() / (HEIGHT / 10);
@@ -579,6 +598,9 @@ public class BattleshipControllerView extends GameControllerView {
 		});
 	}
 
+	/**
+	 * creates a new game
+	 */
 	@Override
 	public boolean newGame() {
 		try {
@@ -591,6 +613,9 @@ public class BattleshipControllerView extends GameControllerView {
 		return true;
 	}
 
+	/**
+	 * updates the user statistics
+	 */
 	@Override
 	protected void updateStatistics() {
 		if (!(gameModel.won(true) || gameModel.won(false)) && gameModel.maxMovesRemaining() > 0) {
@@ -598,6 +623,9 @@ public class BattleshipControllerView extends GameControllerView {
 		}
 	}
 
+	/**
+	 * after a move has been made, updates the board view with the new info
+	 */
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		System.out.println(gameModel.toString());
@@ -610,11 +638,21 @@ public class BattleshipControllerView extends GameControllerView {
 		}
 	}
 
+	/**
+	 * draws moves that have been made to a given board
+	 * @param b
+	 */
 	private void updateBoard(boolean b) {
 		GraphicsContext board = b ? hbgc : cbgc;
+		
+		//iterate through the board
 		for (int row = 0; row < 10; row++) {
 			for (int col = 0; col < 10; col++) {
+				
+				//if the spot isn't available, a move has been made there
 				if (!gameModel.available(row, col, b)) {
+					
+					//if a ship is on that position, color is red. Color is white if not.
 					board.setFill(gameModel.isShip(row, col, b) ? Color.RED : Color.WHITE);
 					board.fillOval(col * WIDTH / 10 + WIDTH / 10 / 4, row * HEIGHT / 10 + HEIGHT / 10 / 4,
 							WIDTH / 10 / 2, HEIGHT / 10 / 2);
@@ -624,6 +662,9 @@ public class BattleshipControllerView extends GameControllerView {
 
 	}
 
+	/**
+	 * Returns the score for the game.
+	 */
 	@Override
 	public int getScore() {
 		// TODO Auto-generated method stub
@@ -676,15 +717,25 @@ public class BattleshipControllerView extends GameControllerView {
 		});
 	}
 
+	/**
+	 * Flips the ship from horizontal or vertical to the other direction and
+	 * updates its image accordingly
+	 * @param sv the ship view we want to flip
+	 */
 	private void flipShip(ShipView sv) {
+		
+		//flip the direction
 		sv.getShip().setDirection(
 				sv.getShip().getDirection() == Direction.HORIZONTAL ? Direction.VERTICAL : Direction.HORIZONTAL);
 
+		//get the new image
 		sv.setImage(getImage(sv.getShip()));
 
+		//set the width
 		sv.setFitWidth(sv.getShip().getDirection() == Direction.HORIZONTAL ? WIDTH / 10 * sv.getShip().getSize() - 4
 				: WIDTH / 10 - 4);
 
+		//set the height
 		sv.setFitHeight(sv.getShip().getDirection() == Direction.HORIZONTAL ? HEIGHT / 10 - 4
 				: HEIGHT / 10 * sv.getShip().getSize() - 4);
 	}

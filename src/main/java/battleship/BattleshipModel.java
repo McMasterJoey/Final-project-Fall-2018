@@ -68,7 +68,7 @@ public class BattleshipModel extends Observable implements Serializable {
 		return count;
 	}
 	
-	public void setShip(Ship ship, int rowStart, int colStart, int rowEnd, int colEnd, Boolean human) {
+	public void setShip(Ship ship, int rowStart, int colStart, int rowEnd, int colEnd) {
 		ship.setPosition(new Point(colStart, rowStart), new Point(colEnd, rowEnd));
 	}
 
