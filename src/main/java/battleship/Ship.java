@@ -1,9 +1,14 @@
 package battleship;
 
 import java.awt.Point;
+import java.io.Serializable;
 
-public class Ship {
+public class Ship implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int size;
 	private boolean set;
 	private boolean[] slots;

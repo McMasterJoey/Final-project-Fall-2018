@@ -507,7 +507,7 @@ public class BattleshipControllerView extends GameControllerView {
 	@Override
 	public int getScore() {
 		// TODO Auto-generated method stub
-		return 0;
+		return 1;
 	}
 
 	// lifted almost wholesale from a stackoverflow answer from user jewelsea
