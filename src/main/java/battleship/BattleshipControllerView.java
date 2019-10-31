@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.Optional;
 
 import battleship.Ship.Direction;
 import controller.AccountManager;
@@ -22,7 +23,10 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -188,7 +192,6 @@ public class BattleshipControllerView extends GameControllerView {
 				}
 			}
 
-			// TODO FIX THIS AFTER MESSAGE IMPLEMENT
 			boolean set = showVerifyPositionMessage();
 			if (!set) {
 				return;
@@ -254,8 +257,14 @@ public class BattleshipControllerView extends GameControllerView {
 	}
 
 	private boolean showVerifyPositionMessage() {
-		// TODO Auto-generated method stub
-		return true;
+		Alert verifyAlert = new Alert(AlertType.CONFIRMATION);
+		verifyAlert.setTitle("Confirm ship placement");
+		verifyAlert.setHeaderText("Are you sure you want to use this ship configuration?");
+		Optional<ButtonType> result = verifyAlert.showAndWait();
+		if(result.isPresent() && result.get() == ButtonType.OK) {
+			return true;
+		}
+		return false;
 	}
 
 	private void adjustShipPosition(ShipView sv, Point initialLocation) {
@@ -299,8 +308,12 @@ public class BattleshipControllerView extends GameControllerView {
 	}
 
 	private void showNotPlacedMessage() {
-		// TODO Auto-generated method stub
-
+		Alert verifyAlert = new Alert(AlertType.INFORMATION);
+		verifyAlert.setContentText(accountManager.getCurUsername() 
+				+ ", you need to place all of your ships before you try to set them.");
+		verifyAlert.setTitle("Hol' up,");
+		verifyAlert.setHeaderText("Wait a minute...");
+		verifyAlert.showAndWait();
 	}
 
 	private Image getImage(Ship ship) {
