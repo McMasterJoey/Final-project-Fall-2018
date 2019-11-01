@@ -10,10 +10,21 @@ import javafx.scene.image.ImageView;
  * @author Joey McMaster
  */
 public class Theme {
+	// Constants, Define what each section of the internal array mean. Can be used from anywhere.
+	public static final int BUTTON_BACKGROUNDS = 0;
+	public static final int LEFT_PANEL_UPPER_TEXT_COLOR = 1;
+	public static final int UPPER_BARS_BACKGROUND = 2;
+	public static final int MIDDLE_AREA_BACKGROUND = 3;
+	public static final int LEFT_PANEL_BACKGROUND = 4;
+	public static final int NEW_ACCOUNT_BACK_LOGOUT_BUTTON_TEXT = 5;
+	public static final int LEFT_PANEL_LOWER_TEXT_COLOR = 6;
+	public static final int LOGIN_BUTTON_TEXT_COLOR = 7;
+	public static final int DEFAULT_SETTINGS_TEXT_COLOR = 8;
+	
 	private String name;
 	private Themepair[] themedata;
 	private ArrayList<Image> themeimg;
-	private Image icon;
+	private Image icon; 
 	/**
 	 * The main constructor.
 	 * @param name The name of the theme.
