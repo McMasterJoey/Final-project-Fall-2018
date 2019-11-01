@@ -59,8 +59,8 @@ public class BattleshipControllerView extends GameControllerView {
 	 * including creating a new BattleshipModel, sets up the view.
 	 */
 	public BattleshipControllerView() {
-		gameModel = new BattleshipModel();
-		gameModel.addObserver(this);
+//		gameModel = new BattleshipModel();
+//		gameModel.addObserver(this);
 		humanBoard = new Canvas(WIDTH, HEIGHT);
 		computerBoard = new Canvas(WIDTH, HEIGHT);
 		hbgc = humanBoard.getGraphicsContext2D();
@@ -94,7 +94,7 @@ public class BattleshipControllerView extends GameControllerView {
 		
 		if (gameModel == null) {
 			gameModel = new BattleshipModel();
-			/* gameModel.setAIStrategy(new <strategy/ai name>()); */
+			gameModel.setAIStrategy(new BattleshipIntermediateAI()); 
 			gameModel.addObserver(this);
 		} else {
 			gameModel.clearBoard();
@@ -605,6 +605,7 @@ public class BattleshipControllerView extends GameControllerView {
 	public boolean newGame() {
 		try {
 			gameModel.clearBoard();
+			gameModel.getBattleshipAI().setBoard(gameModel.getComputerShips());
 			shipsSet = false;
 			renderBoard();
 		} catch (Exception ex) {

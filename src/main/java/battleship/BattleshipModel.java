@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.Random;
 
 public class BattleshipModel extends Observable implements Serializable {
 
@@ -20,11 +21,25 @@ public class BattleshipModel extends Observable implements Serializable {
 		initializeBoard();
 		initializeShips();
 		computer = new BattleshipAI();
-		/*TODO computer.setStrategy(new <AIClassName>());*/
+		computer.setStrategy(new BattleshipIntermediateAI());
+		computer.setBoard(computerShips);
+		potentialHits = new ArrayList<Ship>();
+//		setComputerBoard(computerShips);
+		toString();
 		setChanged();
 		notifyObservers();
 	}
-
+	public void setComputerBoard(ArrayList<Ship> computerShips) {
+		System.out.println("-----Computers' ships!-----");
+		Random rand = new Random();
+		for (Ship ship : computerShips) {
+			int size = ship.getSize();
+			int x = rand.nextInt(11 - size);
+			int y = rand.nextInt(10);
+			ship.setPosition(new Point (x, y), new Point(x+size, y));
+		}
+		System.out.println("-----Computers' ships!-----");
+	}
 	public void setComputer(BattleshipAI computer) {
 		this.computer = computer;
 	}
@@ -98,10 +113,11 @@ public class BattleshipModel extends Observable implements Serializable {
 				if(s.wasHit(move)) {
 					setChanged();
 					notifyObservers();
-					return;
+//					return;
 				}
 			}
-			// TODO computerMove();
+			Point nextMove = computer.nextMove(this);
+			computerMove(nextMove.y, nextMove.x);
 		}
 		setChanged();
 		notifyObservers();
@@ -125,6 +141,7 @@ public class BattleshipModel extends Observable implements Serializable {
 			humanBoard[row][col] = true;
 			for(Ship s : humanShips) {
 				if(s.wasHit(move)) {
+					potentialHits.add(s);
 					setChanged();
 					notifyObservers();
 					return;
@@ -170,7 +187,13 @@ public class BattleshipModel extends Observable implements Serializable {
 			retVal += "\n";
 		}
 		retVal += "Computer's board\n";
-		
+//		
+//		for(int row=0; row<HEIGHT; row++) {
+//			for(int col=0; col<WIDTH; col++) {
+//				retVal += computerBoard[row][col] ? "X " : "O ";
+//			}
+//			retVal += "\n";
+//		}
 		for(int row=0; row<HEIGHT; row++) {
 			for(int col=0; col<WIDTH; col++) {
 				if(isShip(row, col, false)) {
@@ -202,5 +225,12 @@ public class BattleshipModel extends Observable implements Serializable {
 
 	public ArrayList<Ship> getComputerShips() {
 		return computerShips;
+	}
+	
+	/***************************** Methods for strategies Below *********************************/
+	
+	private ArrayList<Ship> potentialHits;
+	public ArrayList<Ship> getPotentialHits() {
+		return potentialHits;
 	}
 }

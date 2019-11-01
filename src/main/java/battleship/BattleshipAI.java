@@ -2,6 +2,7 @@ package battleship;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 
 public class BattleshipAI implements Serializable{
@@ -13,7 +14,7 @@ public class BattleshipAI implements Serializable{
      * Constructor for the BattleshipAI
      */
     public BattleshipAI() {
-    	/*TODO AIStrategy = new <AIClassName>();*/
+    	AIStrategy = new BattleshipEasyAI();
     }
 
     /**
@@ -32,5 +33,14 @@ public class BattleshipAI implements Serializable{
     public Point nextMove(BattleshipModel battleshipModel) {
         
         return AIStrategy.desiredMove(battleshipModel);
+    }
+    
+    /**
+     * Ask the strategy to set up its ships on computer's board.
+     * 
+     * @param computerShips the current state of the battleship game
+     */
+    public void setBoard(ArrayList<Ship> computerShips) {
+    	AIStrategy.setComputerBoard(computerShips);
     }
 }
