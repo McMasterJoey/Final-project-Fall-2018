@@ -1,6 +1,7 @@
 package Gamejam;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
@@ -24,12 +25,14 @@ public class ThemeCreator extends HBox
 	private GamejamMainScreenTheme screen;
 	private ChoiceBox<String> elementselector;
 	private ArrayList<RegionPair> regions;
+	private HashMap<String,Integer> regiondescriptionmap;
 	public ThemeCreator(GamejamMainScreenTheme screen) 
 	{
 		this.screen = screen;
 		this.currentworkingcolor = Color.BLACK;
 		this.leftcol = new VBox();
 		this.colorpicker = new ColorPicker();
+		this.regiondescriptionmap = new HashMap<String,Integer>();
 		this.colorpicker.setOnMouseReleased((click) -> 
 		{
 			this.currentworkingcolor = this.colorpicker.getValue();
@@ -50,25 +53,16 @@ public class ThemeCreator extends HBox
 		for(int x = 0; x < this.screen.getRegionCount(); x++) 
 		{
 			this.elementselector.getItems().add(this.regions.get(x).getDescription());
+			this.regiondescriptionmap.put(this.regions.get(x).getDescription(), this.regions.get(x).getIndex());
 		}
+		
 		this.elementselector.setOnMouseReleased((click) -> 
 		{
-			this.currentworkingid = getIndexFromDescription(elementselector.getValue());
+			this.currentworkingid = this.regiondescriptionmap.get(elementselector.getValue());
 			System.out.println("wid: " + this.currentworkingid);
 		});
 		this.elementselector.setValue("Theme Creator left vbox background");
 		this.leftcol.getChildren().addAll(this.colorpicker,this.elementselector);
 		this.getChildren().addAll(this.leftcol);
-	}
-	private int getIndexFromDescription(String description)
-	{
-		for(int x = 0; x < this.regions.size(); x++)
-		{
-			if (this.regions.get(x).getDescription().equals(description))
-			{
-				return x;
-			}
-		}
-		throw new SanityCheckFailedException("When fetching the index from description, didn't find a matching description!");
 	}
 }

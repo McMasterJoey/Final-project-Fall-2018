@@ -10,7 +10,7 @@ import javafx.scene.paint.Paint;
  * @author Joey McMaster
  *
  */
-public class Themepair {
+public class ThemePair {
 	private Background background;
 	private Border border;
 	private Paint color;
@@ -18,23 +18,23 @@ public class Themepair {
 	/**
 	 * Constructor for collections that represent a Region item coloration.
 	 */
-	public Themepair(Background bg, Border bd) {
+	public ThemePair(Background bg, Border bd) {
 		this.background = bg;
 		this.border = bd;
 	}
 	
-	public Themepair(Background bg, Border bd, String css) {
+	public ThemePair(Background bg, Border bd, String css) {
 		this.background = bg;
 		this.border = bd;
 		this.cssstr = css;
 	}
-	public Themepair(Background bg, Border bd, String css, Paint p) {
+	public ThemePair(Background bg, Border bd, String css, Paint p) {
 		this.background = bg;
 		this.border = bd;
 		this.cssstr = css;
 		this.color = p;
 	}
-	public Themepair(Background bg, Border bd, Paint p) {
+	public ThemePair(Background bg, Border bd, Paint p) {
 		this.color = p;
 		this.background = bg;
 		this.border = bd;

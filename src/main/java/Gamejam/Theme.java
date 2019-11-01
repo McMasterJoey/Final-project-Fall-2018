@@ -13,7 +13,7 @@ public class Theme
 {
 	
 	private String name;
-	private Themepair[] themedata;
+	private ThemePair[] themedata;
 	private ArrayList<Image> themeimg;
 	private Image icon;
 	/**
@@ -24,7 +24,7 @@ public class Theme
 	public Theme(String name, int arraysize) 
 	{
 		this.name = name;
-		this.themedata = new Themepair[arraysize];
+		this.themedata = new ThemePair[arraysize];
 		this.themeimg = new ArrayList<Image>();
 	}
 	public void setIcon(Image icon)
@@ -61,7 +61,7 @@ public class Theme
 	 * @param index The index of the element of theme data. Should correspond to the GamejamMainScreen indexing system. 
 	 * @param data A Themepair object that represents the styling for that section.
 	 */
-	public void setThemeData(int index, Themepair data) 
+	public void setThemeData(int index, ThemePair data) 
 	{
 		this.themedata[index] = data;
 	}
@@ -69,7 +69,7 @@ public class Theme
 	 * Fetches the internal data contained within the theme.
 	 * @return The internal data.
 	 */
-	public Themepair[] getTheme() 
+	public ThemePair[] getTheme() 
 	{
 		return this.themedata;
 	}

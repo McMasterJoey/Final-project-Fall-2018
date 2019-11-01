@@ -2,7 +2,6 @@ package Gamejam;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -73,6 +72,8 @@ public class GamejamMainScreenTheme
 	{
 		if (!this.doneAddingRegions)
 		{
+			this.themes.clear(); // Clear out elements placed there temporarly.
+			
 			this.doneAddingRegions = true;
 			// Sorting this will adjust the locations of elements
 			// so they are arranged by priority
@@ -151,7 +152,7 @@ public class GamejamMainScreenTheme
 		{
 			throw new SanityCheckFailedException("Can't update theme while we're still adding regions to the object.");
 		}
-		Themepair[] themedata = getTheme(themeid).getTheme();
+		ThemePair[] themedata = getTheme(themeid).getTheme();
 		int themeimageid = 0;
 		for(int x = 0; x < themedata.length; x++)
 		{
@@ -180,7 +181,7 @@ public class GamejamMainScreenTheme
 	 * @param index
 	 * @param data
 	 */
-	public void setCustomThemeData(int index, Themepair data) 
+	public void setCustomThemeData(int index, ThemePair data) 
 	{
 		if (!this.doneAddingRegions)
 		{
@@ -209,23 +210,6 @@ public class GamejamMainScreenTheme
 		generateDefaultTheme();
 		/*
 		// Default Theme:
-		Theme t1 = new Theme("Default Theme","/themeDefaultThemeMenuIcon.png", getRegionCount());
-		t1.setThemeData(0, new Themepair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.DARKGRAY, false), quickBorderSetup(Color.DARKBLUE)));
-		t1.setThemeData(1, new Themepair(Color.BLACK));
-		t1.setThemeData(2, new Themepair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.BEIGE, true),
-				quickBorderSetup(RegionColors.getColor(RegionColors.DEFAULT_BACKGROUND))));
-		t1.setThemeData(3, new Themepair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false),
-				quickBorderSetup(RegionColors.getColor(RegionColors.DEFAULT_BACKGROUND))));
-		t1.setThemeData(4, new Themepair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false),
-				quickBorderSetup(Color.BLACK)));
-		t1.setThemeData(5, new Themepair(Color.BLACK));
-		t1.setThemeData(6, new Themepair(Color.BLACK));
-		t1.setThemeData(7, new Themepair(Color.RED));
-		t1.setThemeData(8, new Themepair(Color.BLACK));
-		t1.addNewImage("/usersettingsbuttonbackground.png");
-		t1.addNewImage("/usersettingsbuttonbackground.png");
-		themes.add(t1);
-		
 		Theme t2 = new Theme("Night Theme","/themeNightThemeMenuIcon.png", getRegionCount());
 		t2.setThemeData(0, new Themepair(solidBackgroundSetup(Color.BLACK), quickBorderSetup(Color.ORANGE)));
 		t2.setThemeData(1, new Themepair(Color.WHITE));
@@ -296,30 +280,30 @@ public class GamejamMainScreenTheme
 		t1.addNewImage("/usersettingsbuttonbackground.png");
 		for(int x = 0; x < this.regions.size(); x++) 
 		{
-			Themepair p;
+			ThemePair p;
 			if (this.regions.get(x).getProperties().isButton())
 			{
-				p = new Themepair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.DARKGRAY, false), quickBorderSetup(Color.DARKBLUE), Color.BLACK);
+				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.DARKGRAY, false), quickBorderSetup(Color.DARKBLUE), Color.BLACK);
 				t1.setThemeData(x, p);
 			} 
 			else if (this.regions.get(x).getProperties().isBoundingArea())
 			{
-				p = new Themepair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), quickBorderSetup(RegionColors.getColor(RegionColors.DEFAULT_BACKGROUND)));
+				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), quickBorderSetup(RegionColors.getColor(RegionColors.DEFAULT_BACKGROUND)));
 				t1.setThemeData(x, p);
 			}
 			else if (this.regions.get(x).getProperties().canColorText())
 			{
-				p = new Themepair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), quickBorderSetup(Color.DARKBLUE), Color.RED);
+				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), quickBorderSetup(Color.DARKBLUE), Color.RED);
 				t1.setThemeData(x, p);
 			}
 			else
 			{
-				p = new Themepair(linGrdSimpleBackgroundSetUp(Color.DARKGRAY,Color.GRAY, true), quickBorderSetup(RegionColors.getColor(RegionColors.DEFAULT_BACKGROUND)));
+				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.DARKGRAY,Color.GRAY, true), quickBorderSetup(RegionColors.getColor(RegionColors.DEFAULT_BACKGROUND)));
 				t1.setThemeData(x, p);
 			}
 		
 		}
-		themes.set(0,t1);
+		themes.add(t1);
 	}
 	
 	public static Background linGrdSimpleBackgroundSetUp(Color start, Color end, boolean sidetoside) 
@@ -379,12 +363,18 @@ public class GamejamMainScreenTheme
 	 * @param r An object that is a region or a child of region.
 	 * @param index The index of the value to be fetched to theme.
 	 */
-	private void _updateRegionUtil(Region r, Themepair p) 
+	private void _updateRegionUtil(Region r, ThemePair p) 
 	{
 		r.setBackground(p.getBackground());
 		r.setBorder(p.getBorder());
 		r.setStyle(p.getCSS());
 	}
+	/**
+	 * Acts as a temporary object to be used when initing the object.
+	 * Assists in the placement of RegionPair objects within the extablished region array.
+	 * @author Joey McMaster
+	 *
+	 */
 	private class PriorityPair implements Comparable<PriorityPair>
 	{
 		private Double pri;
@@ -394,15 +384,25 @@ public class GamejamMainScreenTheme
 			this.pri = pri;
 			this.r = r;
 		}
+		/**
+		 * Gets the region pair associated with this object.
+		 * @return The region pair that stored within the object.
+		 */
 		public RegionPair getRegionPair()
 		{
 			return this.r;
 		}
+		/**
+		 * Getter for priority
+		 * @return Fetches the priority of this object.
+		 */
 		public Double getPriority() 
 		{
 			return this.pri;
 		}
-		
+		/**
+		 * Implements compareTo to allow for Collections to sort this item.
+		 */
 		public int compareTo(PriorityPair arg0)
 		{
 			return this.getPriority().compareTo(arg0.getPriority());
