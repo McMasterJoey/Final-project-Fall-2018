@@ -1,6 +1,7 @@
 package battleship;
 
 import java.awt.Point;
+import java.util.ArrayList;
 
 public interface BattleshipStrategy {
 	/**
@@ -13,4 +14,11 @@ public interface BattleshipStrategy {
 	   * square in the x row and y column of a battleship game.
 	   */
 	  public Point desiredMove(BattleshipModel theGame);
+
+	  /**
+	   * Set up ships on computer's board for human players to hit
+	   * @param battleshipModel
+	   */
+
+	public void setComputerBoard(ArrayList<Ship> computerShips);
 }

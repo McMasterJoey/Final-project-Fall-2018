@@ -63,6 +63,7 @@ public class Ship implements Serializable{
 			for (int i = start.y; i < start.y + size; i++) {
 				points[i - start.y] = new Point(start.x, i);
 			}
+//			setDirection(Direction.VERTICAL);
 		} else {
 			for (int i = start.x; i < start.x + size; i++) {
 				points[i - start.x] = new Point(i, start.y);
