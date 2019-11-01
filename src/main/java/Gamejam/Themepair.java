@@ -3,6 +3,7 @@ package Gamejam;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Border;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 /**
  * 
@@ -10,37 +11,33 @@ import javafx.scene.paint.Color;
  *
  */
 public class Themepair {
-	private byte type; // 0 = A Region, 1 = Text based
 	private Background background;
 	private Border border;
-	private Color color;
+	private Paint color;
 	private String cssstr = "";
 	/**
 	 * Constructor for collections that represent a Region item coloration.
 	 */
 	public Themepair(Background bg, Border bd) {
-		this.type = 0;
 		this.background = bg;
 		this.border = bd;
 	}
+	
 	public Themepair(Background bg, Border bd, String css) {
-		this.type = 1;
 		this.background = bg;
 		this.border = bd;
 		this.cssstr = css;
 	}
-	/**
-	 * Constructor for collections that represent simple Color object based coloration.
-	 * @param color
-	 */
-	public Themepair(Color color) {
-		this.type = 2;
-		this.color = color;
-	}
-	public Themepair(Color color, String css) {
-		this.type = 3;
-		this.color = color;
+	public Themepair(Background bg, Border bd, String css, Paint p) {
+		this.background = bg;
+		this.border = bd;
 		this.cssstr = css;
+		this.color = p;
+	}
+	public Themepair(Background bg, Border bd, Paint p) {
+		this.color = p;
+		this.background = bg;
+		this.border = bd;
 	}
 	/**
 	 * 
@@ -60,7 +57,7 @@ public class Themepair {
 	 * 
 	 * @return
 	 */
-	public Color getColor() {
+	public Paint getColor() {
 		return this.color;
 	}
 	/**

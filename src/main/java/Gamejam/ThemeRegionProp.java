@@ -26,6 +26,9 @@ public class ThemeRegionProp
 	private boolean isPutInMiddle = false;
 	private boolean isPutInLeftPane = false;
 	private boolean isContainsText = false;
+	private boolean isContainsColorableText = false;
+	private boolean isContainsThemeableMainUIImages = false;
+	private boolean doNotTreatAsRegion = false;
 	
 	public static final byte BUTTON = 0;
 	public static final byte VBOX = 1;
@@ -38,6 +41,7 @@ public class ThemeRegionProp
 	public static final byte SCROLLPANE = 8;
 	public static final byte TEXTINPUT = 9;
 	public static final byte COMBOBOX = 10;
+	public static final byte BUTTON_WT = 11;
 	
 	/**
 	 * Primary Constructor for the ThemeRegionProp class
@@ -49,7 +53,12 @@ public class ThemeRegionProp
 		if (primaryproperty == 0)
 		{
 			this.isButton = true;
+		}
+		else if (primaryproperty == 11)
+		{
+			this.isButton = true;
 			this.isContainsText = true;
+			this.isContainsColorableText = true;
 		}
 		else if (primaryproperty == 1)
 		{
@@ -65,6 +74,8 @@ public class ThemeRegionProp
 		{
 			this.isLabel = true;
 			this.isContainsText = true;
+			this.isContainsColorableText = true;
+			this.doNotTreatAsRegion = true;
 		}
 		else if (primaryproperty == 4)
 		{
@@ -97,11 +108,12 @@ public class ThemeRegionProp
 		{
 			this.isTextInputField = true;
 			this.isContainsText = true;
+			this.doNotTreatAsRegion = true;
 		}
 		else if (primaryproperty == 10)
 		{
 			this.isComboBox = true;
-			this.isContainsText = true;
+			//this.isContainsText = true;
 		}
 	}
 	/**
@@ -241,5 +253,42 @@ public class ThemeRegionProp
 	public void setIsComboBox(boolean value) 
 	{
 		this.isContainsText = value;
+	}
+	/**
+	 * Sets the property of is has Colorable text.
+	 * @param value The boolean to set this to.
+	 */
+	public void setIsContainsColorableText(boolean value) 
+	{
+		this.isContainsColorableText = value;
+	}
+	public void setIsContainsThemeableMainGUIImages(boolean value)
+	{
+		this.isContainsThemeableMainUIImages = value;
+	}
+	///////////////////////// ANSWER QUESTIONS METHODS ////////////////
+	public boolean canColorText() 
+	{
+		return this.isContainsColorableText;
+	}
+	public boolean isButton()
+	{
+		return this.isButton;
+	}
+	public boolean isPane()
+	{
+		return this.isGeneralPane;
+	}
+	public boolean isBoundingArea()
+	{
+		return this.isBoundingArea;
+	}
+	public boolean isContainsThemeableMainGUIImages()
+	{
+		return this.isContainsThemeableMainUIImages;
+	}
+	public boolean doNotTreatAsRegion()
+	{
+		return this.doNotTreatAsRegion;
 	}
 }
