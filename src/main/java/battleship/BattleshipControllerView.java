@@ -28,8 +28,10 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 
 /**
@@ -48,11 +50,14 @@ public class BattleshipControllerView extends GameControllerView {
 	private BattleshipModel gameModel;
 	private GameMenu menuBar;
 	private boolean shipsSet = false;
+	private boolean gameOver = false;
 	private Canvas humanBoard, computerBoard;
 	private GraphicsContext hbgc, cbgc;
 	private Image carrierImage, battleshipImage, destroyerImage, submarineImage, patrolBoatImage, carrierVerticalImage,
 			battleshipVerticalImage, destroyerVerticalImage, submarineVerticalImage, patrolBoatVerticalImage;
+	private AudioClip winSound, loseSound;
 	private AnchorPane gamePane;
+	
 
 	/**
 	 * Constructor for BattleshipControllerView. Initializes all of the fields
@@ -98,6 +103,8 @@ public class BattleshipControllerView extends GameControllerView {
 			gameModel.addObserver(this);
 		} else {
 			gameModel.clearBoard();
+			gameOver = false;
+			setupListeners();
 		}
 		
 		renderBoard();
@@ -122,6 +129,8 @@ public class BattleshipControllerView extends GameControllerView {
 				BattleshipControllerView.class.getResource("/submarineVertical.png").toString());
 		patrolBoatVerticalImage = new Image(
 				BattleshipControllerView.class.getResource("/patrolBoatVertical.png").toString());
+		winSound = new AudioClip(BattleshipControllerView.class.getResource("/winSound.mp3").toString());
+		loseSound = new AudioClip(BattleshipControllerView.class.getResource("/loseSound.mp3").toString());
 	}
 
 	/**
@@ -468,8 +477,8 @@ public class BattleshipControllerView extends GameControllerView {
 
 		//if the ships have been set and we're on the human board, draw human ships to
 		//their positions
-		if (shipsSet && human) {
-			for (Ship ship : gameModel.getHumanShips()) {
+		if ((shipsSet && human) || (shipsSet && gameOver)) {
+			for (Ship ship : human ? gameModel.getHumanShips() : gameModel.getComputerShips()) {
 				Image shipImage = getImage(ship);
 				pbgc.drawImage(shipImage,
 						(double) ship.getPoints()[0].getX() * (double) WIDTH / (double) 10 + (double) 2,
@@ -492,6 +501,12 @@ public class BattleshipControllerView extends GameControllerView {
 		if (accountManager.isGuest()) {
 			return false;
 		}
+		
+		// Don't save if the game was completed
+		if(!gameModel.isStillRunning()) {
+			gameModel.clearBoard();
+		}
+		
 		FileOutputStream fos;
 		ObjectOutputStream oos;
 		try {
@@ -507,6 +522,7 @@ public class BattleshipControllerView extends GameControllerView {
 			oos.writeObject(gameModel);
 			oos.close();
 		} catch (IOException e) {
+			e.printStackTrace();
 			return false;
 		}
 		return true;
@@ -533,11 +549,12 @@ public class BattleshipControllerView extends GameControllerView {
 				ois.close();
 				update(gameModel, this);
 				file.delete();
-				shipsSet = true;
+				shipsSet = gameModel.getHumanShips().get(0).isSet();
 			} else {
 				retVal = newGame();
 			}
 		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
 			return false;
 		}
 		renderBoard();
@@ -591,7 +608,7 @@ public class BattleshipControllerView extends GameControllerView {
 		computerBoard.setOnMouseClicked((click) -> {
 			int clickX = (int) click.getX() / (WIDTH / 10);
 			int clickY = (int) click.getY() / (HEIGHT / 10);
-			if (clickX > 10 || clickX < 0 || clickY > 10 || clickY < 0) {
+			if (clickX >= 10 || clickX < 0 || clickY >= 10 || clickY < 0) {
 				return;
 			}
 			gameModel.humanMove(clickY, clickX);
@@ -607,6 +624,8 @@ public class BattleshipControllerView extends GameControllerView {
 			gameModel.clearBoard();
 			gameModel.getBattleshipAI().setBoard(gameModel.getComputerShips());
 			shipsSet = false;
+			gameOver = false;
+			setupListeners();
 			renderBoard();
 		} catch (Exception ex) {
 			return false;
@@ -629,7 +648,16 @@ public class BattleshipControllerView extends GameControllerView {
 	 */
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		System.out.println(gameModel.toString());
+		if(!gameModel.isStillRunning()) {
+			gameOver = true;
+			disableListeners();
+			
+			if(gameModel.won(true)) {
+				winSound.play();
+			} else {
+				loseSound.play();
+			}
+		}
 		if (shipsSet) {
 			hbgc.clearRect(0, 0, WIDTH, HEIGHT);
 			cbgc.clearRect(0, 0, WIDTH, HEIGHT);
@@ -739,5 +767,18 @@ public class BattleshipControllerView extends GameControllerView {
 		//set the height
 		sv.setFitHeight(sv.getShip().getDirection() == Direction.HORIZONTAL ? HEIGHT / 10 - 4
 				: HEIGHT / 10 * sv.getShip().getSize() - 4);
+	}
+	
+	private class ShipView extends ImageView {
+		private Ship ship;
+		
+		public ShipView(Image img, Ship ship) {
+			super(img);
+			this.ship = ship;
+		}
+		
+		public Ship getShip() {
+			return ship;
+		}
 	}
 }

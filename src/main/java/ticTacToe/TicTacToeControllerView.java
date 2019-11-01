@@ -332,7 +332,6 @@ public class TicTacToeControllerView extends GameControllerView {
 	public boolean loadSaveGame() {
 		FileInputStream fis;
 		ObjectInputStream ois;
-		boolean retVal = true;
 		try {
 			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
@@ -346,7 +345,7 @@ public class TicTacToeControllerView extends GameControllerView {
 				update(gameModel, this);
 				file.delete();
 			} else {
-				retVal = newGame();
+				newGame();
 			}
 		} catch(IOException | ClassNotFoundException e) {
 			e.printStackTrace();

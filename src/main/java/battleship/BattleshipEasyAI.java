@@ -1,10 +1,16 @@
 package battleship;
 
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class BattleshipEasyAI implements BattleshipStrategy{
+public class BattleshipEasyAI implements BattleshipStrategy, Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public Point desiredMove(BattleshipModel theGame) {
@@ -51,7 +57,6 @@ public class BattleshipEasyAI implements BattleshipStrategy{
 	 */
 	@Override
 	public void setComputerBoard(ArrayList<Ship> computerShips) {
-		System.out.println("-----Computers' ships Below!-----");
 		boolean[][] computerBoard = initBoard();
 		Random rand = new Random();
 		for (Ship ship : computerShips) {
@@ -60,7 +65,6 @@ public class BattleshipEasyAI implements BattleshipStrategy{
 			if (direction == 0) {  //horizontal
 				int x = rand.nextInt(11 - size);
 				int y = rand.nextInt(10);
-				System.out.println("x, y: \n" +x +y);
 				while (overlapping(x, y, size,computerBoard, true)) { // true for horizontal
 					 x = rand.nextInt(11 - size);
 					 y = rand.nextInt(10);
@@ -79,7 +83,6 @@ public class BattleshipEasyAI implements BattleshipStrategy{
 			}
 			
 		}
-		System.out.println("-----Computers' ships Above!-----");
 	}
 
 	/**
@@ -123,7 +126,6 @@ public class BattleshipEasyAI implements BattleshipStrategy{
 				if (computerBoard[x][y])
 					return true;
 				x++;
-				System.out.print(x);
 			}
 		}else {
 			int yEnd = y +size;

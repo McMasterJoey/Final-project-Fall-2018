@@ -6,6 +6,13 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Random;
 
+/**
+ * Class representing the Model part of the M-V-C for Battleship
+ * holds data about the ships, hits, and the boards.
+ * @author Wes Rodgers, Linjieliu
+ *
+ */
+
 public class BattleshipModel extends Observable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -17,6 +24,9 @@ public class BattleshipModel extends Observable implements Serializable {
 	private static final int HEIGHT = 10;
 	private BattleshipAI computer;
 
+	/**
+	 * Constructor
+	 */
 	public BattleshipModel() {
 		initializeBoard();
 		initializeShips();
@@ -24,13 +34,16 @@ public class BattleshipModel extends Observable implements Serializable {
 		computer.setStrategy(new BattleshipIntermediateAI());
 		computer.setBoard(computerShips);
 		potentialHits = new ArrayList<Ship>();
-//		setComputerBoard(computerShips);
 		toString();
 		setChanged();
 		notifyObservers();
 	}
+	
+	/**
+	 * sets up the computer board
+	 * @param computerShips an array list of Ship objects
+	 */
 	public void setComputerBoard(ArrayList<Ship> computerShips) {
-		System.out.println("-----Computers' ships!-----");
 		Random rand = new Random();
 		for (Ship ship : computerShips) {
 			int size = ship.getSize();
@@ -38,12 +51,19 @@ public class BattleshipModel extends Observable implements Serializable {
 			int y = rand.nextInt(10);
 			ship.setPosition(new Point (x, y), new Point(x+size, y));
 		}
-		System.out.println("-----Computers' ships!-----");
 	}
+	
+	/**
+	 * Sets the current AI
+	 * @param computer a battleship ai
+	 */
 	public void setComputer(BattleshipAI computer) {
 		this.computer = computer;
 	}
 
+	/**
+	 * creates the board and sets all to false
+	 */
 	private void initializeBoard() {
 		humanBoard = new boolean[HEIGHT][WIDTH];
 		computerBoard = new boolean[HEIGHT][WIDTH];
@@ -55,6 +75,9 @@ public class BattleshipModel extends Observable implements Serializable {
 		}
 	}
 	
+	/**
+	 * Creates the ship objects.
+	 */
 	private void initializeShips() {
 		humanShips = new ArrayList<Ship>();
 		computerShips = new ArrayList<Ship>();
@@ -72,29 +95,27 @@ public class BattleshipModel extends Observable implements Serializable {
 		computerShips.add(new Ship(2, "patrolBoat"));
 		
 	}
-	
-	public int movesRemaining() {
-		int count = 0;
-		for(int i=0; i<10; i++) {
-			for(int j=0; j<10; j++) {
-				count += available(i, j, true) ? 1 : 0;
-			}
-		}
-		return count;
-	}
-	
-	public void setShip(Ship ship, int rowStart, int colStart, int rowEnd, int colEnd) {
-		ship.setPosition(new Point(colStart, rowStart), new Point(colEnd, rowEnd));
-	}
 
+	/**
+	 * Sets the AI strategy for this model
+	 * @param AI the BattleshipStrategy we want to use
+	 */
 	public void setAIStrategy(BattleshipStrategy AI) {
 		this.computer.setStrategy(AI);
 	}
 
+	/**
+	 * gets the AI strategy for this model
+	 * @return the computer AI
+	 */
 	public BattleshipAI getBattleshipAI() {
 		return computer;
 	}
 
+	/**
+	 * Calculates how many moves are remaining
+	 * @return the number of moves the human player can still make
+	 */
 	public int maxMovesRemaining() {
 		int count = 0;
 		for(int row = 0; row < HEIGHT; row++) {
@@ -105,6 +126,11 @@ public class BattleshipModel extends Observable implements Serializable {
 		return count;
 	}
 	
+	/**
+	 * makes a human move at (col, row)
+	 * @param row the row we want to hit
+	 * @param col the column we want to hit
+	 */
 	public void humanMove(int row, int col) {
 		if(available(row, col, false)) {
 			Point move = new Point(col, row);
@@ -113,17 +139,31 @@ public class BattleshipModel extends Observable implements Serializable {
 				if(s.wasHit(move)) {
 					setChanged();
 					notifyObservers();
-//					return;
 				}
 			}
-			Point nextMove = computer.nextMove(this);
-			computerMove(nextMove.y, nextMove.x);
+			
+			//this little loop makes sure the strategy returns
+			//a legal move
+			Point nextMove;
+			do {
+				nextMove = computer.nextMove(this);
+			} while(!available(nextMove.y, nextMove.x, true));
+			
+			if(isStillRunning()) {
+				computerMove(nextMove.y, nextMove.x);
+			}
 		}
 		setChanged();
 		notifyObservers();
-		return;
 	}
 
+	/**
+	 * Returns true if there is a ship at (col, row) on the given board
+	 * @param row the row we are checking
+	 * @param col the column we are checking
+	 * @param human true if we are checking for human ships, false if checking for computer ships
+	 * @return true if there is a ship on the given board at (col, row), false otherwise
+	 */
 	public boolean isShip(int row, int col, boolean human) {
 		for(Ship s : (human ? humanShips : computerShips)) {
 			for(Point p : s.getPoints()) {
@@ -135,6 +175,11 @@ public class BattleshipModel extends Observable implements Serializable {
 		return false;
 	}
 	
+	/**
+	 * Makes a computer move at (col, row)
+	 * @param row the row of the move
+	 * @param col the column of the move
+	 */
 	public void computerMove(int row, int col) {
 		if(available(row, col, true)) {
 			Point move = new Point(col, row);
@@ -144,20 +189,27 @@ public class BattleshipModel extends Observable implements Serializable {
 					potentialHits.add(s);
 					setChanged();
 					notifyObservers();
-					return;
 				}
 			}
 		}
 		setChanged();
 		notifyObservers();
-		return;
 		
 	}
 
+	/**
+	 * returns true if the game isn't over, false if it is
+	 * @return true if the game isn't over, false if it is
+	 */
 	public boolean isStillRunning() {
 		return !won(true) && !won(false);
 	}
 
+	/**
+	 * returns true if the given player won the game
+	 * @param human true if checking for human wins, false if checking for computer wins
+	 * @return
+	 */
 	public boolean won(boolean human) {
 		ArrayList<Ship> list = human ? computerShips : humanShips;
 		for(Ship s : list) {
@@ -168,11 +220,22 @@ public class BattleshipModel extends Observable implements Serializable {
 		return true;
 	}
 
+	/**
+	 * returns true if the spot is open at (col, row) for the given player
+	 * @param row the row we are checking
+	 * @param col the column we are checking
+	 * @param human true if we are checking human board, false if we are checking computer board.
+	 * @return true if the spot is open at (col, row) for the given player, false otherwise.
+	 */
 	public boolean available(int row, int col, boolean human) {
 		boolean[][] board = human ? humanBoard : computerBoard;
 		return !board[row][col];
 	}
 
+	/**
+	 * Prints out a graphical representation of the board, O for empty spots
+	 * X for missed attacks, S for undamaged ship spots, + for damaged ship spots.
+	 */
 	@Override
 	public String toString() {
 		String retVal = "Human's board\n";
@@ -180,6 +243,7 @@ public class BattleshipModel extends Observable implements Serializable {
 			for(int col=0; col<WIDTH; col++) {
 				if(isShip(row, col, true)) {
 					retVal += "S ";
+					retVal = humanBoard[row][col] ? "+ " : retVal;
 				} else { 
 					retVal += humanBoard[row][col] ? "X " : "O ";
 				}
@@ -187,17 +251,12 @@ public class BattleshipModel extends Observable implements Serializable {
 			retVal += "\n";
 		}
 		retVal += "Computer's board\n";
-//		
-//		for(int row=0; row<HEIGHT; row++) {
-//			for(int col=0; col<WIDTH; col++) {
-//				retVal += computerBoard[row][col] ? "X " : "O ";
-//			}
-//			retVal += "\n";
-//		}
+		
 		for(int row=0; row<HEIGHT; row++) {
 			for(int col=0; col<WIDTH; col++) {
 				if(isShip(row, col, false)) {
 					retVal += "S ";
+					retVal = computerBoard[row][col] ? "+ " : retVal;
 				} else { 
 					retVal += computerBoard[row][col] ? "X " : "O ";
 				}
@@ -207,6 +266,9 @@ public class BattleshipModel extends Observable implements Serializable {
 		return retVal;
 	}
 
+	/**
+	 * Clears the board and creates new ships.
+	 */
 	public void clearBoard() {
 		for(int row=0; row<HEIGHT; row++) {
 			for(int col=0; col<WIDTH; col++) {
@@ -218,11 +280,19 @@ public class BattleshipModel extends Observable implements Serializable {
 			initializeShips();
 		}
 	}
-	
+
+	/**
+	 * returns the ArrayList of human Ship objects
+	 * @return the ArrayList of human Ship objects
+	 */
 	public ArrayList<Ship> getHumanShips() {
 		return humanShips;
 	}
 
+	/**
+	 * returns the ArrayList of computer Ship objects
+	 * @return the ArrayList of computer Ship objects
+	 */
 	public ArrayList<Ship> getComputerShips() {
 		return computerShips;
 	}

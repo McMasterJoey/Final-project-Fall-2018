@@ -1,10 +1,16 @@
 package battleship;
 
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class BattleshipIntermediateAI implements BattleshipStrategy {
+public class BattleshipIntermediateAI implements BattleshipStrategy, Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 1. Cover as much ground as possible at the beginning of the game. 2. Fill the
@@ -17,7 +23,8 @@ public class BattleshipIntermediateAI implements BattleshipStrategy {
 		if (potentialHits.size() > 0) {
 			for (Ship ship : potentialHits) {
 				if (!ship.isDestroyed()) {
-					return findPoint(theGame, ship);
+					Point p = findPoint(theGame, ship);
+					return p;
 				}
 			}
 		}
@@ -29,18 +36,31 @@ public class BattleshipIntermediateAI implements BattleshipStrategy {
 			for (Ship ship : humanShips) {
 				if (!ship.isDestroyed()) {
 					potentialHits.add(ship);
-					return findPoint(theGame, ship);
+					Point p = findPoint(theGame, ship);
+					return p;
 				}
 
 			}
 		}
 		 int row = rand.nextInt(10);
 		 int col = rand.nextInt(10);
-		 while (!theGame.available(row, col, true) && !possible(theGame, row, col)) {
+		 
+		 for(int r = 0; row<10; row++) {
+			 for(int c = 0; c<10; c++) {
+				 if(possible(theGame, r, c)) {
+					 while (!theGame.available(row, col, true)) {
+						 row = rand.nextInt(10);
+						 col = rand.nextInt(10);
+					 }
+					 return new Point(col, row);
+				 }
+			 }
+		 }
+		 while (!theGame.available(row, col, true)) {
 			 row = rand.nextInt(10);
 			 col = rand.nextInt(10);
 		 }
-		return new Point(col, row);
+		 return new Point(col, row);
 	}
 
 	/* Determine if there are enough room between that shot and the adjacent shots
@@ -75,15 +95,18 @@ public class BattleshipIntermediateAI implements BattleshipStrategy {
 			if (!theGame.available(points[i].y, points[i].x, true))
 				idx = i;
 		}
-		if (idx == -1)
+		if (idx == -1) {
 			idx = rand.nextInt(points.length);
+		}
 		for (int i = idx; i < points.length;i++) {
-			if (theGame.available(points[i].y, points[i].x, true))
+			if (theGame.available(points[i].y, points[i].x, true)) {
 				return points[i];
+			}
 		}
 		for (int i = idx; i >= 0;i--) {
-			if (theGame.available(points[i].y, points[i].x, true))
+			if (theGame.available(points[i].y, points[i].x, true)) {
 				return points[i];
+			}
 		}
 		return points[idx];
 
@@ -95,7 +118,6 @@ public class BattleshipIntermediateAI implements BattleshipStrategy {
 	 */
 	@Override
 	public void setComputerBoard(ArrayList<Ship> computerShips) {
-		System.out.println("-----Computers' ships Below!-----");
 		boolean[][] computerBoard = initBoard();
 		Random rand = new Random();
 		for (Ship ship : computerShips) {
@@ -104,7 +126,6 @@ public class BattleshipIntermediateAI implements BattleshipStrategy {
 			if (direction == 0) { // horizontal
 				int x = rand.nextInt(11 - size);
 				int y = rand.nextInt(10);
-				System.out.println("x, y: \n" + x + y);
 				while (overlapping(x, y, size, computerBoard, true)) { // true for horizontal
 					x = rand.nextInt(11 - size);
 					y = rand.nextInt(10);
@@ -123,7 +144,6 @@ public class BattleshipIntermediateAI implements BattleshipStrategy {
 			}
 
 		}
-		System.out.println("-----Computers' ships Above!-----");
 	}
 
 	/**
@@ -167,7 +187,6 @@ public class BattleshipIntermediateAI implements BattleshipStrategy {
 				if (computerBoard[x][y])
 					return true;
 				x++;
-				System.out.print(x);
 			}
 		} else {
 			int yEnd = y + size;
