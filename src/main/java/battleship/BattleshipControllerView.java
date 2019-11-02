@@ -33,6 +33,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
+import ticTacToe.EasyAI;
 
 /**
  * Combined Controller and View for Battleship game. Manipulates the counterpart
@@ -696,8 +697,17 @@ public class BattleshipControllerView extends GameControllerView {
 	 */
 	@Override
 	public int getScore() {
-		// TODO Auto-generated method stub
-		return 1;
+		if(gameModel.isStillRunning()) {
+			return 0;
+		}
+		int baseScore;
+		double difficultyModifier = gameModel.getBattleshipAI().getStrategy() instanceof BattleshipEasyAI ? 1.0 : 1.5;
+		int temp = gameModel.maxMovesRemaining();
+		int winModifier = 1 * (gameModel.won(true) ? -1 : 1);
+		temp = temp * winModifier + 83;
+		baseScore = temp * 15 + 10;
+		baseScore = baseScore - (gameModel.won(true) ? 0 : 755);
+		return (int) (baseScore * difficultyModifier);
 	}
 
 	// lifted almost wholesale from a stackoverflow answer from user jewelsea

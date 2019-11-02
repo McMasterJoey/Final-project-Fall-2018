@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import ticTacToe.EasyAI;
+
 
 public class BattleshipAI implements Serializable{
 
@@ -43,4 +45,8 @@ public class BattleshipAI implements Serializable{
     public void setBoard(ArrayList<Ship> computerShips) {
     	AIStrategy.setComputerBoard(computerShips);
     }
+
+	public BattleshipStrategy getStrategy() {
+		return AIStrategy;
+	}
 }
