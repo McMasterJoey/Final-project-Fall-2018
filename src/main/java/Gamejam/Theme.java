@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import model.SanityCheckFailedException;
 
 /**
  * Represents a collection of Theme pair objects and other data that compose a theme.
@@ -63,6 +64,10 @@ public class Theme
 	 */
 	public void setThemeData(int index, ThemePair data) 
 	{
+		if (data == null)
+		{
+			throw new SanityCheckFailedException("Inserted null data into a theme!");
+		}
 		this.themedata[index] = data;
 	}
 	/**

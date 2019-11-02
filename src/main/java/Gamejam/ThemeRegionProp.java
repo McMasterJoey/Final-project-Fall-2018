@@ -283,6 +283,10 @@ public class ThemeRegionProp
 	{
 		return this.isBoundingArea;
 	}
+	public boolean isButtonWithText()
+	{
+		return (this.isButton && this.isContainsColorableText);
+	}
 	public boolean isContainsThemeableMainGUIImages()
 	{
 		return this.isContainsThemeableMainUIImages;
@@ -290,5 +294,45 @@ public class ThemeRegionProp
 	public boolean doNotTreatAsRegion()
 	{
 		return this.doNotTreatAsRegion;
+	}
+	public boolean isLabel()
+	{
+		return this.isLabel;
+	}
+	public boolean isComboBox()
+	{
+		return this.isComboBox;
+	}
+	public boolean isBorderPane()
+	{
+		return this.isBorderPane;
+	}
+	public boolean isGridPane()
+	{
+		return this.isGridPane;
+	}
+	public boolean isHBox()
+	{
+		return this.isHBox;
+	}
+	public boolean isVBox()
+	{
+		return this.isVBox;
+	}
+	public boolean isTableView()
+	{
+		return this.isTableView;
+	}
+	public boolean isProgressBar()
+	{
+		return this.isProgressBar;
+	}
+	public boolean isScrollPane()
+	{
+		return this.isScrollPane;
+	}
+	public boolean isTextInputField()
+	{
+		return this.isTextInputField;
 	}
 }
