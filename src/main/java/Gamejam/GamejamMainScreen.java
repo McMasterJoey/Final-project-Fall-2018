@@ -50,9 +50,11 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private HBox initCreateAccountMenuBar;
 	private HBox initLoggedInInGameBar;
 	private VBox initUserSettingsMainMenu;
-	private VBox initLeftBar;
+	private ScrollPane initLeftBar;
 	private Label leftBarMsg;
 	private Label leftBarStats;
+	private ProgressBar expBar;
+	private Label expBarLabel;
 	private VBox initCreateAccountMenu;
 	private VBox leaderScreen;
 	private TableView<Score> scoresTable;
@@ -96,7 +98,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Set up GUI Elements
 		this.initTopBar = initTopBar();
 		this.initGameselectonboxarea = initGamePanel();
-		this.initLeftBar = initLeftBar();
+		this.initLeftBar = initLeftPane();
 		leaderScreen = initLeaderScreen();
 		
 		// Not in user parts that can be used later
@@ -124,18 +126,24 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * 
 	 * @return A VBox that contains all the structures for the left bar.
 	 */
-	private VBox initLeftBar() {
-		VBox retval = new VBox();
-		retval.setPrefWidth(145);
-		retval.setPrefHeight(578);
-		retval.setPadding(new Insets(5));
+	private ScrollPane initLeftPane() {
+		VBox leftPane = new VBox();
+		ScrollPane leftPaneScroll = new ScrollPane(leftPane);
+		leftPane.setPrefWidth(145);
+		leftPane.setPrefHeight(578);
+		leftPane.setPadding(new Insets(5));
 		this.leftBarMsg = new Label();
 		this.leftBarMsg.setWrapText(true);
 		this.leftBarStats = new Label();
+		expBarLabel = new Label();
+		expBar = new ProgressBar(0.0);
+		leftPane.setPrefHeight(750);
+		leftPane.setPrefWidth(180);
+		leftPaneScroll.setFitToWidth(true);
 		setGuestMessage();
 		
-		retval.getChildren().addAll(leftBarMsg, leftBarStats);
-		return retval;
+		leftPane.getChildren().addAll(leftBarMsg, expBarLabel, expBar, leftBarStats);
+		return leftPaneScroll;
 	}
 
 	/**
@@ -186,6 +194,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Button viewLeaderboard = new Button("View Leaderboard");
 		viewLeaderboard.setOnAction( (ae) -> viewLeaderboardClick());
 		this.initbuttonlist[8] = viewLeaderboard;
+
 		// Add to Left Hbox
 		leftbox.getChildren().addAll(newacc, viewLeaderboard);
 		
@@ -244,7 +253,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Button viewLeaderboard = new Button("View Leaderboard");
 		viewLeaderboard.setOnAction( (ae) -> viewLeaderboardClick());
 		this.initbuttonlist[9] = viewLeaderboard;
-				
+
 		// Add to Left Hbox
 		leftbox.getChildren().addAll(logout, viewLeaderboard);
 		leftbox.setPrefWidth(1100);
@@ -712,14 +721,18 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.setCenter(this.initGameselectonboxarea);
 		updateLeftPane();
 	}
+
 	/**
 	 * Sets the message to the left panel.
 	 * Assumes the user is a guest.
 	 */
 	private void setGuestMessage() {
-		this.leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in, you could see your stats!");
-		this.leftBarStats.setText("\n\nLevel: 0\nExp: 0");
+		this.leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in,\nyou could see your stats!\n\n");
+		expBar.setProgress(0.0);
+		expBarLabel.setText("Exp: 0/0");
+		this.leftBarStats.setText("Level: 0\nExp: 0");
 	}
+
 	/**
 	 * Updates the object when the objects it observes changes.
 	 */
@@ -727,36 +740,40 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	public void update(Observable o, Object obj) {
 		updateLeftPane();
 	}
+
 	/**
 	 * Updates left pane
 	 */
 	private void updateLeftPane() {
-		if (this.acctMgr.isGuest()) {
+
+		if (acctMgr.isGuest()) {
 			setGuestMessage();
 		} else if (acctMgr.isAdmin()) {
-			this.leftBarMsg.setText("Administrator Account");
-			this.leftBarStats.setText("");
+			leftBarMsg.setText("Administrator Account");
+			leftBarStats.setText("");
 		} else {
-			acctMgr.refreshUserStats();
-			this.leftBarMsg.setText("Welcome to Gamejam, " + this.acctMgr.getCurUsername());
-			this.leftBarStats.setText("\n\nLevel: " + this.acctMgr.getLevel() + "\nExp: " + this.acctMgr.getExp());
+			leftBarMsg.setText("Welcome to Gamejam,\n" + acctMgr.getCurUsername() + "!\n\n");
+			expBarLabel.setText("Account Statistics:\nExp: " + acctMgr.getExpInLevel() + "/" + acctMgr.getExpForLevel(acctMgr.getLevel() + 1));
+			expBar.setProgress( (double) acctMgr.getExpInLevel() / acctMgr.getExpForLevel(acctMgr.getLevel() + 1) );
+			leftBarStats.setText("Level: " + acctMgr.getLevel() + "\nTotal Exp: " + acctMgr.getTotalExp() + "\n\nGame Statistics:");
 
 			ArrayList<String> games = new ArrayList<>(dbGameManager.getGameListByName().keySet());
 			Collections.sort(games);
-
-			leftBarStats.setText(leftBarStats.getText() + "\n");
 
 			for (String game : games) {
 				Integer id = dbGameManager.getGameListByName().get(game);
 				Integer numPlayed = acctMgr.getNumGamesPlayed().get(dbGameManager.getGameListByName().get(game));
 				leftBarStats.setText(leftBarStats.getText() + "\n" + game + ":");
-				leftBarStats.setText(leftBarStats.getText() + "\nWins: " + acctMgr.getGameWins().get(id));
-				leftBarStats.setText(leftBarStats.getText() + "\nLosses: " + acctMgr.getGameLosses().get(id));
-				leftBarStats.setText(leftBarStats.getText() + "\nTies: " + acctMgr.getGameTies().get(id));
-				leftBarStats.setText(leftBarStats.getText() + "\nIncomplete: " + acctMgr.getGameIncompletes().get(id) + "\n");
+				leftBarStats.setText(leftBarStats.getText() + "\n High Score: " + acctMgr.getHighScore(game));
+				leftBarStats.setText(leftBarStats.getText() + "\n  Wins: " + acctMgr.getGameWins().get(id));
+				leftBarStats.setText(leftBarStats.getText() + "\n  Losses: " + acctMgr.getGameLosses().get(id));
+				leftBarStats.setText(leftBarStats.getText() + "\n  Ties: " + acctMgr.getGameTies().get(id));
+				leftBarStats.setText(leftBarStats.getText() + "\n  Incomplete: " + acctMgr.getGameIncompletes().get(id));
+				leftBarStats.setText((leftBarStats.getText() + "\n   Total: " + numPlayed) + "\n");
 			}
 		}
 	}
+
 	/**
 	 * Updates all the GUI elements that use the username of the current user.
 	 */
