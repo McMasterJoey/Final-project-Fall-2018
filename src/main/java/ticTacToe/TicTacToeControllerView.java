@@ -17,7 +17,7 @@ import controller.GameControllerView;
 import controller.GameMenu;
 import controller.logStatType;
 
-import javafx.geometry.Pos; 
+import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -332,7 +332,6 @@ public class TicTacToeControllerView extends GameControllerView {
 	public boolean loadSaveGame() {
 		FileInputStream fis;
 		ObjectInputStream ois;
-		boolean retVal = true;
 		try {
 			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
 			String sep = System.getProperty("file.separator");
@@ -346,7 +345,7 @@ public class TicTacToeControllerView extends GameControllerView {
 				update(gameModel, this);
 				file.delete();
 			} else {
-				retVal = newGame();
+				newGame();
 			}
 		} catch(IOException | ClassNotFoundException e) {
 			e.printStackTrace();

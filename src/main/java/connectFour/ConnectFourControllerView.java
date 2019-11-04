@@ -64,9 +64,9 @@ public class ConnectFourControllerView extends GameControllerView {
 		this.setTop(menuBar);
 		initializeGame();
 		setupResources();
-		accountManager = AccountManager.getInstance();
-		statsManager = StatsManager.getInstance();
-
+	    accountManager = AccountManager.getInstance();
+	    statsManager = StatsManager.getInstance();
+		
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
 		_primarypane.setPrefHeight(HEIGHT);
@@ -172,7 +172,7 @@ public class ConnectFourControllerView extends GameControllerView {
 		}
 		// Don't save if the game was completed
 		if(!gameModel.isStillRunning()) {
-			gameModel.clearBoard();
+		    gameModel.clearBoard();
 		}
 		FileOutputStream fos;
 		ObjectOutputStream oos;
@@ -291,9 +291,9 @@ public class ConnectFourControllerView extends GameControllerView {
 		//System.out.println("--------------");
 		//System.out.println(gameModel.toString());
 		//System.out.println("--------------");
-		if(!gameModel.isStillRunning()) {
-			System.out.println("\nGame score is " + getScore());
-		}
+	    if(!gameModel.isStillRunning()) {
+	        System.out.println("\nGame score is " + getScore());
+	    }
 		if (gameModel.tied()) {
 			//accountManager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
 			statsManager.logGameStat("Connect-Four", logStatType.TIE, 0, getScore());
@@ -401,19 +401,19 @@ public class ConnectFourControllerView extends GameControllerView {
 	}
 	
 	@Override
-	public int getScore() {
-		if(gameModel.isStillRunning()) {
-			return 0;
-		}
-		int baseScore;
-		int difficultyModifier = gameModel.getConnectFourAI().getStrategy() instanceof ConnectFourEasyAI ? 1 : 2;
-		if(gameModel.tied()) {
-			return (int) (difficultyModifier * 110);
-		}
-		int temp = gameModel.maxMovesRemaining();
-		int winModifier = 1 * (gameModel.won('Y') ? -1 : 1);
-		temp = temp * winModifier + 35;
-		baseScore = (int) (temp * 2.5 + 25);
-		return baseScore * difficultyModifier;
-	}
+    public int getScore() {
+        if(gameModel.isStillRunning()) {
+            return 0;
+        }
+        int baseScore;
+        int difficultyModifier = gameModel.getConnectFourAI().getStrategy() instanceof ConnectFourEasyAI ? 1 : 2;
+        if(gameModel.tied()) {
+            return (int) (difficultyModifier * 110);
+        }
+        int temp = gameModel.maxMovesRemaining();
+        int winModifier = 1 * (gameModel.won('Y') ? -1 : 1);
+        temp = temp * winModifier + 35;
+        baseScore = (int) (temp * 2.5 + 25);
+        return baseScore * difficultyModifier;
+    }
 }
