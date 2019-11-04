@@ -16,8 +16,8 @@ import battleship.Ship.Direction;
 import controller.AccountManager;
 import controller.GameControllerView;
 import controller.GameMenu;
+import controller.LogStatType;
 import controller.StatsManager;
-import controller.logStatType;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -651,7 +651,7 @@ public class BattleshipControllerView extends GameControllerView {
 	@Override
 	protected void updateStatistics() {
 		if (!(gameModel.won(true) || gameModel.won(false)) && gameModel.maxMovesRemaining() > 0) {
-			statsManager.logGameStat("Battleship", logStatType.INCOMPLETE, 1, getScore());
+			statsManager.logGameStat("Battleship", LogStatType.INCOMPLETE, 1, getScore());
 		}
 	}
 
