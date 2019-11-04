@@ -666,10 +666,10 @@ public class BattleshipControllerView extends GameControllerView {
 
 			if (gameModel.won(true)) {
 				winSound.play();
-				statsManager.logGameStat("Tic-Tac-Toe",  LogStatType.WIN, 1, getScore());
+				statsManager.logGameStat("Battleship",  LogStatType.WIN, 1, getScore());
 			} else {
 				loseSound.play();
-				statsManager.logGameStat("Tic-Tac-Toe",  LogStatType.LOSS, 1, getScore());
+				statsManager.logGameStat("Battleship",  LogStatType.LOSS, 1, getScore());
 			}
 		}
 		if (shipsSet) {
@@ -717,10 +717,13 @@ public class BattleshipControllerView extends GameControllerView {
 		int baseScore;
 		double difficultyModifier = gameModel.getBattleshipAI().getStrategy() instanceof BattleshipEasyAI ? 1.0 : 1.5;
 		int temp = gameModel.maxMovesRemaining();
-		int winModifier = 1 * (gameModel.won(true) ? -1 : 1);
+		int winModifier = 1 * (gameModel.won(true) ? 1 : -1);
+		System.out.println(temp);
+		System.out.println(winModifier);
 		temp = temp * winModifier + 83;
+		System.out.println(temp);
 		baseScore = temp * 15 + 10;
-		baseScore = baseScore - (gameModel.won(true) ? 0 : 755);
+		System.out.println(baseScore);
 		return (int) (baseScore * difficultyModifier);
 	}
 
