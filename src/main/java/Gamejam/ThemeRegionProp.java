@@ -19,6 +19,7 @@ public class ThemeRegionProp
 	private boolean isScrollPane = false;
 	private boolean isTextInputField = false;
 	private boolean isComboBox = false;
+	private boolean isCheckBox = false;
 	
 	private boolean isGeneralPane = false;
 	private boolean isBoundingArea = false;
@@ -42,6 +43,7 @@ public class ThemeRegionProp
 	public static final byte TEXTINPUT = 9;
 	public static final byte COMBOBOX = 10;
 	public static final byte BUTTON_WT = 11;
+	public static final byte CHECKBOX = 12;
 	
 	/**
 	 * Primary Constructor for the ThemeRegionProp class
@@ -59,6 +61,12 @@ public class ThemeRegionProp
 			this.isButton = true;
 			this.isContainsText = true;
 			this.isContainsColorableText = true;
+		}
+		else if (primaryproperty == 12)
+		{
+			this.isContainsColorableText = true;
+			this.isContainsText = true;
+			this.isCheckBox = true;
 		}
 		else if (primaryproperty == 1)
 		{
@@ -334,5 +342,9 @@ public class ThemeRegionProp
 	public boolean isTextInputField()
 	{
 		return this.isTextInputField;
+	}
+	public boolean isCheckBox()
+	{
+		return this.isCheckBox;
 	}
 }

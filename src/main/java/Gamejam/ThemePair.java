@@ -6,7 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
 /**
- * 
+ * Represents theme coloration information for a single GUI Element.
  * @author Joey McMaster
  *
  */

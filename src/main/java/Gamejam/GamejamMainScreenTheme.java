@@ -381,7 +381,18 @@ public class GamejamMainScreenTheme
 	{
 		return new Background(new BackgroundFill(color, CornerRadii.EMPTY, new Insets(0)));
 	}
-
+	
+	/**
+	 * Generates a border.
+	 * @param color The color of the border
+	 * @param style The style of the border
+	 * @param widths The widths of the border
+	 * @return The resulting border.
+	 */
+	public static Border simpleBorder(Paint color, BorderStrokeStyle style, int widths)
+	{
+		return new Border(new BorderStroke(color, style, CornerRadii.EMPTY, new BorderWidths(widths)));
+	}
 	/**
 	 * Generates a simple background with a static single color 
 	 * @param r The red value (0 - 255)
