@@ -31,6 +31,8 @@ public class ThemeCreator extends HBox
 {
 	private ColorPicker colorpicker;
 	private Paint currentworkingcolor;
+	private Paint gradient_color_1;
+	private Paint gradient_color_2;
 	
 	private Paint curTextColor;
 	private Paint curBorderColor;
@@ -56,6 +58,8 @@ public class ThemeCreator extends HBox
 		this.screen = screen;
 		this.previewarea = new Rectangle(150,28, Color.WHITESMOKE);
 		this.currentworkingcolor = Color.WHITE;
+		this.gradient_color_1 = Color.WHITE;
+		this.gradient_color_2 = Color.WHITE;
 		this.curTextColor = Color.BLACK;
 		this.curBorderColor = Color.BLACK;
 		this.curBackgroundColor = Color.WHITE;
@@ -121,7 +125,7 @@ public class ThemeCreator extends HBox
 		updatebox.getChildren().addAll(updateTheme,updatePreview,setTheme,resetCustomTheme);
 		
 		
-		//HBox backgroundopts = new HBox();
+		// Create the Border Creator
 		HBox borderopts = new HBox();
 		Button border_fetchPaint = new Button("Set Border Color");
 		Button border_finish = new Button("Create Border");
@@ -159,7 +163,7 @@ public class ThemeCreator extends HBox
 				this.currentborderstyle = BorderStrokeStyle.DOTTED;
 			}
 		});
-		//this.curBorderColor
+		
 		border_finish.setOnAction((click) -> 
 		{
 			Gamejam.DPrint("Border finished!");
@@ -191,7 +195,40 @@ public class ThemeCreator extends HBox
 		});
 		borderopts.getChildren().addAll(border_fetchPaint, border_styleing,border_widths,border_top,border_bottom,border_left,border_right,border_finish);
 		
-		this.leftcol.getChildren().addAll(topleftbox,middletopleftbox,borderopts,updatebox);
+		// Create the Background Creator!
+		HBox backgroundopts = new HBox();
+		Button bg_getPaint = new Button("Set Background Color");
+		Button bg_gradient_simple_paint_set_primary = new Button("Get Gradient Color 1");
+		Button bg_gradient_simple_paint_set_secondary = new Button("Get Gradient Color 2");
+		Button bg_gradient_set_paint = new Button("Set Curent Color to Gradient");
+		Button bg_gradient_preview_update = new Button("Update Preview with Gradient");
+		CheckBox bg_gradient_directional_checkbox = new CheckBox("Up/Down");
+		
+		bg_gradient_simple_paint_set_primary.setOnAction((click) -> 
+		{
+			this.gradient_color_1 = this.currentworkingcolor;
+		});
+		bg_gradient_simple_paint_set_secondary.setOnAction((click) -> 
+		{
+			this.gradient_color_2 = this.currentworkingcolor;
+		});
+		bg_gradient_set_paint.setOnAction((click) -> 
+		{
+			this.currentworkingcolor = GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected());
+		});
+		bg_gradient_preview_update.setOnAction((click) -> 
+		{
+			this.previewarea.setFill(GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected()));
+		});
+		
+		
+		bg_getPaint.setOnAction((click) -> 
+		{
+			this.curBackgroundColor = this.currentworkingcolor;
+		});
+		backgroundopts.getChildren().addAll(bg_getPaint,bg_gradient_simple_paint_set_primary,bg_gradient_simple_paint_set_secondary,bg_gradient_directional_checkbox,bg_gradient_preview_update,bg_gradient_set_paint);
+		
+		this.leftcol.getChildren().addAll(topleftbox,middletopleftbox,borderopts,backgroundopts,updatebox);
 		this.getChildren().addAll(this.leftcol);
 		
 		this.screen.addRegion(400, this.leftcol, "Theme Creator left vbox background", new ThemeRegionProp(ThemeRegionProp.VBOX));
@@ -207,13 +244,20 @@ public class ThemeCreator extends HBox
 		this.screen.addRegion(410, resetCustomTheme, "Theme Creator reset theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.screen.addRegion(411, borderopts, "Theme Creator Borders Creator HBox", new ThemeRegionProp(ThemeRegionProp.HBOX));
 		this.screen.addRegion(412, border_fetchPaint, "Theme Creator get color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
-		this.screen.addRegion(413, border_finish, "Theme Creator Border Finalize", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
+		this.screen.addRegion(413, border_finish, "Theme Creator Border Finalize Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.screen.addRegion(414, border_styleing, "Theme Creator Border Styling Choice Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX));
 		this.screen.addRegion(415, border_widths, "Theme Creator Border TextField", new ThemeRegionProp(ThemeRegionProp.TEXTINPUT));
 		this.screen.addRegion(416, border_top, "Theme Creator Top Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
 		this.screen.addRegion(417, border_bottom, "Theme Creator Bottom Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
 		this.screen.addRegion(418, border_left, "Theme Creator Left Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
 		this.screen.addRegion(419, border_right, "Theme Creator Right Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
+		this.screen.addRegion(420, backgroundopts, "Theme Creator Basic Graident and Background HBox", new ThemeRegionProp(ThemeRegionProp.HBOX));
+		this.screen.addRegion(421, bg_getPaint, "Theme Creator Set Background Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
+		this.screen.addRegion(422, bg_gradient_simple_paint_set_primary, "Theme Creator Get Primary Graident Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
+		this.screen.addRegion(423, bg_gradient_simple_paint_set_secondary, "Theme Creator Get Secondary Graident Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
+		this.screen.addRegion(424, bg_gradient_preview_update, "Theme Creator Preview Graident Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
+		this.screen.addRegion(425, bg_gradient_set_paint, "Theme Creator Set Graident Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
+		this.screen.addRegion(426, bg_gradient_directional_checkbox, "Theme Creator Graident Dirrection Checkbox", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
 	}
 	/**
 	 * Itended to take numbers from strings and format them as int

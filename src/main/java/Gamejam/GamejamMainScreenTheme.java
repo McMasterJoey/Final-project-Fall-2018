@@ -340,12 +340,28 @@ public class GamejamMainScreenTheme
 		}
 		themes.set(0,t1);
 	}
-	
-	public static Background linGrdSimpleBackgroundSetUp(Color start, Color end, boolean sidetoside) 
+	public static LinearGradient linGrdSimpleSetup(Paint start, Paint end, boolean sidetoside)
 	{
 		Stop[] stops = new Stop[] 
 		{ 
-				new Stop(0, start), new Stop(1,end) 
+			new Stop(0, (Color) start), new Stop(1,(Color) end)  
+		};
+		LinearGradient grad;
+		if (sidetoside) 
+		{
+			grad = new LinearGradient(0,0,1,0,true, CycleMethod.NO_CYCLE,stops);
+		} 
+		else 
+		{
+			grad = new LinearGradient(0,0,0,1,true, CycleMethod.NO_CYCLE,stops);
+		}
+		return grad;
+	}
+	public static Background linGrdSimpleBackgroundSetUp(Paint start, Paint end, boolean sidetoside) 
+	{
+		Stop[] stops = new Stop[] 
+		{ 
+				new Stop(0, (Color) start), new Stop(1,(Color) end) 
 		};
 		LinearGradient grad;
 		if (sidetoside) 
