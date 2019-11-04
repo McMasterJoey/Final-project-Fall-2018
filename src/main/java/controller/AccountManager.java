@@ -10,14 +10,14 @@ import java.util.HashMap;
 import java.util.Observable;
 
 /**
- * Manager user accounts such as logging in, creating accounts, and updating user statistics in the database.
+ * Manager user accounts such as logging in, creating accounts, and updating user
+ * statistics in the database.
  *
  * @Author Nicholas Fiegel
  * @Author Joey McMaster
  */
 public class AccountManager extends Observable
 {
-
     private String curUsername;
     private boolean isAdmin;
     private boolean isGuest;
@@ -122,12 +122,12 @@ public class AccountManager extends Observable
     /**
      * Logs a game played for the given user
      *
-     * @param game       The name of the game that was played
-     * @param win        Whether the game was won
-     * @param loss       Whether the game was lost
-     * @param tie        Whether the game was a tie
+     * @param game The name of the game that was played
+     * @param win Whether the game was won
+     * @param loss Whether the game was lost
+     * @param tie Whether the game was a tie
      * @param incomplete Whether the game is incomplete
-     * @param time       The amount of time that elapsed the game
+     * @param time The amount of time that elapsed the game
      */
     public void logGameInDB(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time, int score)
     {
@@ -188,7 +188,12 @@ public class AccountManager extends Observable
     }
 
     /**
-     * Logs a stat for the logged in user stattype: 0 = wins 1 = losses 2 = ties 3 = incomplete 4 = time played (in seconds)
+     * Logs a stat for the logged in user stattype:
+     * 0 = wins
+     * 1 = losses
+     * 2 = ties
+     * 3 = incomplete
+     * 4 = time played (in seconds)
      *
      * @param update   Set to true if adding the value to the pre existing value, set to false if setting.
      * @param game     The name of the game whose stats are being set
@@ -277,50 +282,49 @@ public class AccountManager extends Observable
         notifyObservers();
     }
 
-    /**
-     * Attempt to create an account.
-     * <p>
-     * Return codes: 1: Success 2: Username already in use 3: Other error
-     *
-     * @param username A String indicating the username to create
-     * @param password A String indicating the password to associate with the username
-     * @return An int indicating the result of the attempt: 1 success, 2 username already in use, 3 other error
-     */
-    public int createAccount(String username, String password)
-    {
-        ResultSet rs = null;
-        try
-        {
-            conn.execute("INSERT INTO accounts(username, password) VALUES(?, ?)", username, password);
-            // Fetch userId from database, used to reduce the frequency of queries to database.
-            rs = conn.executeQuery("select accountid from accounts where accounts.username = ?", username);
-            rs.next();
-            curUsername = username;
-            isAdmin = false;
-            isGuest = false;
-            totalExp = 0;
-            level = 1;
-            accountID = rs.getInt("accountid");
-            setChanged();
-            notifyObservers();
+	/**
+	 * Attempt to create an account.
+	 *
+	 * Return codes:
+	 * 1: Success
+	 * 2: Username already in use
+	 * 3: Other error
+	 * @param username A String indicating the username to create
+	 * @param password A String indicating the password to associate with the username
+	 * @return An int indicating the result of the attempt: 1 success, 2 username already in use, 3 other error
+	 */
+	public int createAccount(String username, String password) {
+		ResultSet rs = null;
 
-            createStatisticsEntries();
-
-        }
-        catch (SQLException se)
+		try {
+			conn.execute("INSERT INTO accounts(username, password) VALUES(?, ?)", username, password);
+			// Fetch userId from database, used to reduce the frequency of queries to database.
+			rs = conn.executeQuery("select accountid from accounts where accounts.username = ?", username);
+			rs.next();
+			curUsername = username;
+			isAdmin = false;
+			isGuest = false;
+			totalExp = 0;
+			level = 1;
+			accountID = rs.getInt("accountid");
+			createStatisticsEntries();
+			setChanged();
+			notifyObservers();
+		}
+		catch (SQLException se)
         {
-            if (se.getErrorCode() == 1062)
-            { // 1062 indicates username is already in the db
-                return 2;
-            }
-            else
+			if (se.getErrorCode() == 1062) // 1062 indicates username is already in the db
+			{
+				return 2;
+			}
+			else
             {
                 return 3;
             }
-        }
-
-        return 1;
-    }
+		}
+		
+		return 1;
+	}
 
     /**
      * Helper for createAccount, generates the appropriate entries in the statistics table for the new user.
@@ -366,13 +370,11 @@ public class AccountManager extends Observable
             }
 
             fillUserStats();
-
-        }
-        catch (SQLException e)
+		}
+        catch (Exception e)
         {
-            e.printStackTrace();
-        }
-
+			e.printStackTrace();
+		}
     }
 
     /**
@@ -392,10 +394,12 @@ public class AccountManager extends Observable
         {
             Gamejam.DPrint("\nfillUserStatsIDs: accountID = " + accountID);
             int numGames, numUserStatsEntries;
-            rs = conn.executeQuery("SELECT COUNT gamid FROM games");
-            numGames = rs.getInt("gameid");
-            rs = conn.executeQuery("SELECT COUNT statsid FROM statistics WHERE accountid = ?", accountID);
-            numUserStatsEntries = rs.getInt("statsid");
+            rs = conn.executeQuery("SELECT COUNT(gameid) FROM games");
+            rs.next();
+            numGames = rs.getInt("COUNT(gameid)");
+            rs = conn.executeQuery("SELECT COUNT(statsid) FROM statistics WHERE accountid = ?", accountID);
+            rs.next();
+            numUserStatsEntries = rs.getInt("COUNT(statsid)");
 
             if (numUserStatsEntries < numGames) // Check to make sure there are entries for every game
             {
