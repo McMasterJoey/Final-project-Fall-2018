@@ -666,8 +666,10 @@ public class BattleshipControllerView extends GameControllerView {
 
 			if (gameModel.won(true)) {
 				winSound.play();
+				statsManager.logGameStat("Tic-Tac-Toe",  LogStatType.WIN, 1, getScore());
 			} else {
 				loseSound.play();
+				statsManager.logGameStat("Tic-Tac-Toe",  LogStatType.LOSS, 1, getScore());
 			}
 		}
 		if (shipsSet) {
