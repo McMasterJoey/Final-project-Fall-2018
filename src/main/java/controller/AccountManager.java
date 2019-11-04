@@ -265,10 +265,11 @@ public class AccountManager extends Observable {
 			totalExp = 0;
 			level = 1;
 			accountID = rs.getInt("accountid");
+			createStatisticsEntries();
 			setChanged();
 			notifyObservers();
 
-			createStatisticsEntries();
+			
 			
 		} catch (SQLException se) {
 			if (se.getErrorCode() == 1062) { // 1062 indicates username is already in the db
@@ -320,17 +321,19 @@ public class AccountManager extends Observable {
 
 			fillUserStats();
 
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
 	/**
-	 * Fills the userStatsIDs, gameWins, gameLosses, gameTies, gameIncompletes, and numGamesPlayed
-	 * HashMaps with the current users statistics.
+	 * Fills the userStatsIDs, gameWins, gameLosses, gameTies, gameIncompletes, and
+	 * numGamesPlayed HashMaps with the current users statistics.
 	 */
 	private void fillUserStats() {
+		
+		
 		ResultSet rs = null;
 		userStatsIDs = new HashMap<>();
 		gameWins = new HashMap<>();
