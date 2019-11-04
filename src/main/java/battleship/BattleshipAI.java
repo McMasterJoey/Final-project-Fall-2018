@@ -4,8 +4,6 @@ import java.awt.Point;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import ticTacToe.EasyAI;
-
 
 public class BattleshipAI implements Serializable{
 
