@@ -50,12 +50,24 @@ public class GamejamMainScreenTheme
 	{
 		this.imagecache = new ArrayList<Image>();
 		this.imagecache.add(new Image("/themeDefaultThemeMenuIcon.png"));
+		this.imagecache.add(new Image("/themeNightThemeMenuIcon.png"));
+		this.imagecache.add(new Image("/themeUSAThemeMenuIcon.png"));
 		
 		Theme t1 = new Theme("Default Theme", 10);
 		t1.setIcon(this.imagecache.get(0));
 		t1.addNewImage("/usersettingsbuttonbackground.png");
 		t1.addNewImage("/usersettingsbuttonbackground.png");
 		this.themes.add(t1);
+		Theme t2 = new Theme("Night Theme", 10);
+		t2.setIcon(this.imagecache.get(0));
+		t2.addNewImage("/usersettingsbuttonbackgroundnighttheme.png");
+		t2.addNewImage("/usersettingsbuttonbackgroundnighttheme.png");
+		this.themes.add(t2);
+		Theme t3 = new Theme("USA Theme", 10);
+		t3.setIcon(this.imagecache.get(0));
+		t3.addNewImage("/usersettingsbuttonbackground.png");
+		t3.addNewImage("/usersettingsbuttonbackground.png");
+		this.themes.add(t3);
 	}
 	public ThemeCreator getThemeCreator()
 	{
@@ -267,53 +279,8 @@ public class GamejamMainScreenTheme
 			throw new SanityCheckFailedException("Can't setup themes when we're still adding regions to the object.");
 		}
 		generateDefaultTheme();
-		/*
-		// Default Theme:
-		Theme t2 = new Theme("Night Theme","/themeNightThemeMenuIcon.png", getRegionCount());
-		t2.setThemeData(0, new Themepair(solidBackgroundSetup(Color.BLACK), quickBorderSetup(Color.ORANGE)));
-		t2.setThemeData(1, new Themepair(Color.WHITE));
-		t2.setThemeData(2, new Themepair(solidBackgroundSetup(Color.BLACK), quickBorderSetup(Color.ORANGERED)));
-		t2.setThemeData(3, new Themepair(solidBackgroundSetup(Color.BLACK), quickBorderSetup(Color.ORANGERED)));
-		t2.setThemeData(4, new Themepair(solidBackgroundSetup(Color.BLACK), quickBorderSetup(Color.ORANGERED)));
-		t2.setThemeData(5, new Themepair(Color.WHITE));
-		t2.setThemeData(6, new Themepair(Color.WHITE));
-		t2.setThemeData(7, new Themepair(Color.RED));
-		t2.setThemeData(8, new Themepair(Color.WHITE));
-		t2.addNewImage("/usersettingsbuttonbackgroundnighttheme.png");
-		t2.addNewImage("/usersettingsbuttonbackgroundnighttheme.png");
-		themes.add(t2);
-
-		Theme t3 = new Theme("USA Theme","/themeUSAThemeMenuIcon.png", getRegionCount());
-		t3.setThemeData(0, new Themepair(solidBackgroundSetup(Color.WHITE), quickBorderSetup(Color.RED)));
-		t3.setThemeData(1, new Themepair(Color.RED));
-		t3.setThemeData(2, new Themepair(solidBackgroundSetup(Color.BLUE), quickBorderSetup(Color.DARKBLUE)));
-		t3.setThemeData(3, new Themepair(solidBackgroundSetup(Color.BLUE), quickBorderSetup(Color.DARKBLUE)));
-		t3.setThemeData(4, new Themepair(solidBackgroundSetup(Color.BLUE), quickBorderSetup(Color.DARKBLUE)));
-		t3.setThemeData(5, new Themepair(Color.RED));
-		t3.setThemeData(6, new Themepair(Color.RED));
-		t3.setThemeData(7, new Themepair(Color.RED));
-		t3.setThemeData(8, new Themepair(Color.RED));
-		t3.addNewImage("/usersettingsbuttonbackground.png");
-		t3.addNewImage("/usersettingsbuttonbackground.png");
-		themes.add(t3);
-		
-		Theme t4 = new Theme("Experimental Theme","/themeExperimentalThemeMenuIcon.png", getRegionCount());
-		t4.setThemeData(0, new Themepair(solidBackgroundSetup(211, 211, 211), quickBorderSetup(Color.DARKBLUE)));
-		t4.setThemeData(1, new Themepair(Color.BLACK));
-		t4.setThemeData(2, new Themepair(solidBackgroundSetup(RegionColors.getColor(RegionColors.DEFAULT_BACKGROUND)),
-				quickBorderSetup(RegionColors.getColor(RegionColors.DEFAULT_BACKGROUND))));
-		t4.setThemeData(3, new Themepair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.DARKGRAY, false),
-				quickBorderSetup(RegionColors.getColor(RegionColors.DEFAULT_BACKGROUND))));
-		t4.setThemeData(4, new Themepair(solidBackgroundSetup(RegionColors.getColor(RegionColors.DEFAULT_BACKGROUND)),
-				quickBorderSetup(Color.BLACK)));
-		t4.setThemeData(5, new Themepair(Color.BLACK));
-		t4.setThemeData(6, new Themepair(Color.BLACK));
-		t4.setThemeData(7, new Themepair(Color.RED));
-		t4.setThemeData(8, new Themepair(Color.BLACK));
-		t4.addNewImage("/usersettingsbuttonbackground.png");
-		t4.addNewImage("/usersettingsbuttonbackground.png");
-		themes.add(t4);
-		*/
+		themes.set(1,ThemeGenerate.createThemeGenerated_Night());
+		themes.set(2, ThemeGenerate.createThemeGenerated_USA());
 	}
 	private void generateDefaultTheme() 
 	{

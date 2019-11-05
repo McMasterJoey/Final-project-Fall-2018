@@ -122,7 +122,8 @@ public class ThemeCreator extends HBox
 			System.out.println(this.screen.getTheme(-1).dumpThemeToCode());
 		});
 		//
-		updatebox.getChildren().addAll(updateTheme,setTheme,resetCustomTheme,debugger_codedumper);
+		//updatebox.getChildren().addAll(updateTheme,setTheme,resetCustomTheme,debugger_codedumper);
+		updatebox.getChildren().addAll(updateTheme,setTheme,resetCustomTheme);
 		
 		
 		// Create the Border Creator
