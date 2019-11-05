@@ -2,8 +2,21 @@ package Gamejam;
 
 import java.util.ArrayList;
 
+import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Paint;
+import javafx.scene.paint.Stop;
 import model.SanityCheckFailedException;
 
 /**
@@ -78,8 +91,89 @@ public class Theme
 	{
 		return this.themedata;
 	}
+	/**
+	 * Dumps this theme into a form that can put directly into project code.
+	 * @return The hard coded version of this theme.
+	 */
 	public String dumpThemeToCode() 
 	{
+		String retval = "public static Theme createThemeGenerated() {\n";
+		retval += "    Theme retval = new Theme(" + "\"" + this.name + "\"" +"," + this.themedata.length + ");\n";
+		for(int x = 0; x < this.themedata.length;x++)
+		{
+			retval += "    " + dumpBorder(this.themedata[x],x) + "\n";
+			retval += "    " + dumpBackground(this.themedata[x],x) + "\n";
+			retval += "    Paint c" + x + " = " + paintToGenString(this.themedata[x].getColor()) + ";\n";
+			retval += "    ThemePair p" + x + " = new ThemePair(bg" + x + ",bo" + x + ",c" +  x + ");\n";
+			retval += "    retval.setThemeData("+ x + ", p" + x + ");\n";
+		}
+		retval += "    return retval;\n";
+		retval += "}";
+		return retval;
+	}
+	/**
+	 * Takes a paint object that is either a Color or LinearGradient. Dumps it as a string so it can be made via code.
+	 * @param p The paint object
+	 * @return A string in the form of java code.
+	 */
+	public static String paintToGenString(Paint p)
+	{
+		if (p instanceof Color)
+		{
+			Color c = (Color) p;
+			return "new Color(" + c.getRed() + ", " + c.getGreen() + ", " + c.getBlue() + ", " + c.getOpacity() + ")";
+		}
+		else if (p instanceof LinearGradient)
+		{
+			LinearGradient c = (LinearGradient) p;
+		
+			//new Stop[] { new Stop(0, c.getStops().get(0).getColor()), new Stop(1,  c.getStops().get(1).getColor()) };
+			//LinearGradient g = new LinearGradient(0,0,1,1,true,CycleMethod.NO_CYCLE,new Stop[] { new Stop(0, c.getStops().get(0).getColor()), new Stop(1,  c.getStops().get(1).getColor()) });
+			String stops = "new Stop[] { ";
+			for(int x = 0; x < c.getStops().size(); x++)
+			{
+				if (x != 0)
+				{
+					stops += ",";
+				}
+				stops += "new Stop(" + x + "," + paintToGenString(c.getStops().get(x).getColor()) + ")";
+			}
+			stops += "}";
+			return "new LinearGradient(" + c.getStartX() + "," + c.getStartY() + "," + c.getEndX() + "," + c.getEndY() + ",true,CycleMethod.NO_CYCLE," + stops + ")";
+		}
 		return null;
+	}
+	private String dumpBackground(ThemePair p, int x)
+	{
+		String color = paintToGenString(p.getBackground().getFills().get(0).getFill());
+		return "Background bg" + x + " = new Background(new BackgroundFill(" + color + ",CornerRadii.EMPTY, new Insets(0)));";
+	}
+	private String dumpBorder(ThemePair p, int x)
+	{
+		String color = paintToGenString(p.getBorder().getStrokes().get(0).getTopStroke());
+		String style1 = _dumpBorderUtil(p.getBorder().getStrokes().get(0).getTopStyle());
+		String style3 = _dumpBorderUtil(p.getBorder().getStrokes().get(0).getBottomStyle());
+		String style4 = _dumpBorderUtil(p.getBorder().getStrokes().get(0).getLeftStyle());
+		String style2 = _dumpBorderUtil(p.getBorder().getStrokes().get(0).getRightStyle());
+		BorderStrokeStyle s = p.getBorder().getStrokes().get(0).getTopStyle();
+		
+		return "Border bo" + x + " = new Border(new BorderStroke(" + color + "," + color + "," + color + "," + color + "," + style1 + "," + style2 + "," + style3 + "," + style4 + "," + "CornerRadii.EMPTY, new BorderWidths(" + p.getBorder().getStrokes().get(0).getWidths().getTop() + "), new Insets(0)));";
+	}
+	private String _dumpBorderUtil(BorderStrokeStyle s)
+	{
+		String style = "BorderStrokeStyle.SOLID";
+		if (s.equals(BorderStrokeStyle.NONE)) 
+		{
+			style = "BorderStrokeStyle.NONE";
+		}
+		else if (s.equals(BorderStrokeStyle.DASHED)) 
+		{
+			style = "BorderStrokeStyle.DASHED";
+		}
+		else if (s.equals(BorderStrokeStyle.DOTTED)) 
+		{
+			style = "BorderStrokeStyle.DOTTED";
+		}
+		return style;
 	}
 }

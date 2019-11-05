@@ -88,7 +88,6 @@ public class GamejamMainScreenTheme
 			resetCustomTheme();
 			setUpThemes();
 			updateTheme(0);
-			
 			// Undefine so it gets garbage collected
 			//this.preInit = null;
 		}
@@ -171,6 +170,15 @@ public class GamejamMainScreenTheme
 			}
 		
 		}
+		
+		// DEBUG
+		
+		Theme t = ThemeGenerate.createThemeGenerated();
+		for(int x = 0; x < t.getTheme().length;x++)
+		{
+			this.customtheme.setThemeData(x, t.getTheme()[x]);
+		}
+		
 	}
 	/**
 	 * Updates the Theme of the Main GUI

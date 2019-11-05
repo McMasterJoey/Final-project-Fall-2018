@@ -18,6 +18,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import model.SanityCheckFailedException;
@@ -114,8 +115,14 @@ public class ThemeCreator extends HBox
 		{
 			this.screen.resetCustomTheme();
 		});
-	
-		updatebox.getChildren().addAll(updateTheme,setTheme,resetCustomTheme);
+		// DEBUG REMOVE WHEN DONE
+		Button debugger_codedumper = new Button("Dump Theme Code");
+		debugger_codedumper.setOnAction((click) -> 
+		{
+			System.out.println(this.screen.getTheme(-1).dumpThemeToCode());
+		});
+		//
+		updatebox.getChildren().addAll(updateTheme,setTheme,resetCustomTheme,debugger_codedumper);
 		
 		
 		// Create the Border Creator
@@ -208,12 +215,22 @@ public class ThemeCreator extends HBox
 		
 		bg_gradient_simple_paint_set_primary.setOnAction((click) -> 
 		{
+			if (this.currentworkingcolor instanceof LinearGradient)
+			{
+				// Only solid colors can be used for this
+				return;
+			}
 			this.gradient_color_1 = this.currentworkingcolor;
 			gradient_c1_preview.setFill(this.currentworkingcolor);
 			gradient_preview.setFill(GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected()));
 		});
 		bg_gradient_simple_paint_set_secondary.setOnAction((click) -> 
 		{
+			if (this.currentworkingcolor instanceof LinearGradient)
+			{
+				// Only solid colors can be used for this
+				return;
+			}
 			this.gradient_color_2 = this.currentworkingcolor;
 			gradient_c2_preview.setFill(this.currentworkingcolor);
 			gradient_preview.setFill(GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected()));
@@ -248,6 +265,7 @@ public class ThemeCreator extends HBox
 			this.curTextColor = this.currentworkingcolor;
 			txtPaintPreview.setFill(this.currentworkingcolor);
 		});
+		
 		othercolorsetterhbox.getChildren().addAll(border_fetchPaint,borderPaintPreview,bg_getPaint,bgPaintPreview,txt_getPaint,txtPaintPreview);
 		
 		
