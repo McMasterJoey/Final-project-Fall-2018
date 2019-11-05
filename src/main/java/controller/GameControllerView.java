@@ -3,7 +3,6 @@ package controller;
 import java.util.Observer;
 
 import javafx.scene.layout.BorderPane;
-import model.GameModel;
 
 /**
  * 
@@ -14,7 +13,6 @@ public abstract class GameControllerView extends BorderPane implements Observer 
 	protected AccountManager accountManager;
 	protected StatsManager statsManager;
 	protected String gameName;
-	protected GameModel gameModel;
 
 	/**
 	 * 
@@ -46,22 +44,6 @@ public abstract class GameControllerView extends BorderPane implements Observer 
 	 */
 	public void setAccountManager(AccountManager accountManager) {
 		this.accountManager = accountManager;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public GameModel getGameModel() {
-		return gameModel;
-	}
-
-	/**
-	 * 
-	 * @param gameModel
-	 */
-	public void setGameModel(GameModel gameModel) {
-		this.gameModel = gameModel;
 	}
 
 	protected abstract void updateStatistics();

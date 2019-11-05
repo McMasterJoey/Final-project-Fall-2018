@@ -2,6 +2,8 @@ package Gamejam;
 
 import java.util.Collections;
 import java.util.Observer;
+import battleship.BattleshipControllerView;
+import connectFour.ConnectFourControllerView;
 import java.util.ArrayList;
 import java.util.Observable;
 import javafx.geometry.Insets;
@@ -12,6 +14,8 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -52,9 +56,11 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private HBox initCreateAccountMenuBar;
 	private HBox initLoggedInInGameBar;
 	private VBox initUserSettingsMainMenu;
-	private VBox initLeftBar;
+	private ScrollPane initLeftBar;
 	private Label leftBarMsg;
 	private Label leftBarStats;
+	private ProgressBar expBar;
+	private Label expBarLabel;
 	private VBox initCreateAccountMenu;
 	private VBox leaderScreen;
 	private TableView<Score> scoresTable;
@@ -69,6 +75,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private boolean userisAdmin = false;
 	private boolean agamewasloaded = false;
 	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
+	private BattleshipControllerView battleshipGameView;
 	private int gameInUseIndex = -1;
 	private GameIconItem[] initgamelist;
 	private GamejamMainScreenTheme initthemes;
@@ -96,7 +103,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Set up GUI Elements
 		this.initTopBar = initTopBar();
 		this.initGameselectonboxarea = initGamePanel();
-		this.initLeftBar = initLeftBar();
+		this.initLeftBar = initLeftPane();
 		this.leaderScreen = initLeaderScreen();
 		
 		// Not in user parts that can be used later
@@ -110,6 +117,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.connectFourGameView = new ConnectFourControllerView();
 		this.initthemes.addRegion(350, this.tictactoegameview,"Tic-tac-toe general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
 		this.initthemes.addRegion(351, this.connectFourGameView,"Connect-4 general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
+		this.battleshipGameView = new BattleshipControllerView();
 		
 		// Set up Extra menus
 		this.initUserSettingsMainMenu = initUserSettingsGUI();
@@ -127,22 +135,28 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * 
 	 * @return A VBox that contains all the structures for the left bar.
 	 */
-	private VBox initLeftBar() {
-		VBox retval = new VBox();
-		retval.setPrefWidth(145);
-		retval.setPrefHeight(578);
-		retval.setPadding(new Insets(5));
+	private ScrollPane initLeftPane() {
+		VBox leftPane = new VBox();
+		ScrollPane leftPaneScroll = new ScrollPane(leftPane);
+		leftPane.setPrefWidth(145);
+		leftPane.setPrefHeight(578);
+		leftPane.setPadding(new Insets(5));
 		this.leftBarMsg = new Label();
 		this.leftBarMsg.setWrapText(true);
 		this.leftBarStats = new Label();
+		expBarLabel = new Label();
+		expBar = new ProgressBar(0.0);
+		leftPane.setPrefHeight(750);
+		leftPane.setPrefWidth(180);
+		leftPaneScroll.setFitToWidth(true);
 		setGuestMessage();
 		// Add to region list
-		this.initthemes.addRegion(100, retval, "Left HBox", new ThemeRegionProp(ThemeRegionProp.HBOX));
+		this.initthemes.addRegion(100, leftPane, "Left VBox", new ThemeRegionProp(ThemeRegionProp.VBOX));
 		this.initthemes.addRegion(101, this.leftBarMsg, "Left Top Message label", new ThemeRegionProp(ThemeRegionProp.LABEL));
 		this.initthemes.addRegion(102, this.leftBarStats, "Left Stats label", new ThemeRegionProp(ThemeRegionProp.LABEL));
 		
-		retval.getChildren().addAll(this.leftBarMsg, this.leftBarStats);
-		return retval;
+		leftPane.getChildren().addAll(this.leftBarMsg, expBarLabel, expBar, this.leftBarStats);
+		return leftPaneScroll;
 	}
 
 	/**
@@ -192,7 +206,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Leaderboard button
 		Button viewLeaderboard = new Button("View Leaderboard");
 		viewLeaderboard.setOnAction( (ae) -> viewLeaderboardClick());
-		
+
 		// Add to Left Hbox
 		leftbox.getChildren().addAll(newacc, viewLeaderboard);
 		
@@ -255,7 +269,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Leaderboard button
 		Button viewLeaderboard = new Button("View Leaderboard");
 		viewLeaderboard.setOnAction( (ae) -> viewLeaderboardClick());
-				
 		// Add to Left Hbox
 		leftbox.getChildren().addAll(logout, viewLeaderboard);
 		leftbox.setPrefWidth(1100);
@@ -673,6 +686,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			}
 			this.setCenter(this.connectFourGameView);
 		}
+		if (name.equals("Battleship")) {
+			if(userLoggedIn) {
+				this.setTop(this.initLoggedInInGameBar);
+			} else {
+				this.setTop(this.initCreateAccountMenuBar);
+			}
+			this.setCenter(this.battleshipGameView);
+		}
 	}
 	/**
 	 * 	Handles when the leaderboard button is clicked by the user.
@@ -699,14 +720,18 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.setCenter(this.initGameselectonboxarea);
 		updateLeftPane();
 	}
+
 	/**
 	 * Sets the message to the left panel.
 	 * Assumes the user is a guest.
 	 */
 	private void setGuestMessage() {
-		this.leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in, you could see your stats!");
-		this.leftBarStats.setText("\n\nLevel: 0\nExp: 0");
+		this.leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in,\nyou could see your stats!\n\n");
+		expBar.setProgress(0.0);
+		expBarLabel.setText("Exp: 0/0");
+		this.leftBarStats.setText("Level: 0\nExp: 0");
 	}
+
 	/**
 	 * Updates the object when the objects it observes changes.
 	 */
@@ -714,36 +739,40 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	public void update(Observable o, Object obj) {
 		updateLeftPane();
 	}
+
 	/**
 	 * Updates left pane
 	 */
 	private void updateLeftPane() {
-		if (this.acctMgr.isGuest()) {
+
+		if (acctMgr.isGuest()) {
 			setGuestMessage();
 		} else if (acctMgr.isAdmin()) {
-			this.leftBarMsg.setText("Administrator Account");
-			this.leftBarStats.setText("");
+			leftBarMsg.setText("Administrator Account");
+			leftBarStats.setText("");
 		} else {
-			acctMgr.refreshUserStats();
-			this.leftBarMsg.setText("Welcome to Gamejam, " + this.acctMgr.getCurUsername());
-			this.leftBarStats.setText("\n\nLevel: " + this.acctMgr.getLevel() + "\nExp: " + this.acctMgr.getExp());
+			leftBarMsg.setText("Welcome to Gamejam,\n" + acctMgr.getCurUsername() + "!\n\n");
+			expBarLabel.setText("Account Statistics:\nExp: " + acctMgr.getExpInLevel() + "/" + acctMgr.getExpForLevel(acctMgr.getLevel() + 1));
+			expBar.setProgress( (double) acctMgr.getExpInLevel() / acctMgr.getExpForLevel(acctMgr.getLevel() + 1) );
+			leftBarStats.setText("Level: " + acctMgr.getLevel() + "\nTotal Exp: " + acctMgr.getTotalExp() + "\n\nGame Statistics:");
 
 			ArrayList<String> games = new ArrayList<>(dbGameManager.getGameListByName().keySet());
 			Collections.sort(games);
-
-			leftBarStats.setText(leftBarStats.getText() + "\n");
 
 			for (String game : games) {
 				Integer id = dbGameManager.getGameListByName().get(game);
 				Integer numPlayed = acctMgr.getNumGamesPlayed().get(dbGameManager.getGameListByName().get(game));
 				leftBarStats.setText(leftBarStats.getText() + "\n" + game + ":");
-				leftBarStats.setText(leftBarStats.getText() + "\nWins: " + acctMgr.getGameWins().get(id));
-				leftBarStats.setText(leftBarStats.getText() + "\nLosses: " + acctMgr.getGameLosses().get(id));
-				leftBarStats.setText(leftBarStats.getText() + "\nTies: " + acctMgr.getGameTies().get(id));
-				leftBarStats.setText(leftBarStats.getText() + "\nIncomplete: " + acctMgr.getGameIncompletes().get(id) + "\n");
+				leftBarStats.setText(leftBarStats.getText() + "\n High Score: " + acctMgr.getHighScore(game));
+				leftBarStats.setText(leftBarStats.getText() + "\n  Wins: " + acctMgr.getGameWins().get(id));
+				leftBarStats.setText(leftBarStats.getText() + "\n  Losses: " + acctMgr.getGameLosses().get(id));
+				leftBarStats.setText(leftBarStats.getText() + "\n  Ties: " + acctMgr.getGameTies().get(id));
+				leftBarStats.setText(leftBarStats.getText() + "\n  Incomplete: " + acctMgr.getGameIncompletes().get(id));
+				leftBarStats.setText((leftBarStats.getText() + "\n   Total: " + numPlayed) + "\n");
 			}
 		}
 	}
+
 	/**
 	 * Updates all the GUI elements that use the username of the current user.
 	 */
@@ -762,6 +791,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			GameIconItem[] retval = new GameIconItem[2];
 			retval[0] = new GameIconItem("Tic-Tac-Toe", "/tictactoeicon.png", 0);
 			retval[1] = new GameIconItem("Connect-Four", "/connectFourIcon.png", 1);
+			retval[2] = new GameIconItem("Battleship", "/battleshipIcon.png", 2);
 			return retval;
 		}
 		ArrayList<GameIconItem> allgames = this.dbGameManager.fetchAllGameSetUpInfo();

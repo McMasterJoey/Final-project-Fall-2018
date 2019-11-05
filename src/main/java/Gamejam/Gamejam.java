@@ -3,7 +3,6 @@ import controller.LogStatType;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 /**
  * Implementation of the Gamejam project. Acts as the Init class.

@@ -4,8 +4,6 @@ import Gamejam.Gamejam;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import ticTacToe.EasyAI;
-import ticTacToe.IntermediateAI;
 
 public class GameMenu extends MenuBar {
 	private Menu optmenu;
