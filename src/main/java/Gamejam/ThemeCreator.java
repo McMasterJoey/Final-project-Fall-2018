@@ -52,7 +52,7 @@ public class ThemeCreator extends HBox
 	private boolean doinitonce = true;
 	private BorderStrokeStyle currentborderstyle = BorderStrokeStyle.SOLID;
 	private Border currentborder = GamejamMainScreenTheme.noBorder();
-	private int currentborderwidths = 0;
+	private double currentborderwidths = 1;
 	public ThemeCreator(GamejamMainScreenTheme screen) 
 	{
 		this.screen = screen;
@@ -77,12 +77,11 @@ public class ThemeCreator extends HBox
 		{
 			this.themegroupmode = true;
 			this.currentgroupid =  this.regiongroupmap.get(this.groupselector.getValue());
-			System.out.println(this.currentgroupid);
 		});
 		this.colorpicker.setOnAction((click) -> 
 		{
 			this.currentworkingcolor = this.colorpicker.getValue();
-			System.out.println(this.currentworkingcolor);
+			this.previewarea.setFill(this.colorpicker.getValue());
 		});
 		
 		HBox topleftbox = new HBox();
@@ -92,12 +91,6 @@ public class ThemeCreator extends HBox
 		middletopleftbox.getChildren().addAll(this.colorpicker,this.elementselector,this.groupselector,this.previewarea);
 		
 		HBox updatebox = new HBox();
-		Button updatePreview = new Button("Update Preview");
-		updatePreview.setOnAction((click) -> 
-		{
-			this.previewarea.setFill(this.currentworkingcolor);
-		});
-		
 		Button updateTheme = new Button("Update Theme");
 		updateTheme.setOnAction((click) -> 
 		{
@@ -122,28 +115,28 @@ public class ThemeCreator extends HBox
 			this.screen.resetCustomTheme();
 		});
 	
-		updatebox.getChildren().addAll(updateTheme,updatePreview,setTheme,resetCustomTheme);
+		updatebox.getChildren().addAll(updateTheme,setTheme,resetCustomTheme);
 		
 		
 		// Create the Border Creator
 		HBox borderopts = new HBox();
 		Button border_fetchPaint = new Button("Set Border Color");
-		Button border_finish = new Button("Create Border");
+		Button border_finish = new Button("Set Border");
 		ChoiceBox<String> border_styleing = new ChoiceBox<String>();
 		TextField border_widths = new TextField();
 		CheckBox border_top = new CheckBox("Draw Top");
 		CheckBox border_bottom = new CheckBox("Draw Bottom");
 		CheckBox border_left = new CheckBox("Draw Left");
 		CheckBox border_right = new CheckBox("Draw Right");
+		HBox border_preview = new HBox();                              // This is a preview element and should not be themeable from the system.
+		border_preview.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.WHITESMOKE));
+		Label border_preview_showlabel = new Label("Border Preview");  // This is a preview element and should not be themeable from the system.
+		border_preview.getChildren().add(border_preview_showlabel);
+		Label border_label = new Label("Border Type                   Border Width                                       Border Drawing                                                               Border Preview");
 		border_top.setSelected(true);
 		border_bottom.setSelected(true);
 		border_left.setSelected(true);
 		border_right.setSelected(true);
-		
-		border_fetchPaint.setOnAction((click) -> 
-		{
-			this.curBorderColor = this.currentworkingcolor;
-		});
 		
 		border_styleing.getItems().addAll("Solid","Dashed","Dotted");
 		border_styleing.setValue("Solid");
@@ -166,7 +159,6 @@ public class ThemeCreator extends HBox
 		
 		border_finish.setOnAction((click) -> 
 		{
-			Gamejam.DPrint("Border finished!");
 			// Apply Checkbox settings
 			BorderStrokeStyle ts = this.currentborderstyle;
 			BorderStrokeStyle bs = this.currentborderstyle;
@@ -192,43 +184,74 @@ public class ThemeCreator extends HBox
 			this.currentborderwidths = getWidthFromStr(border_widths.getText());
 			
 			this.currentborder = new Border(new BorderStroke(this.curBorderColor,this.curBorderColor,this.curBorderColor,this.curBorderColor,ts,rs,bs,ls,CornerRadii.EMPTY,new BorderWidths(this.currentborderwidths),new Insets(0)));
+			border_preview.setBorder(this.currentborder);
 		});
-		borderopts.getChildren().addAll(border_fetchPaint, border_styleing,border_widths,border_top,border_bottom,border_left,border_right,border_finish);
+		// Set preview to default settings
+		this.currentborder = new Border(new BorderStroke(this.curBorderColor,this.curBorderColor,this.curBorderColor,this.curBorderColor,this.currentborderstyle,this.currentborderstyle,this.currentborderstyle,this.currentborderstyle,CornerRadii.EMPTY,new BorderWidths(this.currentborderwidths),new Insets(0)));
+		border_preview.setBorder(this.currentborder);
 		
-		// Create the Background Creator!
+		borderopts.getChildren().addAll(border_styleing,border_widths,border_top,border_bottom,border_left,border_right,border_finish,border_preview);
+		
+		// Create the Basic Gradient Creator!
 		HBox backgroundopts = new HBox();
-		Button bg_getPaint = new Button("Set Background Color");
 		Button bg_gradient_simple_paint_set_primary = new Button("Get Gradient Color 1");
 		Button bg_gradient_simple_paint_set_secondary = new Button("Get Gradient Color 2");
 		Button bg_gradient_set_paint = new Button("Set Curent Color to Gradient");
-		Button bg_gradient_preview_update = new Button("Update Preview with Gradient");
 		CheckBox bg_gradient_directional_checkbox = new CheckBox("Up/Down");
+		Rectangle gradient_c1_preview = new Rectangle(54,28, Color.WHITE);
+		Rectangle gradient_c2_preview = new Rectangle(54,28, Color.WHITE);
+		Rectangle gradient_preview = new Rectangle(54,28, Color.WHITE);
+		bg_gradient_directional_checkbox.setOnAction((click) -> 
+		{
+			gradient_preview.setFill(GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected()));
+		});
 		
 		bg_gradient_simple_paint_set_primary.setOnAction((click) -> 
 		{
 			this.gradient_color_1 = this.currentworkingcolor;
+			gradient_c1_preview.setFill(this.currentworkingcolor);
+			gradient_preview.setFill(GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected()));
 		});
 		bg_gradient_simple_paint_set_secondary.setOnAction((click) -> 
 		{
 			this.gradient_color_2 = this.currentworkingcolor;
+			gradient_c2_preview.setFill(this.currentworkingcolor);
+			gradient_preview.setFill(GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected()));
 		});
 		bg_gradient_set_paint.setOnAction((click) -> 
 		{
 			this.currentworkingcolor = GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected());
-		});
-		bg_gradient_preview_update.setOnAction((click) -> 
-		{
 			this.previewarea.setFill(GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected()));
 		});
 		
+		backgroundopts.getChildren().addAll(bg_gradient_simple_paint_set_primary,gradient_c1_preview,bg_gradient_simple_paint_set_secondary,gradient_c2_preview,bg_gradient_directional_checkbox,bg_gradient_set_paint,gradient_preview);
 		
+		// Other Color Setters
+		HBox othercolorsetterhbox = new HBox();
+		Button bg_getPaint = new Button("Set Background Color");
+		Button txt_getPaint = new Button("Set Text Color");
+		Rectangle txtPaintPreview = new Rectangle(150,28, Color.WHITESMOKE);
+		Rectangle bgPaintPreview = new Rectangle(150,28, Color.WHITESMOKE);
+		Rectangle borderPaintPreview = new Rectangle(150,28, Color.WHITESMOKE);
+		border_fetchPaint.setOnAction((click) -> 
+		{
+			this.curBorderColor = this.currentworkingcolor;
+			borderPaintPreview.setFill(this.currentworkingcolor);
+		});
 		bg_getPaint.setOnAction((click) -> 
 		{
 			this.curBackgroundColor = this.currentworkingcolor;
+			bgPaintPreview.setFill(this.currentworkingcolor);
 		});
-		backgroundopts.getChildren().addAll(bg_getPaint,bg_gradient_simple_paint_set_primary,bg_gradient_simple_paint_set_secondary,bg_gradient_directional_checkbox,bg_gradient_preview_update,bg_gradient_set_paint);
+		txt_getPaint.setOnAction((click) -> 
+		{
+			this.curTextColor = this.currentworkingcolor;
+			txtPaintPreview.setFill(this.currentworkingcolor);
+		});
+		othercolorsetterhbox.getChildren().addAll(border_fetchPaint,borderPaintPreview,bg_getPaint,bgPaintPreview,txt_getPaint,txtPaintPreview);
 		
-		this.leftcol.getChildren().addAll(topleftbox,middletopleftbox,borderopts,backgroundopts,updatebox);
+		
+		this.leftcol.getChildren().addAll(topleftbox,middletopleftbox,othercolorsetterhbox,border_label,borderopts,backgroundopts,updatebox);
 		this.getChildren().addAll(this.leftcol);
 		
 		this.screen.addRegion(400, this.leftcol, "Theme Creator left vbox background", new ThemeRegionProp(ThemeRegionProp.VBOX));
@@ -238,7 +261,6 @@ public class ThemeCreator extends HBox
 		this.screen.addRegion(404, middletopleftbox, "Theme Creator top selections background box", new ThemeRegionProp(ThemeRegionProp.HBOX));
 		this.screen.addRegion(405, infotext, "Theme Creator top left label", new ThemeRegionProp(ThemeRegionProp.LABEL));
 		this.screen.addRegion(406, updatebox, "Theme Creator middle update buttons background box", new ThemeRegionProp(ThemeRegionProp.HBOX));
-		this.screen.addRegion(407, updatePreview, "Theme Creator update preview button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.screen.addRegion(408, updateTheme, "Theme Creator update theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.screen.addRegion(409, setTheme, "Theme Creator set theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.screen.addRegion(410, resetCustomTheme, "Theme Creator reset theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
@@ -252,28 +274,30 @@ public class ThemeCreator extends HBox
 		this.screen.addRegion(418, border_left, "Theme Creator Left Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
 		this.screen.addRegion(419, border_right, "Theme Creator Right Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
 		this.screen.addRegion(420, backgroundopts, "Theme Creator Basic Graident and Background HBox", new ThemeRegionProp(ThemeRegionProp.HBOX));
-		this.screen.addRegion(421, bg_getPaint, "Theme Creator Set Background Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
+		this.screen.addRegion(421, border_label, "Theme Creator Border Info Label", new ThemeRegionProp(ThemeRegionProp.LABEL));
 		this.screen.addRegion(422, bg_gradient_simple_paint_set_primary, "Theme Creator Get Primary Graident Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.screen.addRegion(423, bg_gradient_simple_paint_set_secondary, "Theme Creator Get Secondary Graident Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
-		this.screen.addRegion(424, bg_gradient_preview_update, "Theme Creator Preview Graident Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.screen.addRegion(425, bg_gradient_set_paint, "Theme Creator Set Graident Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.screen.addRegion(426, bg_gradient_directional_checkbox, "Theme Creator Graident Dirrection Checkbox", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
+		this.screen.addRegion(427, bg_getPaint, "Theme Creator Set Background Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
+		this.screen.addRegion(428, txt_getPaint, "Theme Creator Set Text Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
+		this.screen.addRegion(429,  othercolorsetterhbox, "Theme Creator Other Color Setters HBox", new ThemeRegionProp(ThemeRegionProp.HBOX));
 	}
 	/**
 	 * Itended to take numbers from strings and format them as int
 	 * @param str The input string containing only numbers.
 	 * @return The number within the input string, If no valid number is found, returns 1.
 	 */
-	private int getWidthFromStr(String str)
+	private double getWidthFromStr(String str)
 	{
-		int retval = 0;
+		double retval = 0.0;
 		try
 		{
-			retval = Integer.valueOf(str);
+			retval = Double.valueOf(str);
 		} 
 		catch (NumberFormatException e)
 		{
-			return 1;
+			return 1.0;
 		}
 		return retval;
 	}
