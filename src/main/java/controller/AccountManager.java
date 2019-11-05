@@ -376,7 +376,7 @@ public class AccountManager extends Observable
 			e.printStackTrace();
 		}
     }
-
+    
     /**
      * Fills the userStatsIDs, gameWins, gameLosses, gameTies, gameIncompletes, and numGamesPlayed HashMaps with the current users statistics.
      */
@@ -389,7 +389,6 @@ public class AccountManager extends Observable
         gameTies = new HashMap<>();
         gameIncompletes = new HashMap<>();
         numGamesPlayed = new HashMap<>();
-
         try
         {
             Gamejam.DPrint("\nfillUserStatsIDs: accountID = " + accountID);
