@@ -91,7 +91,7 @@ public class ThemeCreator extends HBox
 		middletopleftbox.getChildren().addAll(this.colorpicker,this.elementselector,this.groupselector,this.previewarea);
 		
 		HBox updatebox = new HBox();
-		Button updateTheme = new Button("Update Theme");
+		Button updateTheme = new Button("Update Custom Theme Data");
 		updateTheme.setOnAction((click) -> 
 		{
 			ThemePair p = new ThemePair(GamejamMainScreenTheme.solidBackgroundSetup(this.curBackgroundColor),this.currentborder,this.curTextColor);
@@ -198,9 +198,9 @@ public class ThemeCreator extends HBox
 		Button bg_gradient_simple_paint_set_secondary = new Button("Get Gradient Color 2");
 		Button bg_gradient_set_paint = new Button("Set Curent Color to Gradient");
 		CheckBox bg_gradient_directional_checkbox = new CheckBox("Up/Down");
-		Rectangle gradient_c1_preview = new Rectangle(54,28, Color.WHITE);
-		Rectangle gradient_c2_preview = new Rectangle(54,28, Color.WHITE);
-		Rectangle gradient_preview = new Rectangle(54,28, Color.WHITE);
+		Rectangle gradient_c1_preview = new Rectangle(90,28, Color.WHITE);
+		Rectangle gradient_c2_preview = new Rectangle(90,28, Color.WHITE);
+		Rectangle gradient_preview = new Rectangle(100,28, Color.WHITE);
 		bg_gradient_directional_checkbox.setOnAction((click) -> 
 		{
 			gradient_preview.setFill(GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected()));
