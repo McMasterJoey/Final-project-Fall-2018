@@ -137,8 +137,7 @@ public class BattleshipModel extends Observable implements Serializable {
 			computerBoard[row][col] = true;
 			for(Ship s : computerShips) {
 				if(s.wasHit(move)) {
-					setChanged();
-					notifyObservers();
+					break;
 				}
 			}
 			
