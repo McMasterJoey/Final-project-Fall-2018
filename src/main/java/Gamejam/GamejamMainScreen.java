@@ -21,6 +21,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -224,6 +225,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		password.setPromptText("password");
 		password.setPrefWidth(165);
 		password.setPrefHeight(25);
+		
+		password.setOnKeyPressed((key) ->{
+			if(key.getCode() == KeyCode.ENTER) {
+				loginButtonClick();
+			}
+		});
+
 		// username.set
 		Button login = new Button("Login");
 		login.setPrefWidth(144);
@@ -367,6 +375,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		password.setPromptText("password");
 		password.setPrefWidth(300);
 		password.setPrefHeight(25);
+		
+		password.setOnKeyPressed((key) ->{
+			if(key.getCode() == KeyCode.ENTER) {
+				createNewAccountButtonOnFinishedClick();
+			}
+		});
+		
 		Button makeaccount = new Button("Create Account");
 		makeaccount.setOnMouseClicked((click) -> {
 			createNewAccountButtonOnFinishedClick();
