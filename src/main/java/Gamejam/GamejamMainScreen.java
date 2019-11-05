@@ -116,9 +116,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Set up Game Views
 		this.tictactoegameview = new TicTacToeControllerView();
 		this.connectFourGameView = new ConnectFourControllerView();
+		this.battleshipGameView = new BattleshipControllerView();
 		this.initthemes.addRegion(350, this.tictactoegameview,"Tic-tac-toe general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
 		this.initthemes.addRegion(351, this.connectFourGameView,"Connect-4 general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
-		this.battleshipGameView = new BattleshipControllerView();
+		this.initthemes.addRegion(352, this.battleshipGameView,"Battleship general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
 		
 		// Set up Extra menus
 		this.initUserSettingsMainMenu = initUserSettingsGUI();
@@ -145,16 +146,20 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.leftBarMsg = new Label();
 		this.leftBarMsg.setWrapText(true);
 		this.leftBarStats = new Label();
-		expBarLabel = new Label();
-		expBar = new ProgressBar(0.0);
+		this.expBarLabel = new Label();
+		this.expBar = new ProgressBar(0.0);
 		leftPane.setPrefHeight(750);
 		leftPane.setPrefWidth(180);
 		leftPaneScroll.setFitToWidth(true);
 		setGuestMessage();
+		
+		
 		// Add to region list
 		this.initthemes.addRegion(100, leftPane, "Left VBox", new ThemeRegionProp(ThemeRegionProp.VBOX));
 		this.initthemes.addRegion(101, this.leftBarMsg, "Left Top Message label", new ThemeRegionProp(ThemeRegionProp.LABEL));
 		this.initthemes.addRegion(102, this.leftBarStats, "Left Stats label", new ThemeRegionProp(ThemeRegionProp.LABEL));
+		this.initthemes.addRegion(102.01, this.expBarLabel, "Left EXP label", new ThemeRegionProp(ThemeRegionProp.LABEL));
+		this.initthemes.addRegion(102.02, this.expBar, "Left EXP Progress Bar", new ThemeRegionProp(ThemeRegionProp.PROGRESSBAR));
 		
 		leftPane.getChildren().addAll(this.leftBarMsg, expBarLabel, expBar, this.leftBarStats);
 		return leftPaneScroll;
@@ -490,20 +495,19 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.initthemes.updateTheme(0);
 		});
 		left.getChildren().add(theme0);
-		/*
 		Button theme1 = new Button();
-		theme1.setGraphic(this.initthemes.getThemeIcon(0));
+		theme1.setGraphic(this.initthemes.getThemeIcon(1));
 		theme1.setOnMouseClicked((click) -> {
 			this.initthemes.updateTheme(1);
 		});
 		left.getChildren().add(theme1);
 		Button theme2 = new Button();
-		theme2.setGraphic(this.initthemes.getThemeIcon(0));
+		theme2.setGraphic(this.initthemes.getThemeIcon(2));
 		theme2.setOnMouseClicked((click) -> {
 			this.initthemes.updateTheme(2);
 		});
 		left.getChildren().add(theme2);
-
+		/*
 		Button theme3 = new Button();
 		theme3.setGraphic(this.initthemes.getThemeIcon(0));
 		theme3.setOnMouseClicked((click) -> {
@@ -520,8 +524,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(222, right, "Theme Menu right side overall background", new ThemeRegionProp(ThemeRegionProp.VBOX));
 		this.initthemes.addRegion(223, backtosettings, "Theme Menu back to user settings menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON));
 		this.initthemes.addRegion(224, theme0, "Theme Menu Default Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON));
-		//this.initthemes.addRegion(225, theme1, "Theme Menu Night Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON));
-		//this.initthemes.addRegion(226, theme2, "Theme Menu USA Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON));
+		this.initthemes.addRegion(225, theme1, "Theme Menu Night Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON));
+		this.initthemes.addRegion(226, theme2, "Theme Menu USA Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON));
 		//this.initthemes.addRegion(227, theme3, "Theme Menu Experimental Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON));
 		return retval;
 	}
