@@ -925,6 +925,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			return (GameControllerView) this.tictactoegameview;
 		} else if (this.gameInUseIndex == 1) {
 			return (GameControllerView) this.connectFourGameView;
+		} else if (this.gameInUseIndex == 2) {
+			return (GameControllerView) this.battleshipGameView;
 		}
 		return null;
 	}
