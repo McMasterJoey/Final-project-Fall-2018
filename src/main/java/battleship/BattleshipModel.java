@@ -187,14 +187,9 @@ public class BattleshipModel extends Observable implements Serializable {
 			for(Ship s : humanShips) {
 				if(s.wasHit(move)) {
 					potentialHits.add(s);
-					setChanged();
-					notifyObservers();
 				}
 			}
-		}
-		setChanged();
-		notifyObservers();
-		
+		}		
 	}
 
 	/**
