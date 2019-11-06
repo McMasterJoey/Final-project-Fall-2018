@@ -1,5 +1,6 @@
 package spaceShooter;
 
+import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -7,12 +8,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Observable;
 
 import controller.GameControllerView;
 import controller.GameMenu;
 import controller.LogStatType;
 import javafx.animation.AnimationTimer;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.media.AudioClip;
 
@@ -27,27 +31,32 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private GameMenu gameMenu;
 	private Canvas gameScreen;
 	private double gameClockCount = 0;
-	private int currentLevel;
 	private ArrayList<SpaceShooterEnemy> enemyList;
+	private ArrayList<SpaceShooterProjectile> enemyProjectiles;
+	private ArrayList<SpaceShooterProjectile> playerProjectiles;
+	private ArrayList<SpaceShooterObject> itemDrops;
+	private int enemySpeedMultiplier = 1;
+	private Point playerDelta;
 
 	public SpaceShooterControllerView() {
 		setUpGameClock();
 		gameModel = new SpaceShooterModel();
 		gameModel.addObserver(this);
 		player = new SpaceShooterPlayer();
-		currentLevel = 1;
-		
+		playerDelta = new Point(0, 0);
+
 		gameScreen = new Canvas(WIDTH, HEIGHT);
 		this.setCenter(gameScreen);
-		
+
 		gameMenu = GameMenu.getMenuBar(this);
 		gameMenu.getDiffeasy().setOnAction((event) -> {
-			// TODO set easy diff stuff
+			enemySpeedMultiplier = 1;
 		});
 		gameMenu.getDiffinter().setOnAction((event) -> {
-			// TODO set intermediate diff stuff
+			enemySpeedMultiplier = 2;
 		});
 		this.setTop(gameMenu);
+		displayStartScreen();
 	}
 
 	private void setUpGameClock() {
@@ -58,12 +67,73 @@ public class SpaceShooterControllerView extends GameControllerView {
 			}
 		};
 	}
+	
+	private void setupListeners() {
+		// TODO player movement and attack listeners
+
+		// this listener will stop the gameClock while the canvas isn't focused.
+		gameScreen.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue,
+					Boolean newPropertyValue) {				
+			
+				if(!newPropertyValue) {
+					pauseGame();
+					displayPauseScreen();
+				}
+			}			
+		});
+	}
+
+	private void checkGameOver() {
+		if(gameModel.getLives() == -1) {
+			displayGameOver();
+		}
+	}
+
+	private void displayStartScreen() {
+		// TODO Draw start screen info
+
+		gameScreen.setOnKeyPressed((key) -> {
+			startGame();
+		});
+
+	}
+	
+	private void displayPauseScreen() {
+		// draw Pause Screen
+		gameScreen.setOnKeyPressed((key) ->{
+			unPauseGame();
+		});
+	}
+	
+	private void displayContinueScreen() {
+		// TODO draw continue screen
+		
+		gameScreen.setOnKeyPressed((key) ->{
+			startGame();
+		});
+		
+	}
+
+	private void displayGameOver() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void startGame() {
+		gameModel.generateLevel();
+		enemyList = gameModel.getCurrentEnemies();
+		setupListeners();
+		gameClock.start();
+	}
 
 	private void gameClockTick() {
 		gameClockCount++;
-		
-		//this is because the game ticks way too fast otherwise.
-		if(gameClockCount%4 == 0) {
+
+		// this is because the game ticks way too fast otherwise.
+		if (gameClockCount % 4 == 0) {
 			updatePlayerPosition();
 			updateEnemyPositions();
 			updateProjectilePositions();
@@ -72,13 +142,9 @@ public class SpaceShooterControllerView extends GameControllerView {
 			checkGameOver();
 		}
 	}
-
-	private void checkGameOver() {
-		// TODO Auto-generated method stub
-	}
-
+	
 	private void updatePlayerPosition() {
-		// TODO
+		player.updatePosition(playerDelta);
 	}
 
 	private void updateEnemyPositions() {
@@ -86,23 +152,61 @@ public class SpaceShooterControllerView extends GameControllerView {
 	}
 
 	private void updateProjectilePositions() {
-		// TODO
+		for(SpaceShooterProjectile ssp : enemyProjectiles) {
+			ssp.updatePosition(new Point(0, ssp.getSpeed()));
+		}
+		
+		for(SpaceShooterProjectile ssp : playerProjectiles) {
+			ssp.updatePosition(new Point(0, -ssp.getSpeed()));
+		}
 	}
 
 	private void checkCollisions() {
-		// TODO
+		ArrayList<SpaceShooterProjectile> toRemove = new ArrayList<SpaceShooterProjectile>();
+		for(SpaceShooterEnemy enemy : enemyList) {
+			for(SpaceShooterProjectile ssp : playerProjectiles) {
+				if(collisionExists(enemy, ssp)) {
+					enemy.setCurrentHP(enemy.getCurrentHP() - 1);
+					toRemove.add(ssp);
+				}
+			}
+		}
+		playerProjectiles.removeAll(toRemove);
+		toRemove.clear();
+		
+		for(SpaceShooterProjectile ssp : enemyProjectiles) {
+			if(collisionExists(player, ssp)) {
+				player.setCurrentHP(player.getCurrentHP() - 1);
+				toRemove.add(ssp);
+			}
+		}
+		enemyProjectiles.removeAll(toRemove);
 	}
-	
+
+	private boolean collisionExists(SpaceShooterShip ship, SpaceShooterProjectile ssp) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	private void checkLevelOver() {
-		// TODO Auto-generated method stub	
-		if(enemyList.size() == 0) {
-			gameModel.getMoreEnemies(currentLevel);
-			currentLevel++;
+		if (enemyList.size() == 0) {
+			gameModel.generateLevel();
+			enemyList = gameModel.getCurrentEnemies();
+			gameModel.incrementLevel();
 		}
 	}
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
+		
+		//play the soundfx
+		Iterator<AudioClip> clips = soundfx.iterator();
+		while(clips.hasNext()) {
+			AudioClip a = clips.next();
+			a.play();
+			clips.remove();			
+		}
+		
 		// TODO draw player
 		// TODO draw enemies
 		// TODO draw projectiles
@@ -110,7 +214,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		// TODO background?
 		// TODO draw score
 		// TODO draw number of lives
-		// TODO play soundfx
+		// TODO draw current level somewhere
 
 	}
 
@@ -191,9 +295,8 @@ public class SpaceShooterControllerView extends GameControllerView {
 			e.printStackTrace();
 			return false;
 		}
-		// TODO pause before starting game.
 		gameModel.addObserver(this);
-		update(gameModel, this);
+		displayContinueScreen();
 		return retVal;
 	}
 
@@ -222,17 +325,11 @@ public class SpaceShooterControllerView extends GameControllerView {
 		try {
 			gameClock.stop();
 			gameClockCount = 0;
-			currentLevel = 1;
+			gameModel.newGame();
 			displayStartScreen();
 			return true;
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			return false;
 		}
 	}
-
-	private void displayStartScreen() {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

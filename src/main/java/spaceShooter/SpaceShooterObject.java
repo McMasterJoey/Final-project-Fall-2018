@@ -42,4 +42,8 @@ public abstract class SpaceShooterObject {
 		this.imagePath = imagePath;
 	}
 	
+	public void updatePosition(Point p) {
+		
+	}
+	
 }

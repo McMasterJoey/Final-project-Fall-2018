@@ -2,7 +2,7 @@ package spaceShooter;
 
 import java.io.Serializable;
 
-public abstract class SpaceShooterShip implements Serializable{
+public abstract class SpaceShooterShip extends SpaceShooterObject implements Serializable{
 
 	/**
 	 * 
