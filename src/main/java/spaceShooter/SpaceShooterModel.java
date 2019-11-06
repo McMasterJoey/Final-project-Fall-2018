@@ -6,19 +6,28 @@ import java.util.Observable;
 public class SpaceShooterModel extends Observable {
 	
 	private ArrayList<SpaceShooterEnemy> currentEnemies;
+	private int currentScore;
+	private int numberLives;
+	private int currentLevel;
 
+	public SpaceShooterModel() {
+		currentEnemies = new ArrayList<SpaceShooterEnemy>();
+		currentScore = 0;
+		numberLives = 3;
+		currentLevel = 1;
+	}
+	
 	public int getScore() {
-		// TODO Auto-generated method stub
-		return 0;
+		return currentScore;
 	}
 
 	public boolean isStillRunning() {
-		// TODO Auto-generated method stub
-		return false;
+		return numberLives >= 0;
 	}
 
 	public void generateLevel() {
-		// TODO Auto-generated method stub
+		// TODO something like this:
+		// currentEnemies = LevelGenerator.getEnemies(currentLevel);
 	}
 
 	public ArrayList<SpaceShooterEnemy> getCurrentEnemies() {
@@ -26,17 +35,17 @@ public class SpaceShooterModel extends Observable {
 	}
 
 	public void incrementLevel() {
-		// TODO Auto-generated method stub
-		
+		currentLevel++;		
 	}
 
 	public void newGame() {
-		// TODO Auto-generated method stub
-		
+		currentEnemies = new ArrayList<SpaceShooterEnemy>();
+		currentScore = 0;
+		numberLives = 3;
+		currentLevel = 1;		
 	}
 
 	public int getLives() {
-		// TODO Auto-generated method stub
-		return 0;
+		return numberLives;
 	}
 }

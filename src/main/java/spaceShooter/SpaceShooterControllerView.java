@@ -69,7 +69,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 	}
 	
 	private void setupListeners() {
-		// TODO player movement and attack listeners
+		setupPlayerListeners();
 
 		// this listener will stop the gameClock while the canvas isn't focused.
 		gameScreen.focusedProperty().addListener(new ChangeListener<Boolean>() {
@@ -86,8 +86,25 @@ public class SpaceShooterControllerView extends GameControllerView {
 		});
 	}
 
+	private void setupPlayerListeners() {
+
+		gameScreen.setOnKeyPressed((key) ->{
+			// TODO movement
+			// TODO attack
+			// TODO pause
+		});
+		
+		gameScreen.setOnKeyReleased((key) ->{
+			// TODO stop movement
+		});
+		
+		gameScreen.setOnMouseClicked((click) ->{
+			// TODO attack
+		});
+	}
+
 	private void checkGameOver() {
-		if(gameModel.getLives() == -1) {
+		if(!gameModel.isStillRunning()) {
 			displayGameOver();
 		}
 	}
@@ -118,7 +135,8 @@ public class SpaceShooterControllerView extends GameControllerView {
 	}
 
 	private void displayGameOver() {
-		// TODO Auto-generated method stub
+		gameClock.stop();
+		// TODO draw screen
 		
 	}
 
@@ -148,7 +166,13 @@ public class SpaceShooterControllerView extends GameControllerView {
 	}
 
 	private void updateEnemyPositions() {
-		// TODO
+
+		Point enemyDelta = new Point();
+
+		// TODO calculate which way the enemy should be moving
+		for(SpaceShooterEnemy enemy : enemyList) {
+			enemy.updatePosition(enemyDelta);
+		}
 	}
 
 	private void updateProjectilePositions() {
@@ -181,9 +205,31 @@ public class SpaceShooterControllerView extends GameControllerView {
 			}
 		}
 		enemyProjectiles.removeAll(toRemove);
+		toRemove.clear();
+		
+		ArrayList<SpaceShooterObject> toRemove2 = new ArrayList<SpaceShooterObject>();
+		for(SpaceShooterObject item : itemDrops) {
+			if(collisionExists(player, item)) {
+				buffPlayer(item);
+				toRemove2.add(item);
+			} else if(offScreen(item)) {
+				toRemove2.add(item);
+			}
+		}
+		itemDrops.removeAll(toRemove2);
 	}
 
-	private boolean collisionExists(SpaceShooterShip ship, SpaceShooterProjectile ssp) {
+	private boolean offScreen(SpaceShooterObject item) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private void buffPlayer(SpaceShooterObject item) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private boolean collisionExists(SpaceShooterObject obj, SpaceShooterObject obj2) {
 		// TODO Auto-generated method stub
 		return false;
 	}

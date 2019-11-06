@@ -3,12 +3,12 @@ package spaceShooter;
 import java.awt.Point;
 
 public abstract class SpaceShooterObject {
-	
-	protected int hitboxWidth; //width in pixels of the ship
-	protected int hitboxHeight; //height in pixels of the ship
-	protected Point location;
 
-	protected String imagePath; // "/<fileName>.png", assuming the file is a png and placed in the resources folder.
+	protected int hitboxWidth; // width in pixels of the ship
+	protected int hitboxHeight; // height in pixels of the ship
+	protected Point location; // x,y coordinates of the object's top left corner
+
+	protected String imagePath; // "/<fileName>.png", assuming the file is a png and in the resources folder
 
 	public int getHitboxWidth() {
 		return hitboxWidth;
@@ -41,9 +41,9 @@ public abstract class SpaceShooterObject {
 	public void setImagePath(String imagePath) {
 		this.imagePath = imagePath;
 	}
-	
+
 	public void updatePosition(Point p) {
-		
+		location.setLocation(location.x + p.x, location.y + p.y);
 	}
-	
+
 }
