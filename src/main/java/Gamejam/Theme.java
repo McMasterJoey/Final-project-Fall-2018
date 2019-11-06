@@ -26,10 +26,10 @@ import model.SanityCheckFailedException;
 public class Theme 
 {
 	
-	private String name;
-	private ThemePair[] themedata;
-	private ArrayList<Image> themeimg;
-	private Image icon;
+	protected String name;
+	protected ThemePair[] themedata;
+	protected ArrayList<Image> themeimg;
+	protected Image icon;
 	/**
 	 * The main constructor.
 	 * @param name The name of the theme.
@@ -143,12 +143,12 @@ public class Theme
 		}
 		return null;
 	}
-	private String dumpBackground(ThemePair p, int x)
+	protected String dumpBackground(ThemePair p, int x)
 	{
 		String color = paintToGenString(p.getBackground().getFills().get(0).getFill());
 		return "Background bg" + x + " = new Background(new BackgroundFill(" + color + ",CornerRadii.EMPTY, new Insets(0)));";
 	}
-	private String dumpBorder(ThemePair p, int x)
+	protected String dumpBorder(ThemePair p, int x)
 	{
 		String color = paintToGenString(p.getBorder().getStrokes().get(0).getTopStroke());
 		String style1 = _dumpBorderUtil(p.getBorder().getStrokes().get(0).getTopStyle());
@@ -159,7 +159,7 @@ public class Theme
 		
 		return "Border bo" + x + " = new Border(new BorderStroke(" + color + "," + color + "," + color + "," + color + "," + style1 + "," + style2 + "," + style3 + "," + style4 + "," + "CornerRadii.EMPTY, new BorderWidths(" + p.getBorder().getStrokes().get(0).getWidths().getTop() + "), new Insets(0)));";
 	}
-	private String _dumpBorderUtil(BorderStrokeStyle s)
+	protected String _dumpBorderUtil(BorderStrokeStyle s)
 	{
 		String style = "BorderStrokeStyle.SOLID";
 		if (s.equals(BorderStrokeStyle.NONE)) 

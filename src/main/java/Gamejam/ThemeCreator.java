@@ -273,34 +273,34 @@ public class ThemeCreator extends HBox
 		this.leftcol.getChildren().addAll(topleftbox,middletopleftbox,othercolorsetterhbox,border_label,borderopts,backgroundopts,updatebox);
 		this.getChildren().addAll(this.leftcol);
 		
-		this.screen.addRegion(400, this.leftcol, "Theme Creator left vbox background", new ThemeRegionProp(ThemeRegionProp.VBOX));
-		this.screen.addRegion(401, this.elementselector, "Theme Creator Element Selector Combo Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX));
-		this.screen.addRegion(402, this.groupselector, "Theme Creator Element Group Combo Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX));
-		this.screen.addRegion(403, topleftbox, "Theme Creator top label background box", new ThemeRegionProp(ThemeRegionProp.HBOX));
-		this.screen.addRegion(404, middletopleftbox, "Theme Creator top selections background box", new ThemeRegionProp(ThemeRegionProp.HBOX));
-		this.screen.addRegion(405, infotext, "Theme Creator top left label", new ThemeRegionProp(ThemeRegionProp.LABEL));
-		this.screen.addRegion(406, updatebox, "Theme Creator middle update buttons background box", new ThemeRegionProp(ThemeRegionProp.HBOX));
-		this.screen.addRegion(408, updateTheme, "Theme Creator update theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
-		this.screen.addRegion(409, setTheme, "Theme Creator set theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
-		this.screen.addRegion(410, resetCustomTheme, "Theme Creator reset theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
-		this.screen.addRegion(411, borderopts, "Theme Creator Borders Creator HBox", new ThemeRegionProp(ThemeRegionProp.HBOX));
-		this.screen.addRegion(412, border_fetchPaint, "Theme Creator get color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
-		this.screen.addRegion(413, border_finish, "Theme Creator Border Finalize Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
-		this.screen.addRegion(414, border_styleing, "Theme Creator Border Styling Choice Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX));
-		this.screen.addRegion(415, border_widths, "Theme Creator Border TextField", new ThemeRegionProp(ThemeRegionProp.TEXTINPUT));
-		this.screen.addRegion(416, border_top, "Theme Creator Top Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
-		this.screen.addRegion(417, border_bottom, "Theme Creator Bottom Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
-		this.screen.addRegion(418, border_left, "Theme Creator Left Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
-		this.screen.addRegion(419, border_right, "Theme Creator Right Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
-		this.screen.addRegion(420, backgroundopts, "Theme Creator Basic Graident and Background HBox", new ThemeRegionProp(ThemeRegionProp.HBOX));
-		this.screen.addRegion(421, border_label, "Theme Creator Border Info Label", new ThemeRegionProp(ThemeRegionProp.LABEL));
-		this.screen.addRegion(422, bg_gradient_simple_paint_set_primary, "Theme Creator Get Primary Graident Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
-		this.screen.addRegion(423, bg_gradient_simple_paint_set_secondary, "Theme Creator Get Secondary Graident Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
-		this.screen.addRegion(425, bg_gradient_set_paint, "Theme Creator Set Graident Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
-		this.screen.addRegion(426, bg_gradient_directional_checkbox, "Theme Creator Graident Dirrection Checkbox", new ThemeRegionProp(ThemeRegionProp.CHECKBOX));
-		this.screen.addRegion(427, bg_getPaint, "Theme Creator Set Background Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
-		this.screen.addRegion(428, txt_getPaint, "Theme Creator Set Text Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
-		this.screen.addRegion(429,  othercolorsetterhbox, "Theme Creator Other Color Setters HBox", new ThemeRegionProp(ThemeRegionProp.HBOX));
+		this.screen.addRegion(400, this.leftcol, "Theme Creator left vbox background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(401, this.elementselector, "Theme Creator Element Selector Combo Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(402, this.groupselector, "Theme Creator Element Group Combo Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(403, topleftbox, "Theme Creator top label background box", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(404, middletopleftbox, "Theme Creator top selections background box", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(405, infotext, "Theme Creator top left label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(406, updatebox, "Theme Creator middle update buttons background box", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(408, updateTheme, "Theme Creator update theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(409, setTheme, "Theme Creator set theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(410, resetCustomTheme, "Theme Creator reset theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(411, borderopts, "Theme Creator Borders Creator HBox", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(412, border_fetchPaint, "Theme Creator get color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(413, border_finish, "Theme Creator Border Finalize Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(414, border_styleing, "Theme Creator Border Styling Choice Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(415, border_widths, "Theme Creator Border TextField", new ThemeRegionProp(ThemeRegionProp.TEXTINPUT, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(416, border_top, "Theme Creator Top Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(417, border_bottom, "Theme Creator Bottom Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(418, border_left, "Theme Creator Left Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(419, border_right, "Theme Creator Right Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(420, backgroundopts, "Theme Creator Basic Graident and Background HBox", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(421, border_label, "Theme Creator Border Info Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(422, bg_gradient_simple_paint_set_primary, "Theme Creator Get Primary Graident Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(423, bg_gradient_simple_paint_set_secondary, "Theme Creator Get Secondary Graident Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(425, bg_gradient_set_paint, "Theme Creator Set Graident Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(426, bg_gradient_directional_checkbox, "Theme Creator Graident Dirrection Checkbox", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(427, bg_getPaint, "Theme Creator Set Background Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(428, txt_getPaint, "Theme Creator Set Text Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
+		this.screen.addRegion(429,  othercolorsetterhbox, "Theme Creator Other Color Setters HBox", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
 	}
 	/**
 	 * Itended to take numbers from strings and format them as int
@@ -359,6 +359,7 @@ public class ThemeCreator extends HBox
 	}
 	private void applySettingToGroup(ThemePair p)
 	{
+		/*
 		for(int x = 0; x < this.regions.size(); x++)
 		{
 			if (this.currentgroupid == 7)
@@ -415,5 +416,6 @@ public class ThemeCreator extends HBox
 				continue;
 			}
 		}
+		*/
 	}
 }

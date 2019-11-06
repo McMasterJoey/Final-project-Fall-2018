@@ -2,6 +2,7 @@ package Gamejam;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -42,7 +43,7 @@ public class GamejamMainScreenTheme
 		this.regions = new ArrayList<RegionPair>(50);
 		this.preInit = new ArrayList<PriorityPair>(50);
 		this.themecreator = new ThemeCreator(this);
-		addRegion(228, this.themecreator, "Theme Menu Theme Creator", new ThemeRegionProp(ThemeRegionProp.HBOX));
+		addRegion(228, this.themecreator, "Theme Menu Theme Creator", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM));
 		cacheImages();
 		
 	}
@@ -157,28 +158,32 @@ public class GamejamMainScreenTheme
 		this.customtheme = new Theme("Custom Theme", getRegionCount());
 		this.customtheme.addNewImage("/usersettingsbuttonbackground.png");
 		this.customtheme.addNewImage("/usersettingsbuttonbackground.png");
+		HashSet<Integer> check3 = new HashSet<Integer>();
+		check3.add(26);
+		check3.add(27);
+		
 		for(int x = 0; x < this.regions.size(); x++) 
 		{
 			ThemePair p;
-			if (this.regions.get(x).getProperties().isButton())
+			if (this.regions.get(x).getProperties().isTrue(0))
 			{
 				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.DARKGRAY, false), quickBorderSetup(Color.DARKBLUE), Color.BLACK);
-				this.setCustomThemeData(x, p);
+				this.customtheme.setThemeData(x, p);
 			} 
-			else if (this.regions.get(x).getProperties().isBoundingArea())
+			else if (this.regions.get(x).getProperties().isTrue(12))
 			{
 				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), noBorder());
-				this.setCustomThemeData(x, p);
+				this.customtheme.setThemeData(x, p);
 			}
-			else if (this.regions.get(x).getProperties().canColorText())
+			else if (this.regions.get(x).getProperties().isAllTrue(check3))
 			{
 				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), noBorder(), Color.RED);
-				this.setCustomThemeData(x, p);
+				this.customtheme.setThemeData(x, p);
 			}
 			else
 			{
 				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.DARKGRAY,Color.GRAY, true), noBorder());
-				this.setCustomThemeData(x, p);
+				this.customtheme.setThemeData(x, p);
 			}
 		
 		}
@@ -212,13 +217,17 @@ public class GamejamMainScreenTheme
 			themedata = getTheme(themeid).getTheme();
 		}
 		int themeimageid = 0;
+		HashSet<Integer> check2 = new HashSet<Integer>();
+		check2.add(26);
+		check2.add(27);
+		
 		for(int x = 0; x < this.regions.size(); x++)
 		{
 			if (this.regions.get(x) == null || this.regions.get(x).getRegion() == null) {
 				Gamejam.DPrint("[ERROR]: Region at index " + x + " was null!");
 				continue;
 			}
-			if (!this.regions.get(x).getProperties().doNotTreatAsRegion())
+			if (!this.regions.get(x).getProperties().isTrue(29))
 			{
 				if (themedata[x] == null)
 				{
@@ -229,7 +238,7 @@ public class GamejamMainScreenTheme
 				this.regions.get(x).getRegion().setBorder(themedata[x].getBorder());
 				this.regions.get(x).getRegion().setStyle(themedata[x].getCSS());
 			}
-			if (this.regions.get(x).getProperties().canColorText()) 
+			if (this.regions.get(x).getProperties().isAllTrue(check2)) 
 			{
 				if (themedata[x] == null)
 				{
@@ -240,7 +249,7 @@ public class GamejamMainScreenTheme
 				Labeled l = (Labeled) this.regions.get(x).getRegion();
 				l.setTextFill(themedata[x].getColor());
 			}
-			if (this.regions.get(x).getProperties().isContainsThemeableMainGUIImages())
+			if (this.regions.get(x).getProperties().isTrue(28))
 			{
 				Button b = (Button) this.regions.get(x).getRegion();
 				b.setGraphic(getTheme(themeid).getImage(themeimageid));
@@ -288,20 +297,30 @@ public class GamejamMainScreenTheme
 		t1.setIcon(this.imagecache.get(0));
 		t1.addNewImage("/usersettingsbuttonbackground.png");
 		t1.addNewImage("/usersettingsbuttonbackground.png");
+		
+		HashSet<Integer> check3 = new HashSet<Integer>();
+		check3.add(26);
+		check3.add(27);
+		
 		for(int x = 0; x < this.regions.size(); x++) 
 		{
 			ThemePair p;
-			if (this.regions.get(x).getProperties().isButton())
+			if (this.regions.get(x).getProperties().isTrue(0))
 			{
 				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.DARKGRAY, false), quickBorderSetup(Color.DARKBLUE), Color.BLACK);
 				t1.setThemeData(x, p);
-			} 
-			else if (this.regions.get(x).getProperties().isBoundingArea())
+			}
+			else if (this.regions.get(x).getProperties().isTrue(13))
+			{
+				p = new ThemePair(transparentBackground(), noBorder());
+				t1.setThemeData(x, p);
+			}
+			else if (this.regions.get(x).getProperties().isTrue(12))
 			{
 				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), noBorder());
 				t1.setThemeData(x, p);
 			}
-			else if (this.regions.get(x).getProperties().canColorText())
+			else if (this.regions.get(x).getProperties().isAllTrue(check3))
 			{
 				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), noBorder(), Color.RED);
 				t1.setThemeData(x, p);
@@ -314,6 +333,10 @@ public class GamejamMainScreenTheme
 		
 		}
 		themes.set(0,t1);
+	}
+	public static Background transparentBackground()
+	{
+		return new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, new Insets(0)));
 	}
 	public static LinearGradient linGrdSimpleSetup(Paint start, Paint end, boolean sidetoside)
 	{
