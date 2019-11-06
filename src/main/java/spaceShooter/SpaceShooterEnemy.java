@@ -12,6 +12,7 @@ public abstract class SpaceShooterEnemy extends SpaceShooterShip{
 	private static final long serialVersionUID = 1L;
 	
 	protected int shotFrequency; //number of game clock ticks before the enemy can shoot again
+	protected int pointValue; //how many points this enemy is worth when you kill it
 
 	public int getShotFrequency() {
 		return shotFrequency;
@@ -19,5 +20,13 @@ public abstract class SpaceShooterEnemy extends SpaceShooterShip{
 
 	public void setShotFrequency(int shotFrequency) {
 		this.shotFrequency = shotFrequency;
+	}
+	
+	public int getPointValue() {
+		return pointValue;
+	}
+	
+	public void setPointValue(int pointValue) {
+		this.pointValue = pointValue;
 	}
 }
