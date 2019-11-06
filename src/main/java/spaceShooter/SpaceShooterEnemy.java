@@ -1,5 +1,6 @@
 package spaceShooter;
 
+import java.awt.Point;
 import java.io.Serializable;
 
 /**
@@ -22,9 +23,18 @@ public abstract class SpaceShooterEnemy implements Serializable {
 
 	protected int hitboxWidth; //width in pixels of the ship
 	protected int hitboxHeight; //height in pixels of the ship
-	
+	protected Point location;
+
 	protected String imagePath; // "/<fileName>.png", assuming the file is a png and placed in the resources folder.
 
+	public Point getLocation() {
+		return location;
+	}
+
+	public void setLocation(Point location) {
+		this.location = location;
+	}
+	
 	public int getMaxHP() {
 		return maxHP;
 	}
