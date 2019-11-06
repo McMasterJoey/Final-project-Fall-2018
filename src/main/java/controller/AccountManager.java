@@ -97,9 +97,9 @@ public class AccountManager extends Observable
                     curUsername = username;
                     isAdmin = rs.getBoolean("admin");
                     isGuest = rs.getBoolean("guest");
+                    level = rs.getInt("level");
                     expInLevel = rs.getInt("exp");
                     totalExp = getExpForLevel(level) + expInLevel;
-                    level = rs.getInt("level");
                     accountID = rs.getInt("accountid");
                     fillUserStats();
 
@@ -510,6 +510,12 @@ public class AccountManager extends Observable
         }
 
         expInLevel = totalExp - getTotalExpForLevel(level); // Determine the remaining exp the user has after leveling
+
+        if (expInLevel < 0)
+        {
+            expInLevel = 0;
+            throw new IllegalStateException("expInLevel became negative!");
+        }
 
         try
         {
