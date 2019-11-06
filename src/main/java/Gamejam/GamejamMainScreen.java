@@ -199,8 +199,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private HBox initTopBar() {
 		HBox retval = new HBox(); // General Box
-		retval.setAlignment(Pos.TOP_RIGHT); // Set it so it aligns on the right
 		HBox leftbox = new HBox();
+		HBox rightbox = new HBox();
+		
 		// Create New Account Button
 		Button newacc = new Button("Create New Account");
 		newacc.setPrefWidth(144);
@@ -213,14 +214,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Button viewLeaderboard = new Button("View Leaderboard");
 		viewLeaderboard.setOnAction( (ae) -> viewLeaderboardClick());
 
-		// Add to Left Hbox
-		leftbox.getChildren().addAll(newacc, viewLeaderboard);
-		
-		leftbox.setPrefWidth(758);
-		leftbox.setPrefHeight(25);
-		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
 		// Add to right hbox first to achieve correct look
-		retval.getChildren().add(leftbox);
+		//retval.getChildren().add(leftbox);
 
 		TextField username = new TextField();
 		username.setPromptText("username");
@@ -247,12 +242,24 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			loginButtonClick();
 		});
     
-		retval.getChildren().addAll(username, password, login);
-		retval.setPrefWidth(600);
+		
+		// Add to Left Hbox
+		leftbox.getChildren().addAll(newacc, viewLeaderboard);
+		leftbox.setPrefWidth(10000);
+		leftbox.setPrefHeight(25);
+		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
+				
+		rightbox.getChildren().addAll(username, password, login);
+		rightbox.setPrefWidth(10000);
+		rightbox.setAlignment(Pos.TOP_RIGHT);
+		retval.getChildren().addAll(leftbox, rightbox);
+		retval.setPrefWidth(20000);
 		retval.setPrefHeight(25);
+		retval.setAlignment(Pos.BASELINE_CENTER);
 		
 		this.initthemes.addRegion(12, retval, "Top bar background while not logged in", new ThemeRegionProp(ThemeRegionProp.HBOX));
 		this.initthemes.addRegion(13, leftbox, "Top bar left background while not logged in", new ThemeRegionProp(ThemeRegionProp.HBOX));
+		this.initthemes.addRegion(13.001, leftbox, "Top bar right background while not logged in", new ThemeRegionProp(ThemeRegionProp.HBOX));
 		this.initthemes.addRegion(14, newacc, "Top bar Create Account Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.initthemes.addRegion(15, viewLeaderboard, "Top bar Create Account Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.initthemes.addRegion(16, username, "Top bar user name input area", new ThemeRegionProp(ThemeRegionProp.TEXTINPUT));
@@ -270,8 +277,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private HBox initLoggedInBar() {
 		HBox retval = new HBox(); // General Box
-		retval.setAlignment(Pos.TOP_RIGHT); // Set it so it aligns on the right
 		HBox leftbox = new HBox();
+		HBox rightbox = new HBox();
+		
 		// Create New Account Button
 		Button logout = new Button("Logout");
 		logout.setPrefWidth(144);
@@ -282,13 +290,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Leaderboard button
 		Button viewLeaderboard = new Button("View Leaderboard");
 		viewLeaderboard.setOnAction( (ae) -> viewLeaderboardClick());
-		// Add to Left Hbox
-		leftbox.getChildren().addAll(logout, viewLeaderboard);
-		leftbox.setPrefWidth(1100);
-		leftbox.setPrefHeight(25);
-		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
-		// Add to right hbox first to achieve correct look
-		retval.getChildren().add(leftbox);
 
 		Label loggedinusername = new Label("Test User");
 		loggedinusername.setFont(new Font(14));
@@ -300,13 +301,26 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		settings.setOnMouseClicked((click) -> {
 			userSettingsButtonClick();
 		});
-				
-		retval.getChildren().addAll(loggedinusername, settings);
-		retval.setPrefWidth(600);
+		
+		// Add to Left Hbox
+		leftbox.getChildren().addAll(logout, viewLeaderboard);
+		leftbox.setPrefWidth(10000);
+		leftbox.setPrefHeight(25);
+		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
+		
+		rightbox.getChildren().addAll(loggedinusername, settings);
+		rightbox.setPrefHeight(25);
+		rightbox.setPrefWidth(10000);
+		rightbox.setAlignment(Pos.TOP_RIGHT);
+		
+		retval.getChildren().addAll(leftbox, rightbox);
+		retval.setPrefWidth(20000);
 		retval.setPrefHeight(25);
+		retval.setAlignment(Pos.BASELINE_CENTER);
 		
 		this.initthemes.addRegion(19, retval, "Top bar logged in background", new ThemeRegionProp(ThemeRegionProp.HBOX));
 		this.initthemes.addRegion(20, leftbox, "Top bar logged in left side background", new ThemeRegionProp(ThemeRegionProp.HBOX));
+		this.initthemes.addRegion(20.1, rightbox, "Top bar logged in right side background", new ThemeRegionProp(ThemeRegionProp.HBOX));
 		this.initthemes.addRegion(21, logout, "Top bar logged in logout button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.initthemes.addRegion(22, viewLeaderboard, "Top bar logged in leaderboard button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.initthemes.addRegion(23, loggedinusername, "Top bar logged in username label", new ThemeRegionProp(ThemeRegionProp.LABEL));
@@ -321,8 +335,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private HBox initLoggedInInGameBar() {
 		HBox retval = new HBox(); // General Box
-		retval.setAlignment(Pos.TOP_RIGHT); // Set it so it aligns on the right
 		HBox leftbox = new HBox();
+		HBox rightbox = new HBox();
+		
 		// Back to Main Menu Button
 		Button logout = new Button("Back To Main Menu");
 		logout.setPrefWidth(144);
@@ -331,14 +346,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			BackToMainMenuButtonClickLoggedIn();
 		});
 		
-		// Add to Left Hbox
-		leftbox.getChildren().add(logout);
-		leftbox.setPrefWidth(1100);
-		leftbox.setPrefHeight(25);
-		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
-		// Add to right hbox first to achieve correct look
-		retval.getChildren().add(leftbox);
-
 		Label loggedinusername = new Label("Test User");
 		loggedinusername.setFont(new Font(14));
 		loggedinusername.setPrefWidth(400);
@@ -350,12 +357,25 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			userSettingsButtonClickInGame();
 		});
 				
-		retval.getChildren().addAll(loggedinusername, settings);
-		retval.setPrefWidth(600);
+		// Add to Left Hbox
+		leftbox.getChildren().addAll(logout);
+		leftbox.setPrefWidth(10000);
+		leftbox.setPrefHeight(25);
+		leftbox.setAlignment(Pos.TOP_LEFT); // Set it so it aligns on the left
+				
+		rightbox.getChildren().addAll(loggedinusername, settings);
+		rightbox.setPrefHeight(25);
+		rightbox.setPrefWidth(10000);
+		rightbox.setAlignment(Pos.TOP_RIGHT);
+		
+		retval.getChildren().addAll(leftbox, rightbox);
+		retval.setPrefWidth(20000);
 		retval.setPrefHeight(25);
+		retval.setAlignment(Pos.BASELINE_CENTER);
 		
 		this.initthemes.addRegion(25, retval, "Top bar logged in and in game background", new ThemeRegionProp(ThemeRegionProp.HBOX));
 		this.initthemes.addRegion(26, leftbox, "Top bar logged in and in game left side background", new ThemeRegionProp(ThemeRegionProp.HBOX));
+		this.initthemes.addRegion(26.001, rightbox, "Top bar logged in and in game right side background", new ThemeRegionProp(ThemeRegionProp.HBOX));
 		this.initthemes.addRegion(27, logout, "Top bar logged in and in game back to main menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		this.initthemes.addRegion(28, loggedinusername, "Top bar logged in and in game username label", new ThemeRegionProp(ThemeRegionProp.LABEL));
 		ThemeRegionProp pp = new ThemeRegionProp(ThemeRegionProp.BUTTON);
@@ -498,13 +518,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Button theme1 = new Button();
 		theme1.setGraphic(this.initthemes.getThemeIcon(1));
 		theme1.setOnMouseClicked((click) -> {
-			this.initthemes.updateTheme(1);
+			//this.initthemes.updateTheme(1);
 		});
 		left.getChildren().add(theme1);
 		Button theme2 = new Button();
 		theme2.setGraphic(this.initthemes.getThemeIcon(2));
 		theme2.setOnMouseClicked((click) -> {
-			this.initthemes.updateTheme(2);
+			//this.initthemes.updateTheme(2);
 		});
 		left.getChildren().add(theme2);
 		/*
@@ -618,8 +638,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private void loginButtonClick() {
 		// Ever time the initTopBar is changed, update this function
-		TextField username = (TextField) this.initTopBar.getChildren().get(1);
-		PasswordField password = (PasswordField) this.initTopBar.getChildren().get(2);
+		HBox rightbox = (HBox) this.initTopBar.getChildren().get(1);
+		TextField username = (TextField) rightbox.getChildren().get(0);
+		PasswordField password = (PasswordField) rightbox.getChildren().get(1);
 		boolean successful = doLogin(username.getText(), password.getText());
 		if (successful) {
 			this.userLoggedIn = true;
@@ -796,8 +817,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * Updates all the GUI elements that use the username of the current user.
 	 */
 	private void UpdateLoggedInBarsWithUserNameOfCurrentUser() {
-		Label lo = (Label) this.initLoggedInBar.getChildren().get(1);
-		Label log = (Label) this.initLoggedInInGameBar.getChildren().get(1);
+		HBox leftbox1 = (HBox) this.initLoggedInBar.getChildren().get(1);
+		HBox leftbox2 = (HBox) this.initLoggedInInGameBar.getChildren().get(1);
+		Label lo = (Label) leftbox1.getChildren().get(0);
+		Label log = (Label) leftbox2.getChildren().get(0);
 		lo.setText(this.loggedinusername);
 		log.setText(this.loggedinusername);
 	}
