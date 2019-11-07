@@ -7,7 +7,7 @@ public class SpaceShooterProjectile extends SpaceShooterObject {
 	private int movementSpeed;
 	
 	public SpaceShooterProjectile(Point location, int projectileSpeed, String imagePath) {
-		this.location = location;
+		this.location = new Point(location);
 		this.movementSpeed = projectileSpeed;
 		this.imagePath = imagePath;
 	}

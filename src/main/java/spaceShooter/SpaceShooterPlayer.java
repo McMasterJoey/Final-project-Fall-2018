@@ -8,7 +8,11 @@ public class SpaceShooterPlayer extends SpaceShooterShip{
 	private int movementSpeed;
 	
 	public SpaceShooterPlayer() {
-		movementSpeed = 5;
+		currentHP = 1;
+		maxHP = 2;
+		movementSpeed = 3;
+		hitboxWidth = 40;
+		hitboxHeight = 40;
 	}
 	
 	public int getMovementSpeed() {

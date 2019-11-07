@@ -12,7 +12,7 @@ public class SpaceShooterModel extends Observable {
 
 	public SpaceShooterModel() {
 		currentEnemies = new ArrayList<SpaceShooterEnemy>();
-		currentScore = 0;
+		currentScore = 1;
 		numberLives = 3;
 		currentLevel = 1;
 	}

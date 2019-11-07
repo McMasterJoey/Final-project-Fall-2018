@@ -11,15 +11,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Observable;
 
+import controller.AccountManager;
 import controller.GameControllerView;
 import controller.GameMenu;
 import controller.LogStatType;
+import controller.StatsManager;
 import javafx.animation.AnimationTimer;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.media.AudioClip;
+import javafx.scene.paint.Color;
 
 public class SpaceShooterControllerView extends GameControllerView {
 
@@ -40,17 +43,27 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private Point startingLocation, playerDelta;
 	private boolean aPressed = false;
 	private boolean dPressed = false;
+	private SpaceShooterResources resources = new SpaceShooterResources();
 
 	public SpaceShooterControllerView() {
 		setUpGameClock();
+		accountManager = AccountManager.getInstance();
+		statsManager = StatsManager.getInstance();
+		
 		gameModel = new SpaceShooterModel();
 		gameModel.addObserver(this);
-		
-		player = new SpaceShooterPlayer();		
-		playerDelta = new Point(0, 0);
-		startingLocation = new Point((WIDTH/2) - (player.getHitboxWidth()/2), HEIGHT - (2*player.getHitboxHeight()));
+		gameName = "space-shooter";
+
+		player = new SpaceShooterPlayer();
+		startingLocation = new Point((WIDTH / 2) - (player.getHitboxWidth() / 2),
+				HEIGHT - (2 * player.getHitboxHeight()));
 		player.setLocation(startingLocation);
 		
+		enemyProjectiles = new ArrayList<SpaceShooterProjectile>();
+		playerProjectiles = new ArrayList<SpaceShooterProjectile>();
+		enemyList = new ArrayList<SpaceShooterEnemy>();
+		itemDrops = new ArrayList<SpaceShooterObject>();
+
 		gameScreen = new Canvas(WIDTH, HEIGHT);
 		this.setCenter(gameScreen);
 
@@ -77,23 +90,12 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private void setupListeners() {
 		setupPlayerListeners();
 
-		// this listener will stop the gameClock while the canvas isn't focused.
-		gameScreen.focusedProperty().addListener(new ChangeListener<Boolean>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue,
-					Boolean newPropertyValue) {
-
-				if (!newPropertyValue) {
-					pauseGame();
-					displayPauseScreen();
-				}
-			}
-		});
+		// this listener will stop the gameClock while the canvas isn't focused.		
 	}
 
 	private void setupPlayerListeners() {
-		gameScreen.setOnKeyPressed((key) -> {
+		Scene myScene = this.getScene();
+		myScene.setOnKeyPressed((key) -> {
 			if (key.getCode() == KeyCode.A || key.getCode() == KeyCode.S) {
 				aPressed = true;
 			} else if (key.getCode() == KeyCode.D || key.getCode() == KeyCode.F) {
@@ -105,10 +107,10 @@ public class SpaceShooterControllerView extends GameControllerView {
 				displayPauseScreen();
 			}
 		});
-		gameScreen.setOnKeyReleased((key) -> {
+		myScene.setOnKeyReleased((key) -> {
 			if (key.getCode() == KeyCode.A || key.getCode() == KeyCode.S) {
 				aPressed = false;
-			} else if (key.getCode() == KeyCode.ADD || key.getCode() == KeyCode.F) {
+			} else if (key.getCode() == KeyCode.D || key.getCode() == KeyCode.F) {
 				dPressed = false;
 			}
 		});
@@ -129,9 +131,14 @@ public class SpaceShooterControllerView extends GameControllerView {
 	}
 
 	private void displayStartScreen() {
-		// TODO Draw start screen info
+		GraphicsContext gc = gameScreen.getGraphicsContext2D();
+		gc.setFill(Color.BLACK);
+		gc.fillRect(0, 0, WIDTH, HEIGHT);
 
-		gameScreen.setOnKeyPressed((key) -> {
+		// TODO design logo to put top center
+		// and push any key to start somewhere in the middle;
+		
+		gameScreen.setOnMouseClicked((key) -> {
 			startGame();
 		});
 
@@ -139,15 +146,16 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	private void displayPauseScreen() {
 		// draw Pause Screen
-		gameScreen.setOnKeyPressed((key) -> {
+		getScene().setOnKeyPressed((key) -> {
 			unPauseGame();
+			setupListeners();
 		});
 	}
 
 	private void displayContinueScreen() {
 		// TODO draw continue screen
 
-		gameScreen.setOnKeyPressed((key) -> {
+		getScene().setOnKeyPressed((key) -> {
 			startGame();
 		});
 
@@ -168,28 +176,25 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	private void gameClockTick() {
 		gameClockCount++;
-
-		// this is because the game ticks way too fast otherwise.
-		if (gameClockCount % 4 == 0) {
-			updatePlayerPosition();
-			updateEnemyPositions();
-			updateProjectilePositions();
-			checkCollisions();
-			checkDeaths();
-			checkLevelOver();
-			checkGameOver();
-		}
+		updatePlayerPosition();
+		updateEnemyPositions();
+		updateProjectilePositions();
+		checkCollisions();
+		checkDeaths();
+		checkLevelOver();
+		checkGameOver();
+		update(gameModel, this);
 	}
 
 	private void checkDeaths() {
-		if(player.getCurrentHP() <= 0) {
+		if (player.getCurrentHP() <= 0) {
 			gameModel.setLives(gameModel.getLives() - 1);
 			player.setLocation(startingLocation);
 		}
-		
+
 		ArrayList<SpaceShooterEnemy> toRemove = new ArrayList<SpaceShooterEnemy>();
-		for(SpaceShooterEnemy enemy : enemyList) {
-			if(enemy.getCurrentHP() <= 0) {
+		for (SpaceShooterEnemy enemy : enemyList) {
+			if (enemy.getCurrentHP() <= 0) {
 				toRemove.add(enemy);
 			}
 		}
@@ -208,13 +213,13 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	private void updateEnemyPositions() {
 		int xMovement;
-		if(gameClockCount % 20 < 10) {
+		if (gameClockCount % 20 < 10) {
 			xMovement = enemySpeedMultiplier * 3;
 		} else {
 			xMovement = enemySpeedMultiplier * -3;
 		}
 		Point enemyDelta = new Point(xMovement, 0);
-		
+
 		for (SpaceShooterEnemy enemy : enemyList) {
 			enemy.updatePosition(enemyDelta);
 		}
@@ -306,7 +311,13 @@ public class SpaceShooterControllerView extends GameControllerView {
 			clips.remove();
 		}
 
-		// TODO draw player
+		GraphicsContext gc = gameScreen.getGraphicsContext2D();
+		gc.clearRect(0, 0, WIDTH, HEIGHT);
+		gc.setFill(Color.BLACK);
+		gc.fillRect(0, 0, WIDTH, HEIGHT); // TODO make a background?
+
+		gc.drawImage(resources.getPlayerImage(), player.getLocation().x, player.getLocation().y,
+				player.getHitboxWidth(), player.getHitboxHeight());
 		// TODO draw enemies
 		// TODO draw projectiles
 		// TODO draw buffs
@@ -424,6 +435,8 @@ public class SpaceShooterControllerView extends GameControllerView {
 		try {
 			gameClock.stop();
 			gameClockCount = 0;
+			player.setCurrentHP(player.getMaxHP());
+			player.setLocation(startingLocation);
 			gameModel.newGame();
 			displayStartScreen();
 			return true;
