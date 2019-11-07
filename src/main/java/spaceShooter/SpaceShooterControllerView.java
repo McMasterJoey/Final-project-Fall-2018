@@ -18,6 +18,7 @@ import javafx.animation.AnimationTimer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.input.KeyCode;
 import javafx.scene.media.AudioClip;
 
 public class SpaceShooterControllerView extends GameControllerView {
@@ -36,15 +37,20 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private ArrayList<SpaceShooterProjectile> playerProjectiles;
 	private ArrayList<SpaceShooterObject> itemDrops;
 	private int enemySpeedMultiplier = 1;
-	private Point playerDelta;
+	private Point startingLocation, playerDelta;
+	private boolean aPressed = false;
+	private boolean dPressed = false;
 
 	public SpaceShooterControllerView() {
 		setUpGameClock();
 		gameModel = new SpaceShooterModel();
 		gameModel.addObserver(this);
-		player = new SpaceShooterPlayer();
+		
+		player = new SpaceShooterPlayer();		
 		playerDelta = new Point(0, 0);
-
+		startingLocation = new Point((WIDTH/2) - (player.getHitboxWidth()/2), HEIGHT - (2*player.getHitboxHeight()));
+		player.setLocation(startingLocation);
+		
 		gameScreen = new Canvas(WIDTH, HEIGHT);
 		this.setCenter(gameScreen);
 
@@ -67,44 +73,57 @@ public class SpaceShooterControllerView extends GameControllerView {
 			}
 		};
 	}
-	
+
 	private void setupListeners() {
 		setupPlayerListeners();
 
 		// this listener will stop the gameClock while the canvas isn't focused.
 		gameScreen.focusedProperty().addListener(new ChangeListener<Boolean>() {
-			
+
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue,
-					Boolean newPropertyValue) {				
-			
-				if(!newPropertyValue) {
+					Boolean newPropertyValue) {
+
+				if (!newPropertyValue) {
 					pauseGame();
 					displayPauseScreen();
 				}
-			}			
+			}
 		});
 	}
 
 	private void setupPlayerListeners() {
-
-		gameScreen.setOnKeyPressed((key) ->{
-			// TODO movement
-			// TODO attack
-			// TODO pause
+		gameScreen.setOnKeyPressed((key) -> {
+			if (key.getCode() == KeyCode.A || key.getCode() == KeyCode.S) {
+				aPressed = true;
+			} else if (key.getCode() == KeyCode.D || key.getCode() == KeyCode.F) {
+				dPressed = true;
+			} else if (key.getCode() == KeyCode.SPACE) {
+				playerAttack();
+			} else if (key.getCode() == KeyCode.P) {
+				pauseGame();
+				displayPauseScreen();
+			}
 		});
-		
-		gameScreen.setOnKeyReleased((key) ->{
-			// TODO stop movement
+		gameScreen.setOnKeyReleased((key) -> {
+			if (key.getCode() == KeyCode.A || key.getCode() == KeyCode.S) {
+				aPressed = false;
+			} else if (key.getCode() == KeyCode.ADD || key.getCode() == KeyCode.F) {
+				dPressed = false;
+			}
 		});
-		
-		gameScreen.setOnMouseClicked((click) ->{
-			// TODO attack
+		gameScreen.setOnMouseClicked((click) -> {
+			playerAttack();
 		});
 	}
 
+	private void playerAttack() {
+		playerProjectiles
+				.add(new SpaceShooterProjectile(player.getLocation(), 5, ""/* TODO path to projectile image */));
+	}
+
 	private void checkGameOver() {
-		if(!gameModel.isStillRunning()) {
+		if (!gameModel.isStillRunning()) {
 			displayGameOver();
 		}
 	}
@@ -117,27 +136,27 @@ public class SpaceShooterControllerView extends GameControllerView {
 		});
 
 	}
-	
+
 	private void displayPauseScreen() {
 		// draw Pause Screen
-		gameScreen.setOnKeyPressed((key) ->{
+		gameScreen.setOnKeyPressed((key) -> {
 			unPauseGame();
 		});
 	}
-	
+
 	private void displayContinueScreen() {
 		// TODO draw continue screen
-		
-		gameScreen.setOnKeyPressed((key) ->{
+
+		gameScreen.setOnKeyPressed((key) -> {
 			startGame();
 		});
-		
+
 	}
 
 	private void displayGameOver() {
 		gameClock.stop();
 		// TODO draw screen
-		
+
 	}
 
 	private void startGame() {
@@ -156,81 +175,115 @@ public class SpaceShooterControllerView extends GameControllerView {
 			updateEnemyPositions();
 			updateProjectilePositions();
 			checkCollisions();
+			checkDeaths();
 			checkLevelOver();
 			checkGameOver();
 		}
 	}
-	
+
+	private void checkDeaths() {
+		if(player.getCurrentHP() <= 0) {
+			gameModel.setLives(gameModel.getLives() - 1);
+			player.setLocation(startingLocation);
+		}
+		
+		ArrayList<SpaceShooterEnemy> toRemove = new ArrayList<SpaceShooterEnemy>();
+		for(SpaceShooterEnemy enemy : enemyList) {
+			if(enemy.getCurrentHP() <= 0) {
+				toRemove.add(enemy);
+			}
+		}
+		enemyList.removeAll(toRemove);
+	}
+
 	private void updatePlayerPosition() {
+		int xSpeed = (dPressed ? player.getMovementSpeed() : 0) - (aPressed ? player.getMovementSpeed() : 0);
+		// check that the player won't be off screen
+		if (player.getLocation().x + xSpeed < 0 || player.getLocation().x + xSpeed + player.getHitboxWidth() > WIDTH) {
+			xSpeed = 0;
+		}
+		playerDelta = new Point(xSpeed, 0);
 		player.updatePosition(playerDelta);
 	}
 
 	private void updateEnemyPositions() {
-
-		Point enemyDelta = new Point();
-
-		// TODO calculate which way the enemy should be moving
-		for(SpaceShooterEnemy enemy : enemyList) {
+		int xMovement;
+		if(gameClockCount % 20 < 10) {
+			xMovement = enemySpeedMultiplier * 3;
+		} else {
+			xMovement = enemySpeedMultiplier * -3;
+		}
+		Point enemyDelta = new Point(xMovement, 0);
+		
+		for (SpaceShooterEnemy enemy : enemyList) {
 			enemy.updatePosition(enemyDelta);
 		}
 	}
 
 	private void updateProjectilePositions() {
-		for(SpaceShooterProjectile ssp : enemyProjectiles) {
+		for (SpaceShooterProjectile ssp : enemyProjectiles) {
 			ssp.updatePosition(new Point(0, ssp.getSpeed()));
 		}
-		
-		for(SpaceShooterProjectile ssp : playerProjectiles) {
+
+		for (SpaceShooterProjectile ssp : playerProjectiles) {
 			ssp.updatePosition(new Point(0, -ssp.getSpeed()));
 		}
 	}
 
 	private void checkCollisions() {
 		ArrayList<SpaceShooterProjectile> toRemove = new ArrayList<SpaceShooterProjectile>();
-		for(SpaceShooterEnemy enemy : enemyList) {
-			for(SpaceShooterProjectile ssp : playerProjectiles) {
-				if(collisionExists(enemy, ssp)) {
+		for (SpaceShooterEnemy enemy : enemyList) {
+			for (SpaceShooterProjectile ssp : playerProjectiles) {
+				if (collisionExists(enemy, ssp)) {
 					enemy.setCurrentHP(enemy.getCurrentHP() - 1);
+					toRemove.add(ssp);
+				} else if (isOffScreen(ssp)) {
 					toRemove.add(ssp);
 				}
 			}
 		}
 		playerProjectiles.removeAll(toRemove);
 		toRemove.clear();
-		
-		for(SpaceShooterProjectile ssp : enemyProjectiles) {
-			if(collisionExists(player, ssp)) {
+
+		for (SpaceShooterProjectile ssp : enemyProjectiles) {
+			if (collisionExists(player, ssp)) {
 				player.setCurrentHP(player.getCurrentHP() - 1);
+				toRemove.add(ssp);
+			} else if (isOffScreen(ssp)) {
 				toRemove.add(ssp);
 			}
 		}
 		enemyProjectiles.removeAll(toRemove);
 		toRemove.clear();
-		
+
 		ArrayList<SpaceShooterObject> toRemove2 = new ArrayList<SpaceShooterObject>();
-		for(SpaceShooterObject item : itemDrops) {
-			if(collisionExists(player, item)) {
+		for (SpaceShooterObject item : itemDrops) {
+			if (collisionExists(player, item)) {
 				buffPlayer(item);
 				toRemove2.add(item);
-			} else if(offScreen(item)) {
+			} else if (isOffScreen(item)) {
 				toRemove2.add(item);
 			}
 		}
 		itemDrops.removeAll(toRemove2);
 	}
 
-	private boolean offScreen(SpaceShooterObject item) {
-		// TODO Auto-generated method stub
-		return false;
+	private boolean isOffScreen(SpaceShooterObject item) {
+		return item.getLocation().y < 0 || item.getLocation().y > HEIGHT;
 	}
 
 	private void buffPlayer(SpaceShooterObject item) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private boolean collisionExists(SpaceShooterObject obj, SpaceShooterObject obj2) {
-		// TODO Auto-generated method stub
+		if (obj.getLocation().x < obj2.getLocation().x + obj2.getHitboxWidth()
+				&& obj.getLocation().x + obj.getHitboxWidth() > obj2.getLocation().x
+				&& obj.getLocation().y < obj2.getLocation().y + obj2.getHitboxHeight()
+				&& obj.getLocation().y + obj.getHitboxHeight() > obj2.getLocation().y) {
+			return true;
+		}
 		return false;
 	}
 
@@ -244,15 +297,15 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		
-		//play the soundfx
+
+		// play the soundfx
 		Iterator<AudioClip> clips = soundfx.iterator();
-		while(clips.hasNext()) {
+		while (clips.hasNext()) {
 			AudioClip a = clips.next();
 			a.play();
-			clips.remove();			
+			clips.remove();
 		}
-		
+
 		// TODO draw player
 		// TODO draw enemies
 		// TODO draw projectiles

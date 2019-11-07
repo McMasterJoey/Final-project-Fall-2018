@@ -48,4 +48,8 @@ public class SpaceShooterModel extends Observable {
 	public int getLives() {
 		return numberLives;
 	}
+	
+	public void setLives(int numberLives) {
+		this.numberLives = numberLives;
+	}
 }
