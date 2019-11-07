@@ -12,9 +12,14 @@ public class SpaceShooterResources {
 	
 	public SpaceShooterResources() {
 		playerImage = new Image(SpaceShooterResources.class.getResource("/spaceShooterPlayerImage.png").toString());
+		playerProjectile = new Image(SpaceShooterResources.class.getResource("/spaceShooterPlayerAttackImage.png").toString());
 	}
 	
 	public Image getPlayerImage() {
 		return playerImage;
+	}
+	
+	public Image getPlayerProjectile() {
+		return playerProjectile;
 	}
 }

@@ -49,7 +49,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		setUpGameClock();
 		accountManager = AccountManager.getInstance();
 		statsManager = StatsManager.getInstance();
-		
+
 		gameModel = new SpaceShooterModel();
 		gameModel.addObserver(this);
 		gameName = "space-shooter";
@@ -58,7 +58,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		startingLocation = new Point((WIDTH / 2) - (player.getHitboxWidth() / 2),
 				HEIGHT - (2 * player.getHitboxHeight()));
 		player.setLocation(startingLocation);
-		
+
 		enemyProjectiles = new ArrayList<SpaceShooterProjectile>();
 		playerProjectiles = new ArrayList<SpaceShooterProjectile>();
 		enemyList = new ArrayList<SpaceShooterEnemy>();
@@ -90,7 +90,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private void setupListeners() {
 		setupPlayerListeners();
 
-		// this listener will stop the gameClock while the canvas isn't focused.		
+		// this listener will stop the gameClock while the canvas isn't focused.
 	}
 
 	private void setupPlayerListeners() {
@@ -100,8 +100,6 @@ public class SpaceShooterControllerView extends GameControllerView {
 				aPressed = true;
 			} else if (key.getCode() == KeyCode.D || key.getCode() == KeyCode.F) {
 				dPressed = true;
-			} else if (key.getCode() == KeyCode.SPACE) {
-				playerAttack();
 			} else if (key.getCode() == KeyCode.P) {
 				pauseGame();
 				displayPauseScreen();
@@ -120,8 +118,11 @@ public class SpaceShooterControllerView extends GameControllerView {
 	}
 
 	private void playerAttack() {
+		int x = player.getLocation().x + (player.getHitboxWidth()/2) - 2;
+		Point projectilePosition = new Point(x, player.getLocation().y);
+		
 		playerProjectiles
-				.add(new SpaceShooterProjectile(player.getLocation(), 5, ""/* TODO path to projectile image */));
+				.add(new SpaceShooterProjectile(projectilePosition, 4, 8, 5, "/spaceShooterPlayerAttackImage.png"));
 	}
 
 	private void checkGameOver() {
@@ -137,7 +138,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 		// TODO design logo to put top center
 		// and push any key to start somewhere in the middle;
-		
+
 		gameScreen.setOnMouseClicked((key) -> {
 			startGame();
 		});
@@ -319,6 +320,10 @@ public class SpaceShooterControllerView extends GameControllerView {
 		gc.drawImage(resources.getPlayerImage(), player.getLocation().x, player.getLocation().y,
 				player.getHitboxWidth(), player.getHitboxHeight());
 		// TODO draw enemies
+		for (SpaceShooterProjectile ssp : playerProjectiles) {
+			gc.drawImage(resources.getPlayerProjectile(), ssp.getLocation().x, ssp.getLocation().y,
+					ssp.getHitboxWidth(), ssp.getHitboxHeight());
+		}
 		// TODO draw projectiles
 		// TODO draw buffs
 		// TODO background?
