@@ -66,6 +66,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private VBox leaderScreen;
 	private TableView<Score> scoresTable;
 	private ComboBox<String> leaderBoardSelection;
+	private VBox statsScreen;
+	private TableView<Score> statsTable;
+	private ComboBox<String> statsSelection;
 	private AccountManager acctMgr;
 	private DBGameManager dbGameManager;
 	private Leaderboard leaderboard;
@@ -85,6 +88,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		super();
 		init();
 	}
+
 ////////////////////////View Init Functions go here /////////////////////////////////////////////
 	/**
 	 * Inits the Object
@@ -124,6 +128,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Set up Extra menus
 		this.initUserSettingsMainMenu = initUserSettingsGUI();
 		this.initThemeMenu = initThemeMenu();
+		this.statsScreen = initStatsScreen();
 		
 		// Set currently inuse views
 		this.setTop(this.initTopBar);
@@ -132,6 +137,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		
 		this.initthemes.doneAddingRegions();
 	}
+
 	/**
 	 * Generates the control structure that will exist the left bar.
 	 * 
@@ -190,6 +196,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(11, leftbox, "Create Account HBox", new ThemeRegionProp(ThemeRegionProp.HBOX));
 		return leftbox;
 	}
+
 	/**
 	 * Gets the item that is supposed to be the top most part of the application
 	 * This should be the clickable menus that allow the use to log in and adjust
@@ -315,6 +322,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(24, settings, "Top bar logged in user settings button", pp);
 		return retval;
 	}
+
 	/**
 	 * Generates the item that will be put in the top bar of the application while a user is in a game and logged in.
 	 * @return An HBox with the control structures to act as the top bar of the application.
@@ -403,6 +411,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(205, makeaccount, "Create Account Screen Create Account Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT));
 		return retval;
 	}
+
 	/**
 	 * Gets the item that surposed to be in the center of the application. In this
 	 * case its the game selector menu.
@@ -437,6 +446,11 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		return grid;
 	}
 
+	/**
+	 * Initializes the Leaderboard screen.
+	 *
+	 * @return a VBox containing the Leaderboard
+	 */
 	private VBox initLeaderScreen() {
 		VBox screen = new VBox();
 		this.scoresTable = new TableView<>();
@@ -450,10 +464,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		}
 
 		this.leaderBoardSelection.getSelectionModel().selectFirst();
-
-		this.leaderBoardSelection.setOnAction( (ae) -> {
-			handleLeaderBoardSelectionChange();
-		});
+		this.leaderBoardSelection.setOnAction( (ae) -> { handleLeaderBoardSelectionChange(); });
 
 		TableColumn<Score, String> username = new TableColumn<>("Username");
 		username.setCellValueFactory(new PropertyValueFactory<>("username"));
@@ -472,6 +483,42 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(208, this.leaderBoardSelection, "Leaderboard selection combo box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX));
 		return screen;
 	}
+
+	/**
+	 * Initializes the in-depth statistics screen for a user.
+	 *
+	 * @return A VBox with the in-depth statistics screen
+	 */
+	private VBox initStatsScreen() {
+		VBox screen = new VBox();
+		statsTable = new TableView<>();
+		statsSelection = new ComboBox();
+
+		// Fill the combobox to select various statistics
+		statsSelection.getItems().add("All Games");
+
+		for (String game : dbGameManager.getGameListByName().keySet()) {
+			statsSelection.getItems().add(game);
+		}
+
+		statsSelection.getSelectionModel().selectFirst();
+		statsSelection.setOnAction( (ae) -> { handleStatsSelectionChange(); });
+
+		TableColumn<Score, String> gameName = new TableColumn<>("Game");
+		gameName.setCellValueFactory(new PropertyValueFactory<>("gameName"));
+
+		TableColumn<Score, String> outcome = new TableColumn<>("Outcome");
+		outcome.setCellValueFactory(new PropertyValueFactory<>("outcome"));
+
+		TableColumn<Score, Integer> score = new TableColumn<>("Score");
+		score.setCellValueFactory(new PropertyValueFactory<>("score"));
+
+		statsTable.getColumns().addAll(gameName, outcome, score);
+		handleStatsSelectionChange();
+		screen.getChildren().addAll(statsSelection, statsTable);
+		return screen;
+	}
+
 	/**
 	 * Gets the item that is the theme menu for the main GUI
 	 * @return The Gridpane to put into a control structure.
@@ -548,7 +595,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		thememenu.setOnMouseClicked((click) -> {
 			swapToThemeMenuButtonClick();
 		});
+		Button stats = new Button("View\nMore\nStatistics");
+		stats.setOnAction( (ae) -> { statisticsClick(); });
 		grid.add(thememenu,0,0);
+		grid.add(stats, 1, 0);
 		pane.getChildren().addAll(info,grid);
 		this.initthemes.addRegion(209, pane, "User Settings main screen background", new ThemeRegionProp(ThemeRegionProp.VBOX));
 		this.initthemes.addRegion(210, info, "User Settings main label", new ThemeRegionProp(ThemeRegionProp.LABEL));
@@ -556,6 +606,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(212, thememenu, "User Settings Theme Menu Button", new ThemeRegionProp(ThemeRegionProp.BUTTON));
 		return pane;
 	}
+
 //////////////////////// Button Click Handlers go here  /////////////////////////////////////////////
 	/**
 	 * Handles the event where the user who is logged in is at the user settings menu and clicks the Theme Menu Button.
@@ -563,6 +614,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private void swapToThemeMenuButtonClick() {
 		this.setCenter(this.initThemeMenu);
 	}
+
 	/**
 	 * Handles when a user wants to exit the create account screen without creating an account.
 	 */
@@ -570,6 +622,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.setTop(this.initTopBar);
 		this.setCenter(this.initGameselectonboxarea);
 	}
+
 	/**
 	 * Handles the event were the user is logged in and is in a game and wants to go back to the main menu.
 	 */
@@ -582,6 +635,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.setCenter(this.initGameselectonboxarea);
 		updateLeftPane();
 	}
+
 	/**
 	 * Handles the event were the Log out button is clicked Assumes: A user is
 	 * already logged in.
@@ -607,12 +661,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.setTop(this.initLoggedInInGameBar);
 		this.setCenter(this.initUserSettingsMainMenu);
 	}
+
 	/**
 	 * Handles the event where the user is loggedin and ingame and clicks the User Settings button.
 	 */
 	private void userSettingsButtonClickInGame() {
 		// Do Nothing!
 	}
+
 	/**
 	 * Handles the event were the Log in Button is Clicked
 	 */
@@ -625,6 +681,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.userLoggedIn = true;
 			this.loggedinusername = username.getText();
 			UpdateLoggedInBarsWithUserNameOfCurrentUser();
+			handleStatsSelectionChange();
 			this.setTop(this.initLoggedInBar);
 			username.setText("");
 			password.setText("");
@@ -636,6 +693,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		
 		//updateLeftPane();
 	}
+
 	/**
 	 * Handles the event were the Create New Account Button is Clicked
 	 */
@@ -675,6 +733,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			button.setTextFill(Color.RED);
 		}
 	}
+
 	/**
 	 * Mapping function, maps game button clicks to their respected game and inits
 	 * it.
@@ -714,6 +773,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.setCenter(this.battleshipGameView);
 		}
 	}
+
 	/**
 	 * 	Handles when the leaderboard button is clicked by the user.
 	 */
@@ -726,6 +786,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		} else {
 			this.setTop(initCreateAccountMenuBar);
 		}
+	}
+
+	/**
+	 * Handles when the View More Statistics button is clicked.
+	 */
+	private void statisticsClick() {
+		this.setCenter(statsScreen);
 	}
 
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
@@ -801,6 +868,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		lo.setText(this.loggedinusername);
 		log.setText(this.loggedinusername);
 	}
+
 //////////////////////// Data base interaction functions go here  ////////////////////////////////////////////////////
 	/**
 	 * Fetches all the games that are implemented
@@ -821,6 +889,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		}
 		return retval;
 	}
+
 	/**
 	 * Creates a new account in the system with the provided info Returns positive
 	 * on success, returns negative on failure
@@ -837,6 +906,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			return this.acctMgr.createAccount(username, password);
 		}
 	}
+
 	/**
 	 * Carries out the login. Returns postive if it was successful Returns negative
 	 * if it wasn't successful
@@ -852,6 +922,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		}
 	}
 
+	/**
+	 * Handles when the ComboBox selection is changed in the Leaderboard.
+	 */
 	private void handleLeaderBoardSelectionChange() {
 		String choice = leaderBoardSelection.getValue();
 
@@ -866,6 +939,19 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 				scoresTable.getItems().add(cur);
 			}
 		}
+	}
+
+	/**
+	 * Handles when the ComboBox selection is changed in the in-depth statistics screen.
+	 */
+	private void handleStatsSelectionChange() {
+		statsTable.getItems().clear();
+
+		if (acctMgr.isAdmin() || acctMgr.isGuest()) {
+			return;
+		}
+
+		statsTable.getItems().addAll(acctMgr.getScores(statsSelection.getValue()));
 	}
 
 ////////////////////////Other function types go here ////////////////////////////////////////////////////
@@ -894,6 +980,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			throw new SanityCheckFailedException("stopAndSaveCurrentGame: saveGame or pauseGame failed to save and pause!");
 		}
 	}
+
 	/**
 	 * Loads the saved data of the current game into the gamestate.
 	 * If no data exists or it fails, does nothing.
@@ -916,6 +1003,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			throw new SanityCheckFailedException("loadAndResumeGame: loadSaveGame or unPauseGame failed to load and unpause!");
 		}
 	}
+
 	/**
 	 * Returns the view of the loaded game in interface form.
 	 * @return The view of the loaded game, returns null if no game is loaded.
@@ -930,6 +1018,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		}
 		return null;
 	}
+
 	/**
 	 * Determines if a game was just played or is being played.
 	 * @return True if a game is being played or a game was the last major menu used. Otherwise false.

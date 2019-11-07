@@ -2,6 +2,7 @@ package controller;
 
 import Gamejam.Gamejam;
 import model.SanityCheckFailedException;
+import model.Score;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -481,6 +482,90 @@ public class AccountManager extends Observable
     }
 
     /**
+     * Gets the list of user's scores for a given game.
+     *
+     * @param game A String with the name of the game to fetch scores for
+     * @return An ArrayList<Score> of the user's scores for that game
+     */
+    public ArrayList<Score> getScores(String game)
+    {
+        ArrayList<Score> scores = new ArrayList<>();
+
+        if (game.equals("All Games"))
+        {
+            for (String gameName : dbGameManager.getGameListByName().keySet())
+            {
+                ArrayList<Score> temp = scoresQuery(gameName);
+                scores.addAll(temp);
+            }
+        }
+        else
+        {
+            scores = scoresQuery(game);
+        }
+
+        return scores;
+    }
+
+    /**
+     * Queries the database to get the user's scores for a given game.
+     *
+     * @param game A String indicating the name of the game to fetch scores for
+     * @return An ArrayList<Score> of the user's scores for that game
+     */
+    private ArrayList<Score> scoresQuery(String game)
+    {
+        ArrayList<Score> scores = new ArrayList<>();
+        ResultSet rs = null;
+        int gameID = dbGameManager.getGameListByName().get(game);
+        int statsID = userStatsIDs.get(gameID);
+
+        try
+        {
+            rs = conn.executeQuery("SELECT win, loss, tie, incomplete, score FROM gamelog WHERE statsid = ?", statsID);
+
+            while (rs.next())
+            {
+                boolean win = rs.getBoolean("win");
+                boolean loss = rs.getBoolean("loss");
+                boolean tie = rs.getBoolean("tie");
+                boolean incomplete = rs.getBoolean("incomplete");
+                int score = rs.getInt("score");
+                String outcome;
+
+                if (win)
+                {
+                    outcome = "Win";
+                }
+                else if (loss)
+                {
+                    outcome = "Loss";
+                }
+                else if (tie)
+                {
+                    outcome = "Tie";
+                }
+                else if (incomplete)
+                {
+                    outcome = "Incomplete";
+                }
+                else
+                {
+                    outcome = "Error: This shouldn't be possible";
+                }
+
+                scores.add(new Score(gameID, game, accountID, curUsername, score, outcome));
+            }
+        }
+        catch (SQLException se)
+        {
+            se.printStackTrace();
+        }
+
+        return scores;
+    }
+
+    /**
      * Public method to trigger fillUserStats.
      */
     public void refreshUserStats()
@@ -539,7 +624,6 @@ public class AccountManager extends Observable
      */
     public int getTotalExpForLevel(int level)
     {
-
         if (level == 2)
         {
             return 1000;
@@ -560,7 +644,6 @@ public class AccountManager extends Observable
      */
     public int getExpForLevel(int level)
     {
-
         if (level == 2)
         {
             return 1000;
@@ -584,7 +667,6 @@ public class AccountManager extends Observable
      */
     public int deleteAccount(String username)
     {
-
         try
         {
             conn.execute("DELETE from accounts where username = '" + username + "'");
