@@ -38,7 +38,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private ArrayList<SpaceShooterEnemy> enemyList;
 	private ArrayList<SpaceShooterProjectile> enemyProjectiles;
 	private ArrayList<SpaceShooterProjectile> playerProjectiles;
-	private ArrayList<SpaceShooterObject> itemDrops;
+	private ArrayList<SpaceShooterBuff> itemDrops;
 	private int enemySpeedMultiplier = 1;
 	private Point startingLocation, playerDelta;
 	private boolean aPressed = false;
@@ -62,7 +62,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		enemyProjectiles = new ArrayList<SpaceShooterProjectile>();
 		playerProjectiles = new ArrayList<SpaceShooterProjectile>();
 		enemyList = new ArrayList<SpaceShooterEnemy>();
-		itemDrops = new ArrayList<SpaceShooterObject>();
+		itemDrops = new ArrayList<SpaceShooterBuff>();
 
 		gameScreen = new Canvas(WIDTH, HEIGHT);
 		this.setCenter(gameScreen);
@@ -118,9 +118,9 @@ public class SpaceShooterControllerView extends GameControllerView {
 	}
 
 	private void playerAttack() {
-		int x = player.getLocation().x + (player.getHitboxWidth()/2) - 2;
+		int x = player.getLocation().x + (player.getHitboxWidth() / 2) - 2;
 		Point projectilePosition = new Point(x, player.getLocation().y);
-		
+
 		playerProjectiles
 				.add(new SpaceShooterProjectile(projectilePosition, 4, 8, 5, "/spaceShooterPlayerAttackImage.png"));
 	}
@@ -135,9 +135,10 @@ public class SpaceShooterControllerView extends GameControllerView {
 		GraphicsContext gc = gameScreen.getGraphicsContext2D();
 		gc.setFill(Color.BLACK);
 		gc.fillRect(0, 0, WIDTH, HEIGHT);
+		gc.drawImage(resources.getPlayerImage(), player.getLocation().getX(), player.getLocation().getY(),
+				player.getHitboxWidth(), player.getHitboxHeight());
 
 		// TODO design logo to put top center
-		// and push any key to start somewhere in the middle;
 
 		gameScreen.setOnMouseClicked((key) -> {
 			startGame();
@@ -146,7 +147,10 @@ public class SpaceShooterControllerView extends GameControllerView {
 	}
 
 	private void displayPauseScreen() {
-		// draw Pause Screen
+		GraphicsContext gc = gameScreen.getGraphicsContext2D();
+		gc.setFill(Color.rgb(0, 0, 0, 0.5));
+		gc.fillRect(0, 0, WIDTH, HEIGHT);
+		// TODO draw pause text or image
 		getScene().setOnKeyPressed((key) -> {
 			unPauseGame();
 			setupListeners();
@@ -164,7 +168,10 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	private void displayGameOver() {
 		gameClock.stop();
-		// TODO draw screen
+		GraphicsContext gc = gameScreen.getGraphicsContext2D();
+		gc.setFill(Color.rgb(0, 0, 0, 0.5));
+		gc.fillRect(0, 0, WIDTH, HEIGHT);
+		// TODO draw game over stuff
 
 	}
 
@@ -263,7 +270,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		toRemove.clear();
 
 		ArrayList<SpaceShooterObject> toRemove2 = new ArrayList<SpaceShooterObject>();
-		for (SpaceShooterObject item : itemDrops) {
+		for (SpaceShooterBuff item : itemDrops) {
 			if (collisionExists(player, item)) {
 				buffPlayer(item);
 				toRemove2.add(item);
@@ -278,8 +285,8 @@ public class SpaceShooterControllerView extends GameControllerView {
 		return item.getLocation().y < 0 || item.getLocation().y > HEIGHT;
 	}
 
-	private void buffPlayer(SpaceShooterObject item) {
-		// TODO Auto-generated method stub
+	private void buffPlayer(SpaceShooterBuff item) {
+		item.buffPlayer(player);
 
 	}
 
@@ -315,21 +322,40 @@ public class SpaceShooterControllerView extends GameControllerView {
 		GraphicsContext gc = gameScreen.getGraphicsContext2D();
 		gc.clearRect(0, 0, WIDTH, HEIGHT);
 		gc.setFill(Color.BLACK);
-		gc.fillRect(0, 0, WIDTH, HEIGHT); // TODO make a background?
+		gc.fillRect(0, 0, WIDTH, HEIGHT);
 
 		gc.drawImage(resources.getPlayerImage(), player.getLocation().x, player.getLocation().y,
 				player.getHitboxWidth(), player.getHitboxHeight());
-		// TODO draw enemies
+
+		for (SpaceShooterEnemy enemy : enemyList) {
+			gc.drawImage(resources.getEnemyImage(enemy), enemy.getLocation().x, enemy.getLocation().y,
+					enemy.getHitboxWidth(), enemy.getHitboxHeight());
+		}
+
 		for (SpaceShooterProjectile ssp : playerProjectiles) {
 			gc.drawImage(resources.getPlayerProjectile(), ssp.getLocation().x, ssp.getLocation().y,
 					ssp.getHitboxWidth(), ssp.getHitboxHeight());
 		}
-		// TODO draw projectiles
-		// TODO draw buffs
-		// TODO background?
-		// TODO draw score
-		// TODO draw number of lives
-		// TODO draw current level somewhere
+
+		for (SpaceShooterProjectile ssp : enemyProjectiles) {
+			gc.drawImage(resources.getEnemyProjectile(ssp), ssp.getLocation().x, ssp.getLocation().y,
+					ssp.getHitboxWidth(), ssp.getHitboxHeight());
+		}
+
+		for (SpaceShooterBuff item : itemDrops) {
+			gc.drawImage(resources.getItemImage(item), item.getLocation().getX(), item.getLocation().getY(),
+					item.getHitboxWidth(), item.getHitboxHeight());
+		}
+
+		gc.setFill(Color.WHITE);
+		gc.fillText("Score : " + gameModel.getScore(), 10, 10);
+
+		gc.drawImage(resources.getPlayerImage(), WIDTH - (player.getHitboxWidth() * 2),
+				HEIGHT - player.getHitboxHeight() + 5, player.getHitboxWidth() / 2, player.getHitboxHeight() / 2);
+		gc.fillText(" : " + gameModel.getLives(), WIDTH - (player.getHitboxWidth() * 2) + player.getHitboxWidth() / 2,
+				HEIGHT - player.getHitboxHeight()/2 + 5);
+
+		gc.fillText("Level : " + gameModel.getCurrentLevel(), WIDTH - (player.getHitboxWidth() * 2), 10);
 
 	}
 

@@ -22,4 +22,19 @@ public class SpaceShooterResources {
 	public Image getPlayerProjectile() {
 		return playerProjectile;
 	}
+
+	public Image getEnemyProjectile(SpaceShooterProjectile ssp) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Image getEnemyImage(SpaceShooterEnemy enemy) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Image getItemImage(SpaceShooterBuff item) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

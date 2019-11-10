@@ -21,6 +21,10 @@ public class SpaceShooterModel extends Observable {
 		return currentScore;
 	}
 
+	public int getCurrentLevel() {
+		return currentLevel;
+	}
+	
 	public boolean isStillRunning() {
 		return numberLives >= 0;
 	}
