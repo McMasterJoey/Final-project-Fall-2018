@@ -307,7 +307,7 @@ public class ThemeCreator extends HBox
 	 * @param str The input string containing only numbers.
 	 * @return The number within the input string, If no valid number is found, returns 1.
 	 */
-	private double getWidthFromStr(String str)
+	public static double getWidthFromStr(String str)
 	{
 		double retval = 0.0;
 		try

@@ -81,6 +81,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private GameIconItem[] initgamelist;
 	private GamejamMainScreenTheme initthemes;
 	private int initthemeinuseid = 0;
+	private BasicThemeCreator basicthemecreator;
+	private ThemeCreator advancedthemecreator;
+	private HBox emptythemecreator;
 	public GamejamMainScreen() {
 		super();
 		init();
@@ -497,17 +500,39 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * @return The Gridpane to put into a control structure.
 	 */
 	private GridPane initThemeMenu() {
+		this.basicthemecreator = this.initthemes.getBasicThemeCreator();
+		this.advancedthemecreator = this.initthemes.getThemeCreator();
+		this.emptythemecreator = new HBox();
+		
 		GridPane retval = new GridPane();
 		retval.getColumnConstraints().add(new ColumnConstraints(220));
 		retval.getColumnConstraints().add(new ColumnConstraints(800));
 		VBox left = new VBox();  // Used for Pre-made Themes Buttons
 		VBox right = new VBox(); // Used for Custom made themes.
+		
+		right.getChildren().add(this.emptythemecreator);
+		
 		Button backtosettings = new Button();
 		backtosettings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/themeBackButtonMenuIcon.png"))));
 		backtosettings.setOnMouseClicked((click) -> {
 			this.setCenter(this.initUserSettingsMainMenu);
 		});
-		left.getChildren().add(backtosettings);
+		Button showBasicThemeEditorButton = new Button();
+		Button showAdvancedThemeEditorButton = new Button();
+		
+		showBasicThemeEditorButton.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/themeButtonSwitchToBasicThemeEditor.png"))));
+		showBasicThemeEditorButton.setOnMouseClicked((click) -> {
+			right.getChildren().set(0,this.basicthemecreator);
+			left.getChildren().set(1, showAdvancedThemeEditorButton);
+			
+		});
+		showAdvancedThemeEditorButton.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/themeButtonSwitchToAdvancedThemeEditor.png"))));
+		showAdvancedThemeEditorButton.setOnMouseClicked((click) -> {
+			right.getChildren().set(0,this.advancedthemecreator);
+			left.getChildren().set(1, showBasicThemeEditorButton);
+		});
+		
+		left.getChildren().addAll(backtosettings,showAdvancedThemeEditorButton);
 		
 		Button theme0 = new Button();
 		theme0.setGraphic(this.initthemes.getThemeIcon(0));
@@ -527,17 +552,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			//this.initthemes.updateTheme(2);
 		});
 		left.getChildren().add(theme2);
-		/*
-		Button theme3 = new Button();
-		theme3.setGraphic(this.initthemes.getThemeIcon(0));
-		theme3.setOnMouseClicked((click) -> {
-			this.initthemes.updateTheme(3);
-		});
-		left.getChildren().add(theme3);
-		*/
+		
 		retval.add(left, 0, 0);
 		// Custom Theme Setter
-		right.getChildren().add(this.initthemes.getThemeCreator());
+		right.getChildren().add(this.initthemes.getBasicThemeCreator());
 		retval.add(right,1, 0);
 		this.initthemes.addRegion(220, retval, "Theme Menu overall background", new ThemeRegionProp(ThemeRegionProp.GRIDPANE, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(221, left, "Theme Menu left side overall background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_TM, ThemeRegionProp.INT_REG));

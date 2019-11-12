@@ -52,6 +52,7 @@ public class ThemeRegionProp
 	public static final byte LOC_MI_BTM = -14;
 	public static final byte LOC_MI_ATM = -15;
 	public static final byte LOC_MI_LB = -16;
+	public static final byte LOC_MI_GH = -17;
 	
 	// Miss Properties
 	public static final byte INT_REG = -100; // The element merely holds another and might not theme well.
@@ -64,6 +65,7 @@ public class ThemeRegionProp
 		if (missproperty == INT_REG)
 		{
 			this.bol_array[this.nameToIndex.get("IntermediateArea")] = true;
+			this.bol_array[this.nameToIndex.get("NotIntermediateArea")] = false;
 		}
 	}
 	public ThemeRegionProp(byte primaryproperty, byte locationid)
@@ -107,16 +109,27 @@ public class ThemeRegionProp
 		this.nameToIndex.put("UsedWhileInGame",30);
 		this.nameToIndex.put("IsGame",31);
 		this.nameToIndex.put("LeaderBoard",32);
+		this.nameToIndex.put("ButtonWithImage",33);
+		this.nameToIndex.put("GameHistoryMenu",34);
+		this.nameToIndex.put("NotIntermediateArea",35);
 		
 		this.bol_array = new boolean[this.nameToIndex.size()];
 		for(int x = 0; x < this.bol_array.length; x++)
 		{
 			this.bol_array[x] = false;
 		}
+		this.bol_array[35] = true;
 		
 	}
 	private void presetLocationUtil(byte locationid)
 	{
+		if (locationid == LOC_MI_GH)
+		{
+			this.bol_array[this.nameToIndex.get("Middle")] = true;
+			this.bol_array[this.nameToIndex.get("GameHistoryMenu")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+			this.bol_array[this.nameToIndex.get("UsedWhileLoggedIn")] = true;
+		}
 		if (locationid == LOC_TB)
 		{
 			this.bol_array[this.nameToIndex.get("TopBar")] = true;
@@ -229,6 +242,7 @@ public class ThemeRegionProp
 		if (primaryproperty == BUTTON)
 		{
 			this.bol_array[this.nameToIndex.get("Button")] = true;
+			this.bol_array[this.nameToIndex.get("ButtonWithImage")] = true;
 		}
 		else if (primaryproperty == BUTTON_WT)
 		{
@@ -370,6 +384,31 @@ public class ThemeRegionProp
 			}
 		}
 		return true;
+	}
+	/**
+	 * Used primarily for encoding Dynamic Theme generation.
+	 * Checks if atleast one value represented by the integers in the input are true.
+	 * If they are, then the element this object represents the properties of is true given the expression.
+	 * Otherwise returns false.
+	 * @param domain A collection of ints that represent a sequence of True statements.
+	 * @return If atleast one int in the collection maps to a true value, then return true. Also returns true of the collection is empty. Otherwise returns false.
+	 */
+	public boolean isAtleastOneTrue(Collection<Integer> domain)
+	{
+		if (domain.size() == 0)
+		{
+			return true;
+		}
+		
+		Iterator<Integer> iter = domain.iterator();
+		while(iter.hasNext())
+		{
+			if (this.bol_array[iter.next()])
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	public boolean isTrue(int domain)
 	{

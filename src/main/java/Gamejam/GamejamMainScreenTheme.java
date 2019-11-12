@@ -35,6 +35,7 @@ public class GamejamMainScreenTheme
 	private ArrayList<RegionPair> regions;
 	private ArrayList<PriorityPair> preInit;
 	private ThemeCreator themecreator;
+	private BasicThemeCreator basicthemecreator;
 	private boolean doneAddingRegions = false;
 	private ArrayList<Image> imagecache;
 	public GamejamMainScreenTheme() 
@@ -43,7 +44,9 @@ public class GamejamMainScreenTheme
 		this.regions = new ArrayList<RegionPair>(50);
 		this.preInit = new ArrayList<PriorityPair>(50);
 		this.themecreator = new ThemeCreator(this);
+		this.basicthemecreator = new BasicThemeCreator(this);
 		addRegion(228, this.themecreator, "Theme Menu Theme Creator", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM));
+		addRegion(228.001, this.basicthemecreator, "Theme Menu Basic Theme Creator", new ThemeRegionProp(ThemeRegionProp.BORDERPANE, ThemeRegionProp.LOC_MI_TM));
 		cacheImages();
 		
 	}
@@ -74,6 +77,10 @@ public class GamejamMainScreenTheme
 	{
 		return this.themecreator;
 	}
+	public BasicThemeCreator getBasicThemeCreator()
+	{
+		return this.basicthemecreator;
+	}
 	public ImageView getThemeIcon(int themeid)
 	{
 		return new ImageView(this.imagecache.get(themeid));
@@ -98,6 +105,7 @@ public class GamejamMainScreenTheme
 				this.regions.get(this.regions.size() - 1).setIndex(x);
 			}
 			this.themecreator.doOnMainScreenThemeFinishInit();
+			this.basicthemecreator.finishConstructing();
 			resetCustomTheme();
 			setUpThemes();
 			updateTheme(0);
@@ -404,6 +412,17 @@ public class GamejamMainScreenTheme
 	 * @return The resulting border.
 	 */
 	public static Border simpleBorder(Paint color, BorderStrokeStyle style, int widths)
+	{
+		return new Border(new BorderStroke(color, style, CornerRadii.EMPTY, new BorderWidths(widths)));
+	}
+	/**
+	 * Generates a border.
+	 * @param color The color of the border
+	 * @param style The style of the border
+	 * @param widths The widths of the border
+	 * @return The resulting border.
+	 */
+	public static Border simpleBorder(Paint color, BorderStrokeStyle style, double widths)
 	{
 		return new Border(new BorderStroke(color, style, CornerRadii.EMPTY, new BorderWidths(widths)));
 	}
