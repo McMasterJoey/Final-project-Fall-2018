@@ -9,12 +9,14 @@ public class SpaceShooterModel extends Observable {
 	private int currentScore;
 	private int numberLives;
 	private int currentLevel;
+	private EnemyGenerator LevelGenerator;
 
 	public SpaceShooterModel() {
 		currentEnemies = new ArrayList<SpaceShooterEnemy>();
 		currentScore = 1;
 		numberLives = 3;
 		currentLevel = 1;
+		LevelGenerator = new EnemyGenerator();
 	}
 	
 	public int getScore() {
@@ -31,7 +33,7 @@ public class SpaceShooterModel extends Observable {
 
 	public void generateLevel() {
 		// TODO something like this:
-		// currentEnemies = LevelGenerator.getEnemies(currentLevel);
+		 currentEnemies = LevelGenerator.getEnemies(currentLevel);
 	}
 
 	public ArrayList<SpaceShooterEnemy> getCurrentEnemies() {

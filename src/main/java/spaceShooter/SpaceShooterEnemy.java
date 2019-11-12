@@ -29,4 +29,5 @@ public abstract class SpaceShooterEnemy extends SpaceShooterShip{
 	public void setPointValue(int pointValue) {
 		this.pointValue = pointValue;
 	}
+
 }
