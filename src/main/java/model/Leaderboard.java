@@ -5,6 +5,8 @@ import controller.DBGameManager;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,8 +68,15 @@ public class Leaderboard {
                 int accountID = statsIDToAccountID.get(statsID);
                 String username = accountIDToUsername.get(accountID);
                 int score = gameLogs.getInt("score");
+                boolean win = gameLogs.getBoolean("win");
+                boolean loss = gameLogs.getBoolean("loss");
+                boolean tie = gameLogs.getBoolean("tie");
+                boolean incomplete = gameLogs.getBoolean("incomplete");
+                Timestamp ts = gameLogs.getTimestamp("date");
+                LocalDateTime date = ts.toLocalDateTime();
+                String outcome = Score.determineOutcome(win, loss, tie, incomplete);
 
-                scores.add(new Score(gameID, gameName, accountID, username, score));
+                scores.add(new Score(gameID, gameName, accountID, username, score, date, outcome));
             }
 
             Collections.sort(scores);
@@ -86,7 +95,7 @@ public class Leaderboard {
      * @param gameName The name of the game to record a score for
      * @param score The score the user earned
      */
-    public void addScore(int accountID, String gameName, int score) {
+    public void addScore(int accountID, String gameName, int score, LocalDateTime date, String outcome) {
         ResultSet rs = null;
 
         try {
@@ -96,7 +105,7 @@ public class Leaderboard {
             if (idFound) {
                 String username = rs.getString("username");
                 int gameID = gameMgr.getGameListByName().get(gameName);
-                scores.add(new Score(gameID, gameName, accountID, username, score));
+                scores.add(new Score(gameID, gameName, accountID, username, score, date, outcome));
                 Collections.sort(scores);
                 Collections.reverse(scores);
             } else {

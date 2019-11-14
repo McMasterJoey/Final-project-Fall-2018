@@ -6,6 +6,8 @@ import model.Score;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
@@ -143,14 +145,14 @@ public class AccountManager extends Observable
             Gamejam.DPrint("\nFetching game from a string!");
             int gameID = getGameIdFromString(game);
             Gamejam.DPrint(gameID);
-            String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
+            String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score, date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 
             if (!userStatsIDs.containsKey(gameID))
             { // The game the user just played was added after the user's account creation
                 createStatisticsEntries(); // So, create an entry in the DB for the user in the statistics table
             }
 
-            conn.execute(transaction, userStatsIDs.get(gameID), win, loss, tie, incomplete, time, score);
+            conn.execute(transaction, userStatsIDs.get(gameID), win, loss, tie, incomplete, time, score, LocalDateTime.now());
 
             // Update the statistics table with the game outcome
             if (win)
@@ -339,17 +341,6 @@ public class AccountManager extends Observable
         {
             rs = conn.executeQuery("SELECT gameid FROM statistics WHERE accountid = ?", accountID);
 
-//			if (rs.next()) { // An entry already exists for this user
-//				return;
-//			} else {
-//				rs = conn.executeQuery("SELECT gameid FROM games");
-//
-//				while (rs.next()) {
-//					int gameID = rs.getInt("gameid");
-//					conn.execute("INSERT INTO statistics(accountid, gameid) VALUES(?, ?)", accountID, gameID);
-//				}
-//			}
-
             while (rs.next())
             {
                 games.add(rs.getInt("gameid"));
@@ -390,6 +381,12 @@ public class AccountManager extends Observable
         gameTies = new HashMap<>();
         gameIncompletes = new HashMap<>();
         numGamesPlayed = new HashMap<>();
+
+        if (isGuest || isAdmin)
+        {
+            return;
+        }
+
         try
         {
             Gamejam.DPrint("\nfillUserStatsIDs: accountID = " + accountID);
@@ -522,7 +519,7 @@ public class AccountManager extends Observable
 
         try
         {
-            rs = conn.executeQuery("SELECT win, loss, tie, incomplete, score FROM gamelog WHERE statsid = ?", statsID);
+            rs = conn.executeQuery("SELECT * FROM gamelog WHERE statsid = ?", statsID);
 
             while (rs.next())
             {
@@ -531,30 +528,11 @@ public class AccountManager extends Observable
                 boolean tie = rs.getBoolean("tie");
                 boolean incomplete = rs.getBoolean("incomplete");
                 int score = rs.getInt("score");
-                String outcome;
+                Timestamp ts = rs.getTimestamp("date");
+                LocalDateTime date = ts.toLocalDateTime();
+                String outcome = Score.determineOutcome(win, loss, tie, incomplete);
 
-                if (win)
-                {
-                    outcome = "Win";
-                }
-                else if (loss)
-                {
-                    outcome = "Loss";
-                }
-                else if (tie)
-                {
-                    outcome = "Tie";
-                }
-                else if (incomplete)
-                {
-                    outcome = "Incomplete";
-                }
-                else
-                {
-                    outcome = "Error: This shouldn't be possible";
-                }
-
-                scores.add(new Score(gameID, game, accountID, curUsername, score, outcome));
+                scores.add(new Score(gameID, game, accountID, curUsername, score, date, outcome));
             }
         }
         catch (SQLException se)

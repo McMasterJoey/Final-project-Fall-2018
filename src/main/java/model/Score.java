@@ -1,5 +1,8 @@
 package model;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Provides information about a user's score for a game.
  *
@@ -12,6 +15,8 @@ public class Score implements Comparable
     private int accountID;
     private String username;
     private int score;
+    private LocalDateTime date;
+    private String formattedDate;
     private String outcome;
 
     /**
@@ -23,13 +28,16 @@ public class Score implements Comparable
      * @param username The account name associated with userid
      * @param score The user's score for this instance of the game
      */
-    public Score(int gameID, String gameName, int accountID, String username, int score)
+    public Score(int gameID, String gameName, int accountID, String username, int score, LocalDateTime date)
     {
         this.gameID = gameID;
         this.gameName = gameName;
         this.accountID = accountID;
         this.username = username;
         this.score = score;
+        this.date = date;
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss");
+        formattedDate = date.format(format);
     }
 
     /**
@@ -41,10 +49,34 @@ public class Score implements Comparable
      * @param username The account name associated with userid
      * @param outcome A String indicating the outcome of the game (win, loss, tie, incomplete)
      */
-    public Score(int gameID, String gameName, int accountID, String username, int score, String outcome)
+    public Score(int gameID, String gameName, int accountID, String username, int score, LocalDateTime date, String outcome)
     {
-        this(gameID, gameName, accountID, username, score);
+        this(gameID, gameName, accountID, username, score, date);
         this.outcome = outcome;
+    }
+
+    public static String determineOutcome(boolean win, boolean loss, boolean tie, boolean incomplete)
+    {
+        if (win)
+        {
+            return "Win";
+        }
+        else if (loss)
+        {
+            return "Loss";
+        }
+        else if (tie)
+        {
+            return "Tie";
+        }
+        else if (incomplete)
+        {
+            return "Incomplete";
+        }
+        else
+        {
+            throw new IllegalArgumentException("Error: Game must result in a win, loss, tie, or incomplete (all were false)");
+        }
     }
 
     //---
@@ -75,6 +107,16 @@ public class Score implements Comparable
         return score;
     }
 
+    public LocalDateTime getDate()
+    {
+        return date;
+    }
+
+    public String getFormattedDate()
+    {
+        return formattedDate;
+    }
+
     public String getOutcome()
     {
         return outcome;
@@ -101,7 +143,4 @@ public class Score implements Comparable
             return 0;
         }
     }
-
-    // End Getters
-    //---
 }

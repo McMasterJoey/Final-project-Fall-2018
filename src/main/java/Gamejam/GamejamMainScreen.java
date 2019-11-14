@@ -1,5 +1,6 @@
 package Gamejam;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Observer;
 import battleship.BattleshipControllerView;
@@ -62,6 +63,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private Label leftBarStats;
 	private ProgressBar expBar;
 	private Label expBarLabel;
+	private Button moreStatsBtn;
 	private VBox initCreateAccountMenu;
 	private VBox leaderScreen;
 	private TableView<Score> scoresTable;
@@ -154,12 +156,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.leftBarStats = new Label();
 		this.expBarLabel = new Label();
 		this.expBar = new ProgressBar(0.0);
+		moreStatsBtn = new Button("View More Statistics");
+		moreStatsBtn.setOnAction( (ae) -> {statisticsClick();});
 		leftPane.setPrefHeight(750);
 		leftPane.setPrefWidth(180);
 		leftPaneScroll.setFitToWidth(true);
 		setGuestMessage();
-		
-		
+
 		// Add to region list
 		this.initthemes.addRegion(100, leftPane, "Left VBox", new ThemeRegionProp(ThemeRegionProp.VBOX));
 		this.initthemes.addRegion(101, this.leftBarMsg, "Left Top Message label", new ThemeRegionProp(ThemeRegionProp.LABEL));
@@ -167,7 +170,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(102.01, this.expBarLabel, "Left EXP label", new ThemeRegionProp(ThemeRegionProp.LABEL));
 		this.initthemes.addRegion(102.02, this.expBar, "Left EXP Progress Bar", new ThemeRegionProp(ThemeRegionProp.PROGRESSBAR));
 		
-		leftPane.getChildren().addAll(this.leftBarMsg, expBarLabel, expBar, this.leftBarStats);
+		leftPane.getChildren().addAll(this.leftBarMsg, expBarLabel, expBar, this.leftBarStats, moreStatsBtn);
 		return leftPaneScroll;
 	}
 
@@ -475,7 +478,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		TableColumn<Score, Integer> score = new TableColumn<>("Score");
 		score.setCellValueFactory(new PropertyValueFactory<>("score"));
 
-		this.scoresTable.getColumns().addAll(username, gameName, score);
+		TableColumn<Score, String> outcome = new TableColumn<>("Outcome");
+		outcome.setCellValueFactory(new PropertyValueFactory<>("outcome"));
+
+		TableColumn<Score, String> date = new TableColumn<>("Date");
+		date.setCellValueFactory(new PropertyValueFactory<>("formattedDate"));
+
+		this.scoresTable.getColumns().addAll(username, gameName, score, outcome, date);
 		handleLeaderBoardSelectionChange();
 		screen.getChildren().addAll(leaderBoardSelection, scoresTable);
 		this.initthemes.addRegion(206, screen, "Leaderboard overall background", new ThemeRegionProp(ThemeRegionProp.VBOX));
@@ -812,10 +821,11 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * Assumes the user is a guest.
 	 */
 	private void setGuestMessage() {
-		this.leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in,\nyou could see your stats!\n\n");
+		leftBarMsg.setText("\nYou are not logged in.\nIf you were logged in,\nyou could see your stats!\n\n");
 		expBar.setProgress(0.0);
 		expBarLabel.setText("Exp: 0/0");
-		this.leftBarStats.setText("Level: 0\nExp: 0");
+		leftBarStats.setText("Level: 0\nExp: 0\n\n");
+		moreStatsBtn.setDisable(true);
 	}
 
 	/**
@@ -835,7 +845,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			setGuestMessage();
 		} else if (acctMgr.isAdmin()) {
 			leftBarMsg.setText("Administrator Account");
-			leftBarStats.setText("");
+			leftBarStats.setText("\n");
+			moreStatsBtn.setDisable(true);
 		} else {
 			leftBarMsg.setText("Welcome to Gamejam,\n" + acctMgr.getCurUsername() + "!\n\n");
 			expBarLabel.setText("Account Statistics:\nExp: " + acctMgr.getExpInLevel() + "/" + acctMgr.getExpForLevel(acctMgr.getLevel() + 1));
@@ -856,6 +867,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 				leftBarStats.setText(leftBarStats.getText() + "\n  Incomplete: " + acctMgr.getGameIncompletes().get(id));
 				leftBarStats.setText((leftBarStats.getText() + "\n   Total: " + numPlayed) + "\n");
 			}
+
+			leftBarStats.setText(leftBarStats.getText() + "\n");
+			moreStatsBtn.setDisable(false);
 		}
 	}
 

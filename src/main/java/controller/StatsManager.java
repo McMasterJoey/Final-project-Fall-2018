@@ -1,6 +1,9 @@
 package controller;
 
 import model.Leaderboard;
+import model.Score;
+
+import java.time.LocalDateTime;
 
 /**
  * Class to unify updates to user statistics.
@@ -47,6 +50,6 @@ public class StatsManager {
     }
     public void logGameStat(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time, int score) {
         acctMgr.logGameInDB(game, win, loss, tie, incomplete, time, score);
-        leaderboard.addScore(acctMgr.getAccountID(), game, score);
+        leaderboard.addScore(acctMgr.getAccountID(), game, score, LocalDateTime.now(), Score.determineOutcome(win, loss, tie, incomplete));
     }
 }
