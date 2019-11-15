@@ -15,7 +15,7 @@ public class Enemy3 extends SpaceShooterEnemy{
 		setHitboxHeight(40);
 		setHitboxWidth(40);
 		setCurrentHP(4);
-		setDamagePerShot(2);
+		setDamagePerShot(1);
 		setLocation(new Point(10, 10));
 	}
 	

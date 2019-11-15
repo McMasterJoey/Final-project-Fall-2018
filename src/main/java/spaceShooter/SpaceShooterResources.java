@@ -14,6 +14,7 @@ public class SpaceShooterResources {
 	private Image enemyImage3_2;
 	private Image playerProjectile;
 	private Image enemyProjectile;
+	private Image enemyImageBoss;
 	
 	public SpaceShooterResources() {
 		playerImage = new Image(SpaceShooterResources.class.getResource("/spaceShooterPlayerImage.png").toString());
@@ -24,6 +25,7 @@ public class SpaceShooterResources {
 		enemyImage2_2 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemy2_2.png").toString());
 		enemyImage3_1 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemy3_1.png").toString());
 		enemyImage3_2 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemy3_2.png").toString());
+		enemyImageBoss = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/AlienMothership.png").toString()); 
 	}
 	
 	public Image getPlayerImage() {
@@ -42,6 +44,12 @@ public class SpaceShooterResources {
 	public Image getEnemyImage(SpaceShooterEnemy enemy) {
 		if (enemy.getPointValue() ==10)
 			return enemyImage1_1;
+		if (enemy.getPointValue() == 20)
+			return enemyImage2_1;
+		if (enemy.getPointValue() == 30)
+			return enemyImage3_1;
+		if (enemy.getPointValue() == 500)
+			return enemyImageBoss;
 		return null;
 	}
 
