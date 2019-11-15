@@ -522,7 +522,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		TableColumn<Score, Integer> score = new TableColumn<>("Score");
 		score.setCellValueFactory(new PropertyValueFactory<>("score"));
 
-		statsTable.getColumns().addAll(gameName, outcome, score);
+		TableColumn<Score, String> date = new TableColumn<>("Date");
+		date.setCellValueFactory(new PropertyValueFactory<>("formattedDate"));
+
+		statsTable.getColumns().addAll(gameName, outcome, score, date);
 		handleStatsSelectionChange();
 		screen.getChildren().addAll(statsSelection, statsTable);
 		return screen;
@@ -802,6 +805,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private void statisticsClick() {
 		this.setCenter(statsScreen);
+		this.gameInUseIndex = -1;
+		this.agamewasloaded = false;
+		this.setTop(initLoggedInInGameBar);
 	}
 
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
@@ -834,6 +840,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	@Override
 	public void update(Observable o, Object obj) {
 		updateLeftPane();
+		handleLeaderBoardSelectionChange();
+		handleStatsSelectionChange();
 	}
 
 	/**
@@ -965,7 +973,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			return;
 		}
 
-		statsTable.getItems().addAll(acctMgr.getScores(statsSelection.getValue()));
+		ArrayList<Score> scores = acctMgr.getScores(statsSelection.getValue());
+		statsTable.getItems().addAll(scores);
 	}
 
 ////////////////////////Other function types go here ////////////////////////////////////////////////////

@@ -519,7 +519,7 @@ public class AccountManager extends Observable
 
         try
         {
-            rs = conn.executeQuery("SELECT * FROM gamelog WHERE statsid = ?", statsID);
+            rs = conn.executeQuery("SELECT * FROM gamelog WHERE statsid = ? ORDER BY date DESC", statsID);
 
             while (rs.next())
             {

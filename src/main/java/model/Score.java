@@ -36,7 +36,7 @@ public class Score implements Comparable
         this.username = username;
         this.score = score;
         this.date = date;
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss");
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
         formattedDate = date.format(format);
     }
 
@@ -55,6 +55,17 @@ public class Score implements Comparable
         this.outcome = outcome;
     }
 
+    /**
+     * Returns a String giving the outcome of a game, based on the boolean values stored
+     * in the gamelog table.
+     *
+     * @param win A boolean indicating a win
+     * @param loss A boolean indicating a loss
+     * @param tie A boolean indicating a tie
+     * @param incomplete A boolean indicating an incomplete game
+     * @return A String indicating the outcome of the game (Win, Loss, Tie, Incomplete)
+     * @throws IllegalArgumentException if all boolean values are false
+     */
     public static String determineOutcome(boolean win, boolean loss, boolean tie, boolean incomplete)
     {
         if (win)
