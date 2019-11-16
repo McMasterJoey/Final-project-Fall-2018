@@ -15,6 +15,8 @@ public class SpaceShooterResources {
 	private Image playerProjectile;
 	private Image enemyProjectile;
 	private Image enemyImageBoss;
+	private Image enemyLaser1;
+	private Image enemyLaser2;
 	
 	public SpaceShooterResources() {
 		playerImage = new Image(SpaceShooterResources.class.getResource("/spaceShooterPlayerImage.png").toString());
@@ -25,7 +27,10 @@ public class SpaceShooterResources {
 		enemyImage2_2 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemy2_2.png").toString());
 		enemyImage3_1 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemy3_1.png").toString());
 		enemyImage3_2 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemy3_2.png").toString());
-		enemyImageBoss = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/AlienMothership.png").toString()); 
+		enemyImageBoss = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/AlienMothership.png").toString());
+		enemyLaser1 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/laser.png").toString());
+		enemyLaser2 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemylaser.png").toString());
+		
 	}
 	
 	public Image getPlayerImage() {
@@ -37,8 +42,7 @@ public class SpaceShooterResources {
 	}
 
 	public Image getEnemyProjectile(SpaceShooterProjectile ssp) {
-		// TODO Auto-generated method stub
-		return null;
+		return ssp.getImagePath().equals("/enemylaser.png") ? enemyLaser2 : enemyLaser1;
 	}
 
 	public Image getEnemyImage(SpaceShooterEnemy enemy) {

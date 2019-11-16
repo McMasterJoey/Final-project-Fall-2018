@@ -8,6 +8,7 @@ public class EnemyGenerator {
 	Random rand;
 	ArrayList<SpaceShooterEnemy> enemyList;
 	public ArrayList<SpaceShooterEnemy> getEnemies(int currentLevel) {
+		System.out.println("current level = " + currentLevel);
 		enemyList = new ArrayList<SpaceShooterEnemy>();
 		rand = new Random();
 		if (currentLevel == 1) {
@@ -143,8 +144,7 @@ public class EnemyGenerator {
 	private void GenerateBoss(ArrayList<SpaceShooterEnemy> enemyList) {
 		int x = (1090 - 300) / 2+20;
 		int y = 160;
-		EnemyBoss boss = new EnemyBoss();
-		boss.setLocation(new Point(x, y));
+		EnemyBoss boss = new EnemyBoss(x, y);
 		enemyList.add(boss);
 		GenerateHeart(enemyList, 2);
 	}
@@ -246,21 +246,17 @@ public class EnemyGenerator {
 		}
 		SpaceShooterEnemy enemy = null;
 		if (type == 1) {
-			enemy = new Enemy1();
+			enemy = new Enemy1(point.x, point.y);
 		}
 		if (type == 2) {
-			enemy = new Enemy2();
+			enemy = new Enemy2(point.x, point.y);
 		}
 		if (type == 3) {
-			enemy = new Enemy3();
+			enemy = new Enemy3(point.x, point.y);
 		}
 		if (type == 4) {
-			enemy = new EnemyBoss();
-		}
-		if (enemy != null)
-			enemy.setLocation(point);
-		
-		
+			enemy = new EnemyBoss(point.x, point.y);
+		}		
 		return enemy;
 	}
 
@@ -274,15 +270,13 @@ public class EnemyGenerator {
 			int x = 1090 / 4;
 			int y = 660 / 3 - j * 50;
 			for (int i = 0; i < 10; i++) {
-				Enemy1 type1 = new Enemy1();
-				type1.setLocation(new Point(x + 50 * i, y));
+				Enemy1 type1 = new Enemy1(x+50*i, y);
 				enemyList.add(type1);
 			}
 			x = 1090 / 4;
 			y -= 100;
 			for (int i = 0; i < 10; i++) {
-				Enemy2 type2 = new Enemy2();
-				type2.setLocation(new Point(x + 50 * i, y));
+				Enemy2 type2 = new Enemy2(x+50*i, y);
 				enemyList.add(type2);
 			}
 
@@ -291,21 +285,17 @@ public class EnemyGenerator {
 			x = 1090 / 4;
 			y -= 100;
 			for (int i = 0; i < 10; i++) {
-				Enemy3 type3 = new Enemy3();
-				type3.setLocation(new Point(x + 50 * i, y));
+				Enemy3 type3 = new Enemy3(x+50*i, y);
 				enemyList.add(type3);
 			}
 		}
 
 	}
 	private boolean collisionExists(SpaceShooterObject obj, SpaceShooterObject obj2) {
-		if (obj.getLocation().x < obj2.getLocation().x + obj2.getHitboxWidth()
+		return obj.getLocation().x < obj2.getLocation().x + obj2.getHitboxWidth()
 				&& obj.getLocation().x + obj.getHitboxWidth() > obj2.getLocation().x
 				&& obj.getLocation().y < obj2.getLocation().y + obj2.getHitboxHeight()
-				&& obj.getLocation().y + obj.getHitboxHeight() > obj2.getLocation().y) {
-			return true;
-		}
-		return false;
+				&& obj.getLocation().y + obj.getHitboxHeight() > obj2.getLocation().y;
 	}
 	
 

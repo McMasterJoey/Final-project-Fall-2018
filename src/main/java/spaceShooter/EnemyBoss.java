@@ -9,16 +9,13 @@ public class EnemyBoss extends SpaceShooterEnemy{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public EnemyBoss(){
+	public EnemyBoss(int x, int y){
 		setPointValue(500);
-		setShotFrequency(10);
+		setShotFrequency(2);
 		setHitboxHeight(150);
 		setHitboxWidth(300);
 		setCurrentHP(40);
 		setDamagePerShot(1);
-		setLocation(new Point(10, 10));
-	}
-	
-	
-	
+		setLocation(new Point(x, y));
+	}	
 }

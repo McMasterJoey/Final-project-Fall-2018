@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Observable;
+import java.util.Random;
 
 import controller.AccountManager;
 import controller.GameControllerView;
@@ -38,12 +39,16 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private ArrayList<SpaceShooterEnemy> enemyList;
 	private ArrayList<SpaceShooterProjectile> enemyProjectiles;
 	private ArrayList<SpaceShooterProjectile> playerProjectiles;
+	private ArrayList<SpaceShooterEnemy> referenceEnemyList;
 	private ArrayList<SpaceShooterBuff> itemDrops;
 	private int enemySpeedMultiplier = 1;
+	private int transitionClockCount;
 	private Point startingLocation, playerDelta;
 	private boolean aPressed = false;
 	private boolean dPressed = false;
 	private SpaceShooterResources resources = new SpaceShooterResources();
+	private boolean beginningOfLevel = false;
+	private Random shooter = new Random(System.nanoTime());
 
 	public SpaceShooterControllerView() {
 		setUpGameClock();
@@ -52,16 +57,18 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 		gameModel = new SpaceShooterModel();
 		gameModel.addObserver(this);
-		gameName = "space-shooter";
+		gameName = "Space-Shooter";
 
 		player = new SpaceShooterPlayer();
 		startingLocation = new Point((WIDTH / 2) - (player.getHitboxWidth() / 2),
 				HEIGHT - (2 * player.getHitboxHeight()));
-		player.setLocation(startingLocation);
+		player.setLocation(new Point(startingLocation.x, startingLocation.y));
 
 		enemyProjectiles = new ArrayList<SpaceShooterProjectile>();
 		playerProjectiles = new ArrayList<SpaceShooterProjectile>();
 		enemyList = new ArrayList<SpaceShooterEnemy>();
+		gameModel.generateLevel();
+		enemyList = gameModel.getCurrentEnemies();
 		itemDrops = new ArrayList<SpaceShooterBuff>();
 
 		gameScreen = new Canvas(WIDTH, HEIGHT);
@@ -76,6 +83,28 @@ public class SpaceShooterControllerView extends GameControllerView {
 		});
 		this.setTop(gameMenu);
 		displayStartScreen();
+	}
+
+	private void setupEnemyLevelTransition() {
+		transitionClockCount = 0;
+		beginningOfLevel = true;
+		referenceEnemyList = new ArrayList<SpaceShooterEnemy>();
+		for (int i = 0; i < enemyList.size(); i++) {
+			SpaceShooterEnemy enemy = enemyList.get(i);
+			if (enemy instanceof Enemy1) {
+				referenceEnemyList.add(i, new Enemy1(enemy.getLocation().x, enemy.getLocation().y));
+			} else if (enemy instanceof Enemy2) {
+				referenceEnemyList.add(i, new Enemy2(enemy.getLocation().x, enemy.getLocation().y));
+			} else if (enemy instanceof Enemy3) {
+				referenceEnemyList.add(i, new Enemy3(enemy.getLocation().x, enemy.getLocation().y));
+			} else {
+				referenceEnemyList.add(i, new EnemyBoss(enemy.getLocation().x, enemy.getLocation().y));
+			}
+		}
+		for (int i = 0; i < enemyList.size(); i++) {
+			enemyList.get(i).setLocation(new Point(WIDTH / 2 - enemyList.get(i).getHitboxWidth() / 2, 0));
+		}
+
 	}
 
 	private void setUpGameClock() {
@@ -186,6 +215,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		gameClockCount++;
 		updatePlayerPosition();
 		updateEnemyPositions();
+		enemyAttack();
 		updateProjectilePositions();
 		checkCollisions();
 		checkDeaths();
@@ -194,15 +224,57 @@ public class SpaceShooterControllerView extends GameControllerView {
 		update(gameModel, this);
 	}
 
+	private void enemyAttack() {
+		if (!beginningOfLevel && gameClockCount % 15 == 0) {
+			for (SpaceShooterEnemy enemy : enemyList) {
+				int frequency = enemy.getShotFrequency() * 40;
+				int randShot = shooter.nextInt();
+				boolean shotThisTick = randShot % frequency == 0;
+				if (shotThisTick) {
+					if (!(enemy instanceof EnemyBoss)) {
+						SpaceShooterProjectile enemyShot = new SpaceShooterProjectile(
+								new Point(enemy.getLocation().x + enemy.getHitboxWidth() / 2,
+										enemy.getLocation().y + enemy.getHitboxHeight()),
+								8, 10, 2, "/enemylaser.png");
+						if(enemy instanceof Enemy3) {
+							enemyShot.setHoming(true);
+						}
+						enemyProjectiles.add(enemyShot);
+					} else {
+						SpaceShooterProjectile enemyShot1 = new SpaceShooterProjectile(
+								new Point(enemy.getLocation().x + 50, enemy.getLocation().y + enemy.getHitboxHeight()),
+								12, 15, 4, "/laser.png");
+						SpaceShooterProjectile enemyShot2 = new SpaceShooterProjectile(
+								new Point(enemy.getLocation().x + enemy.getHitboxWidth() - 50,
+										enemy.getLocation().y + enemy.getHitboxHeight()),
+								12, 15, 4, "/laser.png");
+						SpaceShooterProjectile enemyShot3 = new SpaceShooterProjectile(
+								new Point(enemy.getLocation().x + enemy.getHitboxWidth() / 2,
+										enemy.getLocation().y + enemy.getHitboxHeight()),
+								12, 15, 4, "/enemylaser.png");
+						enemyShot3.setHoming(true);
+						enemyProjectiles.add(enemyShot1);
+						enemyProjectiles.add(enemyShot2);
+						enemyProjectiles.add(enemyShot3);
+					}
+
+				}
+			}
+		}
+	}
+
 	private void checkDeaths() {
 		if (player.getCurrentHP() <= 0) {
+			System.out.println(gameModel.getLives());
+			player.setLocation(new Point(startingLocation.x, startingLocation.y));
 			gameModel.setLives(gameModel.getLives() - 1);
-			player.setLocation(startingLocation);
+			player.setCurrentHP(1);
 		}
 
 		ArrayList<SpaceShooterEnemy> toRemove = new ArrayList<SpaceShooterEnemy>();
 		for (SpaceShooterEnemy enemy : enemyList) {
 			if (enemy.getCurrentHP() <= 0) {
+				gameModel.incrementScore(enemy.getPointValue());
 				toRemove.add(enemy);
 			}
 		}
@@ -221,10 +293,32 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	private void updateEnemyPositions() {
 		int xMovement;
-		if (gameClockCount % 20 < 10) {
-			xMovement = enemySpeedMultiplier * 3;
+		if (beginningOfLevel) {
+			for (int i = 0; i < enemyList.size(); i++) {
+				SpaceShooterEnemy enemy = enemyList.get(i);
+				SpaceShooterEnemy referenceEnemy = referenceEnemyList.get(i);
+
+				double ticksLeft = 240 - transitionClockCount;
+				double xMovementPerTick = (referenceEnemy.getLocation().getX() - enemy.getLocation().getX())
+						/ ticksLeft;
+				double yMovementPerTick = (referenceEnemy.getLocation().getY() - enemy.getLocation().getY())
+						/ ticksLeft;
+				System.out.println("xMovement per tick = " + xMovementPerTick);
+				System.out.println("yMovement per tick = " + yMovementPerTick);
+				Point enemyDelta = new Point();
+				enemyDelta.setLocation(xMovementPerTick, yMovementPerTick);
+				enemyList.get(i).updatePosition(enemyDelta);
+			}
+			transitionClockCount++;
+			if (transitionClockCount == 240) {
+				beginningOfLevel = false;
+			}
+			return;
+		}
+		if (gameClockCount % 240 < 120) {
+			xMovement = enemySpeedMultiplier * 1;
 		} else {
-			xMovement = enemySpeedMultiplier * -3;
+			xMovement = enemySpeedMultiplier * -1;
 		}
 		Point enemyDelta = new Point(xMovement, 0);
 
@@ -235,11 +329,19 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	private void updateProjectilePositions() {
 		for (SpaceShooterProjectile ssp : enemyProjectiles) {
-			ssp.updatePosition(new Point(0, ssp.getSpeed()));
+			int xDelta = 0;
+			if(ssp.isHoming()) {
+				xDelta = ssp.getSpeed() / 2 * (player.getLocation().x > ssp.getLocation().x ? 1 : -1);
+			}
+			ssp.updatePosition(new Point(xDelta, ssp.getSpeed()));
 		}
 
 		for (SpaceShooterProjectile ssp : playerProjectiles) {
-			ssp.updatePosition(new Point(0, -ssp.getSpeed()));
+			int xDelta = 0;
+			if(ssp.isHoming()) {
+				xDelta = ssp.getSpeed() / 2 * (player.getLocation().x > ssp.getLocation().x ? 1 : -1);
+			}
+			ssp.updatePosition(new Point(xDelta, -ssp.getSpeed()));
 		}
 	}
 
@@ -291,20 +393,18 @@ public class SpaceShooterControllerView extends GameControllerView {
 	}
 
 	private boolean collisionExists(SpaceShooterObject obj, SpaceShooterObject obj2) {
-		if (obj.getLocation().x < obj2.getLocation().x + obj2.getHitboxWidth()
+		return obj.getLocation().x < obj2.getLocation().x + obj2.getHitboxWidth()
 				&& obj.getLocation().x + obj.getHitboxWidth() > obj2.getLocation().x
 				&& obj.getLocation().y < obj2.getLocation().y + obj2.getHitboxHeight()
-				&& obj.getLocation().y + obj.getHitboxHeight() > obj2.getLocation().y) {
-			return true;
-		}
-		return false;
+				&& obj.getLocation().y + obj.getHitboxHeight() > obj2.getLocation().y;
 	}
 
 	private void checkLevelOver() {
 		if (enemyList.size() == 0) {
+			gameModel.incrementLevel();
 			gameModel.generateLevel();
 			enemyList = gameModel.getCurrentEnemies();
-			gameModel.incrementLevel();
+			setupEnemyLevelTransition();
 		}
 	}
 
@@ -353,7 +453,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		gc.drawImage(resources.getPlayerImage(), WIDTH - (player.getHitboxWidth() * 2),
 				HEIGHT - player.getHitboxHeight() + 5, player.getHitboxWidth() / 2, player.getHitboxHeight() / 2);
 		gc.fillText(" : " + gameModel.getLives(), WIDTH - (player.getHitboxWidth() * 2) + player.getHitboxWidth() / 2,
-				HEIGHT - player.getHitboxHeight()/2 + 5);
+				HEIGHT - player.getHitboxHeight() / 2 + 5);
 
 		gc.fillText("Level : " + gameModel.getCurrentLevel(), WIDTH - (player.getHitboxWidth() * 2), 10);
 
@@ -361,7 +461,8 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	@Override
 	protected void updateStatistics() {
-		statsManager.logGameStat("Space-Shooter", LogStatType.INCOMPLETE, 1, getScore());
+		int score = getScore() < 1 ? 1 : getScore();
+		statsManager.logGameStat("Space-Shooter", LogStatType.INCOMPLETE, 1, score);
 	}
 
 	@Override
@@ -467,7 +568,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 			gameClock.stop();
 			gameClockCount = 0;
 			player.setCurrentHP(player.getMaxHP());
-			player.setLocation(startingLocation);
+			player.setLocation(new Point(startingLocation.x, startingLocation.y));
 			gameModel.newGame();
 			displayStartScreen();
 			return true;
