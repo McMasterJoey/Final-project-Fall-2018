@@ -167,7 +167,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		gc.drawImage(resources.getPlayerImage(), player.getLocation().getX(), player.getLocation().getY(),
 				player.getHitboxWidth(), player.getHitboxHeight());
 
-		// TODO design logo to put top center
+		gc.drawImage(resources.getLogo(), 250, 100, WIDTH - 500, 250);
 
 		gameScreen.setOnMouseClicked((key) -> {
 			startGame();
@@ -177,7 +177,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	private void displayPauseScreen() {
 		GraphicsContext gc = gameScreen.getGraphicsContext2D();
-		gc.setFill(Color.rgb(0, 0, 0, 0.5));
+		gc.setFill(Color.rgb(0, 0, 0, 0.7));
 		gc.fillRect(0, 0, WIDTH, HEIGHT);
 		// TODO draw pause text or image
 		getScene().setOnKeyPressed((key) -> {
@@ -187,9 +187,13 @@ public class SpaceShooterControllerView extends GameControllerView {
 	}
 
 	private void displayContinueScreen() {
-		// TODO draw continue screen
+		GraphicsContext gc = gameScreen.getGraphicsContext2D();
+		gc.setFill(Color.BLACK);
+		gc.setStroke(Color.WHITE);
+		gc.fillRect(0,  0, WIDTH, HEIGHT);
+		gc.strokeText("Click to resume game", 100, 100);
 
-		getScene().setOnKeyPressed((key) -> {
+		gameScreen.setOnMouseClicked((click) -> {
 			startGame();
 		});
 
@@ -198,15 +202,20 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private void displayGameOver() {
 		gameClock.stop();
 		GraphicsContext gc = gameScreen.getGraphicsContext2D();
-		gc.setFill(Color.rgb(0, 0, 0, 0.5));
+		gc.setFill(Color.rgb(0, 0, 0, 0.8));
 		gc.fillRect(0, 0, WIDTH, HEIGHT);
-		// TODO draw game over stuff
+		statsManager.logGameStat("Space-Shooter", LogStatType.LOSS, 1, getScore());
+		gc.drawImage(resources.getGameOver(), 300, 100, WIDTH - 600, 250);
 
 	}
 
 	private void startGame() {
 		gameModel.generateLevel();
 		enemyList = gameModel.getCurrentEnemies();
+		enemyProjectiles.clear();
+		playerProjectiles.clear();
+		player.setLocation(new Point(startingLocation.x, startingLocation.y));
+		itemDrops.clear();
 		setupListeners();
 		gameClock.start();
 	}
@@ -220,8 +229,8 @@ public class SpaceShooterControllerView extends GameControllerView {
 		checkCollisions();
 		checkDeaths();
 		checkLevelOver();
-		checkGameOver();
 		update(gameModel, this);
+		checkGameOver();
 	}
 
 	private void enemyAttack() {
@@ -236,7 +245,11 @@ public class SpaceShooterControllerView extends GameControllerView {
 								new Point(enemy.getLocation().x + enemy.getHitboxWidth() / 2,
 										enemy.getLocation().y + enemy.getHitboxHeight()),
 								8, 10, 2, "/enemylaser.png");
-						if(enemy instanceof Enemy3) {
+						if (enemy instanceof Enemy3) {
+							enemyShot = new SpaceShooterProjectile(
+									new Point(enemy.getLocation().x + enemy.getHitboxWidth() / 2,
+											enemy.getLocation().y + enemy.getHitboxHeight()),
+									8, 10, 2, "/laser.png");
 							enemyShot.setHoming(true);
 						}
 						enemyProjectiles.add(enemyShot);
@@ -265,7 +278,6 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	private void checkDeaths() {
 		if (player.getCurrentHP() <= 0) {
-			System.out.println(gameModel.getLives());
 			player.setLocation(new Point(startingLocation.x, startingLocation.y));
 			gameModel.setLives(gameModel.getLives() - 1);
 			player.setCurrentHP(1);
@@ -303,8 +315,6 @@ public class SpaceShooterControllerView extends GameControllerView {
 						/ ticksLeft;
 				double yMovementPerTick = (referenceEnemy.getLocation().getY() - enemy.getLocation().getY())
 						/ ticksLeft;
-				System.out.println("xMovement per tick = " + xMovementPerTick);
-				System.out.println("yMovement per tick = " + yMovementPerTick);
 				Point enemyDelta = new Point();
 				enemyDelta.setLocation(xMovementPerTick, yMovementPerTick);
 				enemyList.get(i).updatePosition(enemyDelta);
@@ -330,7 +340,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private void updateProjectilePositions() {
 		for (SpaceShooterProjectile ssp : enemyProjectiles) {
 			int xDelta = 0;
-			if(ssp.isHoming()) {
+			if (ssp.isHoming()) {
 				xDelta = ssp.getSpeed() / 2 * (player.getLocation().x > ssp.getLocation().x ? 1 : -1);
 			}
 			ssp.updatePosition(new Point(xDelta, ssp.getSpeed()));
@@ -338,7 +348,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 		for (SpaceShooterProjectile ssp : playerProjectiles) {
 			int xDelta = 0;
-			if(ssp.isHoming()) {
+			if (ssp.isHoming()) {
 				xDelta = ssp.getSpeed() / 2 * (player.getLocation().x > ssp.getLocation().x ? 1 : -1);
 			}
 			ssp.updatePosition(new Point(xDelta, -ssp.getSpeed()));
@@ -461,8 +471,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	@Override
 	protected void updateStatistics() {
-		int score = getScore() < 1 ? 1 : getScore();
-		statsManager.logGameStat("Space-Shooter", LogStatType.INCOMPLETE, 1, score);
+		statsManager.logGameStat("Space-Shooter", LogStatType.INCOMPLETE, 1, getScore());
 	}
 
 	@Override
@@ -501,6 +510,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 			oos = new ObjectOutputStream(fos);
 			oos.writeObject(gameModel);
 			oos.close();
+			System.out.println("Saved game at level " + gameModel.getCurrentLevel());
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -516,7 +526,8 @@ public class SpaceShooterControllerView extends GameControllerView {
 	 * @return true if the load was successful, false otherwise
 	 */
 	public boolean loadSaveGame() {
-		pauseGame();
+		gameClock.stop();
+		gameClockCount=0;
 		boolean retVal = true;
 		try {
 			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
@@ -528,8 +539,8 @@ public class SpaceShooterControllerView extends GameControllerView {
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				gameModel = (SpaceShooterModel) ois.readObject();
 				ois.close();
-				update(gameModel, this);
 				file.delete();
+				System.out.println("loaded game at level " + gameModel.getCurrentLevel());
 			} else {
 				retVal = newGame();
 			}

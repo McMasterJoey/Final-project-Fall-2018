@@ -1,10 +1,15 @@
 package spaceShooter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Observable;
 
-public class SpaceShooterModel extends Observable {
+public class SpaceShooterModel extends Observable implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ArrayList<SpaceShooterEnemy> currentEnemies;
 	private int currentScore;
 	private int numberLives;
@@ -28,7 +33,7 @@ public class SpaceShooterModel extends Observable {
 	}
 	
 	public boolean isStillRunning() {
-		return numberLives >= 0;
+		return numberLives > 0;
 	}
 
 	public void generateLevel() {

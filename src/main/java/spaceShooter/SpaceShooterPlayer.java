@@ -1,7 +1,8 @@
 package spaceShooter;
 
+import java.io.Serializable;
 
-public class SpaceShooterPlayer extends SpaceShooterShip{
+public class SpaceShooterPlayer extends SpaceShooterShip implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	

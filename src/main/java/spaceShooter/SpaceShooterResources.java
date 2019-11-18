@@ -17,6 +17,8 @@ public class SpaceShooterResources {
 	private Image enemyImageBoss;
 	private Image enemyLaser1;
 	private Image enemyLaser2;
+	private Image logo;
+	private Image gameOver;
 	
 	public SpaceShooterResources() {
 		playerImage = new Image(SpaceShooterResources.class.getResource("/spaceShooterPlayerImage.png").toString());
@@ -30,7 +32,8 @@ public class SpaceShooterResources {
 		enemyImageBoss = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/AlienMothership.png").toString());
 		enemyLaser1 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/laser.png").toString());
 		enemyLaser2 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemylaser.png").toString());
-		
+		logo = new Image(SpaceShooterResources.class.getResource("/SpaceShooterLogo.png").toString());
+		gameOver = new Image(SpaceShooterResources.class.getResource("/gameover.png").toString());
 	}
 	
 	public Image getPlayerImage() {
@@ -46,7 +49,7 @@ public class SpaceShooterResources {
 	}
 
 	public Image getEnemyImage(SpaceShooterEnemy enemy) {
-		if (enemy.getPointValue() ==10)
+		if (enemy.getPointValue() == 10)
 			return enemyImage1_1;
 		if (enemy.getPointValue() == 20)
 			return enemyImage2_1;
@@ -60,5 +63,13 @@ public class SpaceShooterResources {
 	public Image getItemImage(SpaceShooterBuff item) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public Image getLogo() {
+		return logo;
+	}
+	
+	public Image getGameOver() {
+		return gameOver;
 	}
 }

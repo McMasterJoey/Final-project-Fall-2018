@@ -1,10 +1,15 @@
 package spaceShooter;
 
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class EnemyGenerator {
+public class EnemyGenerator implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Random rand;
 	ArrayList<SpaceShooterEnemy> enemyList;
 	public ArrayList<SpaceShooterEnemy> getEnemies(int currentLevel) {

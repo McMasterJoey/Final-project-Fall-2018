@@ -1,5 +1,7 @@
 package spaceShooter;
 
+import java.io.Serializable;
+
 /**
  * Abstract class that has all of the fields and getters/setters that any
  * enemy will have.
@@ -7,7 +9,7 @@ package spaceShooter;
  *
  */
 
-public abstract class SpaceShooterEnemy extends SpaceShooterShip{
+public abstract class SpaceShooterEnemy extends SpaceShooterShip implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	

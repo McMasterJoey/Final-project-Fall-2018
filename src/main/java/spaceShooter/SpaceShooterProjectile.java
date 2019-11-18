@@ -1,9 +1,14 @@
 package spaceShooter;
 
 import java.awt.Point;
+import java.io.Serializable;
 
-public class SpaceShooterProjectile extends SpaceShooterObject {
+public class SpaceShooterProjectile extends SpaceShooterObject implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int movementSpeed;
 	private boolean homing;
 	

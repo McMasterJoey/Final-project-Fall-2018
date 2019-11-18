@@ -2,6 +2,7 @@ package battleship;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.HashSet;
 
 /**
  * Ship class, holds all of the relevant model information for battleship Ships
@@ -21,7 +22,7 @@ public class Ship implements Serializable{
 	public enum Direction {
 		HORIZONTAL, VERTICAL;
 	}
-
+	
 	/**
 	 * Constructor
 	 * @param size the ship size in board units

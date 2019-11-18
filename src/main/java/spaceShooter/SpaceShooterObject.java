@@ -1,9 +1,14 @@
 package spaceShooter;
 
 import java.awt.Point;
+import java.io.Serializable;
 
-public abstract class SpaceShooterObject {
+public abstract class SpaceShooterObject implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected int hitboxWidth; // width in pixels of the ship
 	protected int hitboxHeight; // height in pixels of the ship
 	protected Point location; // x,y coordinates of the object's top left corner

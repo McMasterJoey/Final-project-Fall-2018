@@ -1,8 +1,9 @@
 package spaceShooter;
 
 import java.awt.Point;
+import java.io.Serializable;
 
-public class EnemyBoss extends SpaceShooterEnemy{
+public class EnemyBoss extends SpaceShooterEnemy implements Serializable{
 
 	/**
 	 * 
