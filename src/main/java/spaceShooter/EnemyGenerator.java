@@ -13,7 +13,6 @@ public class EnemyGenerator implements Serializable{
 	Random rand;
 	ArrayList<SpaceShooterEnemy> enemyList;
 	public ArrayList<SpaceShooterEnemy> getEnemies(int currentLevel) {
-		System.out.println("current level = " + currentLevel);
 		enemyList = new ArrayList<SpaceShooterEnemy>();
 		rand = new Random();
 		if (currentLevel == 1) {

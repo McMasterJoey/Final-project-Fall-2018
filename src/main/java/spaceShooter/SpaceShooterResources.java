@@ -19,6 +19,8 @@ public class SpaceShooterResources {
 	private Image enemyLaser2;
 	private Image logo;
 	private Image gameOver;
+	private Image pauseImage;
+	private Image continueImage;
 	
 	public SpaceShooterResources() {
 		playerImage = new Image(SpaceShooterResources.class.getResource("/spaceShooterPlayerImage.png").toString());
@@ -34,6 +36,8 @@ public class SpaceShooterResources {
 		enemyLaser2 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemylaser.png").toString());
 		logo = new Image(SpaceShooterResources.class.getResource("/SpaceShooterLogo.png").toString());
 		gameOver = new Image(SpaceShooterResources.class.getResource("/gameover.png").toString());
+		pauseImage = new Image(SpaceShooterResources.class.getResource("/pauseImage.png").toString());
+		continueImage = new Image(SpaceShooterResources.class.getResource("/continueImage.png").toString());
 	}
 	
 	public Image getPlayerImage() {
@@ -71,5 +75,13 @@ public class SpaceShooterResources {
 	
 	public Image getGameOver() {
 		return gameOver;
+	}
+
+	public Image getPauseImage() {
+		return pauseImage;
+	}
+
+	public Image getContinueImage() {
+		return continueImage;
 	}
 }

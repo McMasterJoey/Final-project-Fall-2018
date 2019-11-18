@@ -99,7 +99,7 @@ public class AccountManager extends Observable
                     isGuest = rs.getBoolean("guest");
                     level = rs.getInt("level");
                     expInLevel = rs.getInt("exp");
-                    totalExp = getExpForLevel(level) + expInLevel;
+                    totalExp = getTotalExpForLevel(level) + expInLevel;
                     accountID = rs.getInt("accountid");
                     fillUserStats();
 
