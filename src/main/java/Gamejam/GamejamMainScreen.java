@@ -33,6 +33,7 @@ import controller.AccountManager;
 import controller.DBGameManager;
 import controller.GameControllerView;
 import model.*;
+import spaceShooter.SpaceShooterControllerView;
 import ticTacToe.TicTacToeControllerView;
 
 /**
@@ -78,6 +79,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private boolean agamewasloaded = false;
 	private boolean DEBUG_FakeDatabase = false; // REMOVE WHEN DONE
 	private BattleshipControllerView battleshipGameView;
+	private SpaceShooterControllerView spaceShooterGameView;
 	private int gameInUseIndex = -1;
 	private GameIconItem[] initgamelist;
 	private GamejamMainScreenTheme initthemes;
@@ -119,9 +121,11 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.tictactoegameview = new TicTacToeControllerView();
 		this.connectFourGameView = new ConnectFourControllerView();
 		this.battleshipGameView = new BattleshipControllerView();
+		this.spaceShooterGameView = new SpaceShooterControllerView();
 		this.initthemes.addRegion(350, this.tictactoegameview,"Tic-tac-toe general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
 		this.initthemes.addRegion(351, this.connectFourGameView,"Connect-4 general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
 		this.initthemes.addRegion(352, this.battleshipGameView,"Battleship general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
+		this.initthemes.addRegion(353, this.spaceShooterGameView, "Space-Shooter general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
 		
 		// Set up Extra menus
 		this.initUserSettingsMainMenu = initUserSettingsGUI();
@@ -812,12 +816,26 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.setCenter(this.connectFourGameView);
 		}
 		if (name.equals("Battleship")) {
+			this.gameInUseIndex = 2;
+			this.agamewasloaded = true;
 			if(userLoggedIn) {
+				loadAndResumeGame();
 				this.setTop(this.initLoggedInInGameBar);
 			} else {
 				this.setTop(this.initCreateAccountMenuBar);
 			}
 			this.setCenter(this.battleshipGameView);
+		}
+		if (name.equals("Space-Shooter")) {
+			this.gameInUseIndex = 3;
+			this.agamewasloaded = true;
+			if(userLoggedIn) {
+				loadAndResumeGame();
+				this.setTop(this.initLoggedInInGameBar);
+			} else {
+				this.setTop(this.initCreateAccountMenuBar);
+			}
+			this.setCenter(this.spaceShooterGameView);
 		}
 	}
 
@@ -951,10 +969,11 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private GameIconItem[] getGameList() {
 		if (this.DEBUG_FakeDatabase) {
-			GameIconItem[] retval = new GameIconItem[2];
+			GameIconItem[] retval = new GameIconItem[4];
 			retval[0] = new GameIconItem("Tic-Tac-Toe", "/tictactoeicon.png", 0);
 			retval[1] = new GameIconItem("Connect-Four", "/connectFourIcon.png", 1);
 			retval[2] = new GameIconItem("Battleship", "/battleshipIcon.png", 2);
+			retval[3] = new GameIconItem("Space-Shooter", "/spaceShooterIcon.png", 3);
 			return retval;
 		}
 		ArrayList<GameIconItem> allgames = this.dbGameManager.fetchAllGameSetUpInfo();
@@ -1092,6 +1111,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			return (GameControllerView) this.connectFourGameView;
 		} else if (this.gameInUseIndex == 2) {
 			return (GameControllerView) this.battleshipGameView;
+		} else if (this.gameInUseIndex == 3) {
+			return (GameControllerView) this.spaceShooterGameView;
 		}
 		return null;
 	}
