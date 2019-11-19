@@ -79,6 +79,12 @@ public class BattleshipControllerView extends GameControllerView {
 
 		gameName = "battleship";
 		menuBar = GameMenu.getMenuBar(this);
+		menuBar.getDiffeasy().setOnAction((event) ->{
+			gameModel.setAIStrategy(new BattleshipEasyAI());
+		});
+		menuBar.getDiffinter().setOnAction((event) ->{
+			gameModel.setAIStrategy(new BattleshipIntermediateAI());
+		});
 		this.setTop(menuBar);
 
 		accountManager = AccountManager.getInstance();

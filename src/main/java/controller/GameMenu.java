@@ -12,6 +12,7 @@ public class GameMenu extends MenuBar {
 	private MenuItem diffeasy;
 	private MenuItem saveGame;
 	private MenuItem loadGame;
+	
 	public Menu getOptmenu() {
 		return optmenu;
 	}
