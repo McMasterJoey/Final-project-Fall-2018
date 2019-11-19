@@ -906,4 +906,13 @@ public class AccountManager extends Observable
         }
         return gameid;
     }
+    /**
+     * TODO: Prior to using this function, themes should be loaded into the GamejamMainScreenTheme Object. 
+     * This then returns a list of names of the themes the user has stored within the data base. 
+     * @return
+     */
+    public ArrayList<String> getThemeNames()
+    {
+    	return new ArrayList<String>();
+    }
 }

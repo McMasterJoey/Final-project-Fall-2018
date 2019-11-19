@@ -74,4 +74,8 @@ public class ThemePair {
 	public Border getBorder() {
 		return this.border;
 	}
+	public String toString()
+	{
+		return "<ThemePair>: " + this.background + " " + this.border + " " + this.color;
+	}
 }

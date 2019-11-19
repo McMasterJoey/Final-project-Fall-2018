@@ -1,4 +1,9 @@
 package Gamejam;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+
 /**
  * Defines a property set to be filled out by each themeable region element.
  * 
@@ -8,30 +13,11 @@ package Gamejam;
  */
 public class ThemeRegionProp 
 {
-	private boolean isButton = false;
-	private boolean isHBox = false;
-	private boolean isVBox = false;
-	private boolean isLabel = false;
-	private boolean isBorderPane = false;
-	private boolean isGridPane = false;
-	private boolean isTableView = false;
-	private boolean isProgressBar = false;
-	private boolean isScrollPane = false;
-	private boolean isTextInputField = false;
-	private boolean isComboBox = false;
-	private boolean isCheckBox = false;
 	
-	private boolean isGeneralPane = false;
-	private boolean isBoundingArea = false;
-	private boolean isPutInUpperBar = false;
-	private boolean isPutInMiddle = false;
-	private boolean isPutInLeftPane = false;
-	private boolean isContainsText = false;
-	private boolean isContainsColorableText = false;
-	private boolean isContainsThemeableMainUIImages = false;
-	private boolean doNotTreatAsRegion = false;
+	private HashMap<String,Integer> nameToIndex = new HashMap<String,Integer>();
+	private boolean[] bol_array;
 	
-	public static final byte BUTTON = 0;
+	public static final byte NONE = 0;
 	public static final byte VBOX = 1;
 	public static final byte HBOX = 2;
 	public static final byte LABEL = 3;
@@ -44,167 +30,294 @@ public class ThemeRegionProp
 	public static final byte COMBOBOX = 10;
 	public static final byte BUTTON_WT = 11;
 	public static final byte CHECKBOX = 12;
+	public static final byte BUTTON = 13;
+	public static final byte COLORPICKER = 14;
 	
-	/**
-	 * Primary Constructor for the ThemeRegionProp class
-	 * Takes an int that represents what the region object is.
-	 * @param primaryproperty Refer to the Constants included with the class.
-	 */
-	public ThemeRegionProp(byte primaryproperty)
-	{
-		if (primaryproperty == 0)
-		{
-			this.isButton = true;
-		}
-		else if (primaryproperty == 11)
-		{
-			this.isButton = true;
-			this.isContainsText = true;
-			this.isContainsColorableText = true;
-		}
-		else if (primaryproperty == 12)
-		{
-			this.isContainsColorableText = true;
-			this.isContainsText = true;
-			this.isCheckBox = true;
-		}
-		else if (primaryproperty == 1)
-		{
-			this.isVBox = true;
-			this.isBoundingArea = true;
-		}
-		else if (primaryproperty == 2)
-		{
-			this.isHBox = true;
-			this.isBoundingArea = true;
-		}
-		else if (primaryproperty == 3)
-		{
-			this.isLabel = true;
-			this.isContainsText = true;
-			this.isContainsColorableText = true;
-			this.doNotTreatAsRegion = true;
-		}
-		else if (primaryproperty == 4)
-		{
-			this.isBorderPane = true;
-			this.isGeneralPane = true;
-			this.isBoundingArea = true;
-		}
-		else if (primaryproperty == 5)
-		{
-			this.isGridPane = true;
-			this.isGeneralPane = true;
-			this.isBoundingArea = true;
-		}
-		else if (primaryproperty == 6)
-		{
-			this.isProgressBar = true;
-		}
-		else if (primaryproperty == 7)
-		{
-			this.isTableView = true;
-			this.isContainsText = true;
-		}
-		else if (primaryproperty == 8)
-		{
-			this.isScrollPane = true;
-			this.isGeneralPane = true;
-			this.isBoundingArea = true;
-		}
-		else if (primaryproperty == 9)
-		{
-			this.isTextInputField = true;
-			this.isContainsText = true;
-			this.doNotTreatAsRegion = true;
-		}
-		else if (primaryproperty == 10)
-		{
-			this.isComboBox = true;
-			//this.isContainsText = true;
-		}
-	}
-	/**
-	 * Sets the property is it a Button.
-	 * @param value The boolean to set this to.
-	 */
-	public void setIsButton(boolean value) 
-	{
-		this.isButton = value;
-	}
-	/**
-	 * Sets the property of is it a HBox
-	 * @param value The boolean to set this to.
-	 */
-	public void setIsHBox(boolean value) 
-	{
-		this.isHBox = value;
-	}
+	// General UI Positioning
+	public static final byte LOC_TB = -1;
+	public static final byte LOC_LB = -2;
+	public static final byte LOC_MI = -3;
 	
-	/**
-	 * Sets the property of is it a BorderPane
-	 * @param value The boolean to set this to.
-	 */
-	public void setIsBorderPane(boolean value) 
-	{
-		this.isBorderPane = value;
-	}
-	/**
-	 * Sets the property of is it a VBox
-	 * @param value The boolean to set this to.
-	 */
-	public void setIsVBox(boolean value) 
-	{
-		this.isVBox = value;
-	}
-	/**
-	 * Sets the property of is it a Label
-	 * @param value The boolean to set this to.
-	 */
-	public void setIsLabel(boolean value) 
-	{
-		this.isLabel = value;
-	}
-	/**
-	 * Sets the property of is it a GridPane
-	 * @param value The boolean to set this to.
-	 */
-	public void setIsGridPane(boolean value) 
-	{
-		this.isGridPane = value;
-	}
-	/**
-	 * Sets the property of is it a TableView
-	 * @param value The boolean to set this to.
-	 */
-	public void setIsTableView(boolean value) 
-	{
-		this.isTableView = value;
-	}
-	/**
-	 * Sets the property of is it a Progress Bar
-	 * @param value The boolean to set this to.
-	 */
-	public void setIsProgressBar(boolean value) 
-	{
-		this.isProgressBar = value;
-	}
-	/**
-	 * Sets the property of is it a Scroll Pane
-	 * @param value The boolean to set this to.
-	 */
-	public void setIsScrollPane(boolean value) 
-	{
-		this.isScrollPane = value;
-	}
+	// Specific sectional Positioning
+	public static final byte LOC_TB_LI = -4;
+	public static final byte LOC_TB_NLI = -5;
+	public static final byte LOC_TB_UTIL = -6;
+	public static final byte LOC_TB_LI_IG = -7;
+	public static final byte LOC_TB_NLI_IG = -8;
 	
-	/**
-	 * Sets the property of is it a General Pane
-	 * @param value The boolean to set this to.
-	 */
-	public void setIsPane(boolean value) 
+	public static final byte LOC_MI_SG = -9;
+	public static final byte LOC_MI_IG = -10;
+	public static final byte LOC_MI_CA = -11;
+	public static final byte LOC_MI_USM = -12;
+	public static final byte LOC_MI_TM = -13;
+	public static final byte LOC_MI_BTM = -14;
+	public static final byte LOC_MI_ATM = -15;
+	public static final byte LOC_MI_LB = -16;
+	public static final byte LOC_MI_GH = -17;
+	
+	// Miss Properties
+	public static final byte INT_REG = -100; // The element merely holds another and might not theme well.
+	
+	public ThemeRegionProp(byte primaryproperty, byte locationid, byte missproperty)
 	{
-		this.isGeneralPane = value;
+		init_map();
+		presetAttributesUtil(primaryproperty);
+		presetLocationUtil(locationid);
+		if (missproperty == INT_REG)
+		{
+			this.bol_array[this.nameToIndex.get("IntermediateArea")] = true;
+			this.bol_array[this.nameToIndex.get("NotIntermediateArea")] = false;
+		}
+	}
+	public ThemeRegionProp(byte primaryproperty, byte locationid)
+	{
+		init_map();
+		presetAttributesUtil(primaryproperty);
+		presetLocationUtil(locationid);
+	}
+	private void init_map()
+	{
+		this.nameToIndex.put("Button",0);
+		this.nameToIndex.put("HBox",1);
+		this.nameToIndex.put("VBox",2);
+		this.nameToIndex.put("Label",3);
+		this.nameToIndex.put("BorderPane",4);
+		this.nameToIndex.put("GridPane",5);
+		this.nameToIndex.put("TableView",6);
+		this.nameToIndex.put("ProgressBar",7);
+		this.nameToIndex.put("ScrollPane",8);
+		this.nameToIndex.put("TextInputField",9);
+		this.nameToIndex.put("ComboBox",10);
+		this.nameToIndex.put("CheckBox",11);
+		this.nameToIndex.put("BoundingArea",12);
+		this.nameToIndex.put("IntermediateArea",13);
+		this.nameToIndex.put("TopBar",14);
+		this.nameToIndex.put("LeftBar",15);
+		this.nameToIndex.put("Middle",16);
+		this.nameToIndex.put("GamesMenu",17);
+		this.nameToIndex.put("UserSettingsMenu",18);
+		this.nameToIndex.put("ThemeMenu",19);
+		this.nameToIndex.put("BasicThemeMenu",20);
+		this.nameToIndex.put("AdvancedThemeMenu",21);
+		this.nameToIndex.put("CreateAccountMenu",22);
+		this.nameToIndex.put("UsedWhileLoggedIn",23);
+		this.nameToIndex.put("NotUsedWhileLoggedIn",24);
+		this.nameToIndex.put("HasGeneralLocationInfo",25);
+		this.nameToIndex.put("ContainsText",26);
+		this.nameToIndex.put("ContainsColorableText",27);
+		this.nameToIndex.put("ContainsThemeableMainUIImages",28);
+		this.nameToIndex.put("DoNotTreatAsRegion",29);
+		this.nameToIndex.put("UsedWhileInGame",30);
+		this.nameToIndex.put("IsGame",31);
+		this.nameToIndex.put("LeaderBoard",32);
+		this.nameToIndex.put("ButtonWithImage",33);
+		this.nameToIndex.put("GameHistoryMenu",34);
+		this.nameToIndex.put("NotIntermediateArea",35);
+		this.nameToIndex.put("ColorPicker",36);
+		this.nameToIndex.put("TreatAsButton",37);
+		
+		this.bol_array = new boolean[this.nameToIndex.size()];
+		for(int x = 0; x < this.bol_array.length; x++)
+		{
+			this.bol_array[x] = false;
+		}
+		this.bol_array[35] = true;
+		
+	}
+	private void presetLocationUtil(byte locationid)
+	{
+		if (locationid == LOC_MI_GH)
+		{
+			this.bol_array[this.nameToIndex.get("Middle")] = true;
+			this.bol_array[this.nameToIndex.get("GameHistoryMenu")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+			this.bol_array[this.nameToIndex.get("UsedWhileLoggedIn")] = true;
+		}
+		if (locationid == LOC_TB)
+		{
+			this.bol_array[this.nameToIndex.get("TopBar")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+		}
+		if (locationid == LOC_LB)
+		{
+			this.bol_array[this.nameToIndex.get("LeftBar")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+		}
+		if (locationid == LOC_MI)
+		{
+			this.bol_array[this.nameToIndex.get("Middle")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+		}
+		if (locationid == LOC_TB_LI)
+		{
+			this.bol_array[this.nameToIndex.get("TopBar")] = true;
+			this.bol_array[this.nameToIndex.get("UsedWhileLoggedIn")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+		}
+		if (locationid == LOC_TB_NLI)
+		{
+			this.bol_array[this.nameToIndex.get("TopBar")] = true;
+			this.bol_array[this.nameToIndex.get("NotUsedWhileLoggedIn")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+		}
+		if (locationid == LOC_TB_LI_IG)
+		{
+			this.bol_array[this.nameToIndex.get("TopBar")] = true;
+			this.bol_array[this.nameToIndex.get("UsedWhileLoggedIn")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+			this.bol_array[this.nameToIndex.get("UsedWhileInGame")] = true;
+		}
+		if (locationid == LOC_TB_NLI_IG)
+		{
+			this.bol_array[this.nameToIndex.get("TopBar")] = true;
+			this.bol_array[this.nameToIndex.get("NotUsedWhileLoggedIn")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+			this.bol_array[this.nameToIndex.get("UsedWhileInGame")] = true;
+		}
+		if (locationid == LOC_TB_UTIL)
+		{
+			this.bol_array[this.nameToIndex.get("TopBar")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+		}
+		
+		if (locationid == LOC_MI_SG)
+		{
+			this.bol_array[this.nameToIndex.get("Middle")] = true;
+			this.bol_array[this.nameToIndex.get("GamesMenu")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+		}
+		
+		if (locationid == LOC_MI_IG)
+		{
+			this.bol_array[this.nameToIndex.get("Middle")] = true;
+			this.bol_array[this.nameToIndex.get("UsedWhileInGame")] = true;
+			this.bol_array[this.nameToIndex.get("IsGame")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+		}
+		
+		if (locationid == LOC_MI_CA)
+		{
+			this.bol_array[this.nameToIndex.get("Middle")] = true;
+			this.bol_array[this.nameToIndex.get("CreateAccountMenu")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+			this.bol_array[this.nameToIndex.get("NotUsedWhileLoggedIn")] = true;
+		}
+		
+		if (locationid == LOC_MI_USM)
+		{
+			this.bol_array[this.nameToIndex.get("Middle")] = true;
+			this.bol_array[this.nameToIndex.get("UserSettingsMenu")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+			this.bol_array[this.nameToIndex.get("UsedWhileLoggedIn")] = true;
+		}
+		
+		if (locationid == LOC_MI_TM)
+		{
+			this.bol_array[this.nameToIndex.get("Middle")] = true;
+			this.bol_array[this.nameToIndex.get("ThemeMenu")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+			this.bol_array[this.nameToIndex.get("UsedWhileLoggedIn")] = true;
+		}
+		if (locationid == LOC_MI_BTM)
+		{
+			this.bol_array[this.nameToIndex.get("Middle")] = true;
+			this.bol_array[this.nameToIndex.get("BasicThemeMenu")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+			this.bol_array[this.nameToIndex.get("UsedWhileLoggedIn")] = true;
+		}
+		if (locationid == LOC_MI_ATM)
+		{
+			this.bol_array[this.nameToIndex.get("Middle")] = true;
+			this.bol_array[this.nameToIndex.get("AdvancedThemeMenu")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+			this.bol_array[this.nameToIndex.get("UsedWhileLoggedIn")] = true;
+		}
+		if (locationid == LOC_MI_LB)
+		{
+			this.bol_array[this.nameToIndex.get("Middle")] = true;
+			this.bol_array[this.nameToIndex.get("LeaderBoard")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+		}
+		
+	}
+	private void presetAttributesUtil(byte primaryproperty) 
+	{
+		if (primaryproperty == BUTTON)
+		{
+			this.bol_array[this.nameToIndex.get("Button")] = true;
+			this.bol_array[this.nameToIndex.get("ButtonWithImage")] = true;
+			this.bol_array[this.nameToIndex.get("TreatAsButton")] = true;
+		}
+		else if (primaryproperty == BUTTON_WT)
+		{
+			this.bol_array[this.nameToIndex.get("Button")] = true;
+			this.bol_array[this.nameToIndex.get("ContainsText")] = true;
+			this.bol_array[this.nameToIndex.get("ContainsColorableText")] = true;
+			this.bol_array[this.nameToIndex.get("TreatAsButton")] = true;
+		}
+		else if (primaryproperty == CHECKBOX)
+		{
+			this.bol_array[this.nameToIndex.get("ContainsText")] = true;
+			this.bol_array[this.nameToIndex.get("ContainsColorableText")] = true;
+			this.bol_array[this.nameToIndex.get("CheckBox")] = true;
+		}
+		else if (primaryproperty == VBOX)
+		{
+			this.bol_array[this.nameToIndex.get("VBox")] = true;
+			this.bol_array[this.nameToIndex.get("BoundingArea")] = true;
+		}
+		else if (primaryproperty == HBOX)
+		{
+			this.bol_array[this.nameToIndex.get("HBox")] = true;
+			this.bol_array[this.nameToIndex.get("BoundingArea")] = true;
+		}
+		else if (primaryproperty == LABEL)
+		{
+			this.bol_array[this.nameToIndex.get("Label")] = true;
+			this.bol_array[this.nameToIndex.get("ContainsText")] = true;
+			this.bol_array[this.nameToIndex.get("ContainsColorableText")] = true;
+			this.bol_array[this.nameToIndex.get("DoNotTreatAsRegion")] = true;
+		}
+		else if (primaryproperty == BORDERPANE)
+		{
+			this.bol_array[this.nameToIndex.get("BorderPane")] = true;
+			this.bol_array[this.nameToIndex.get("BoundingArea")] = true;
+		}
+		else if (primaryproperty == GRIDPANE)
+		{
+			this.bol_array[this.nameToIndex.get("GridPane")] = true;
+			this.bol_array[this.nameToIndex.get("BoundingArea")] = true;
+		}
+		else if (primaryproperty == PROGRESSBAR)
+		{
+			this.bol_array[this.nameToIndex.get("ProgressBar")] = true;
+		}
+		else if (primaryproperty == TABLEVIEW)
+		{
+			this.bol_array[this.nameToIndex.get("TableView")] = true;
+			this.bol_array[this.nameToIndex.get("ContainsText")] = true;
+		}
+		else if (primaryproperty == SCROLLPANE)
+		{
+			this.bol_array[this.nameToIndex.get("ScrollPane")] = true;
+			this.bol_array[this.nameToIndex.get("BoundingArea")] = true;
+		}
+		else if (primaryproperty == TEXTINPUT)
+		{
+			this.bol_array[this.nameToIndex.get("TextInputField")] = true;
+			this.bol_array[this.nameToIndex.get("ContainsText")] = true;
+			this.bol_array[this.nameToIndex.get("DoNotTreatAsRegion")] = true;
+		}
+		else if (primaryproperty == COMBOBOX)
+		{
+			this.bol_array[this.nameToIndex.get("ComboBox")] = true;
+			this.bol_array[this.nameToIndex.get("TreatAsButton")] = true;
+		}
+		else if (primaryproperty == COLORPICKER)
+		{
+			this.bol_array[this.nameToIndex.get("ColorPicker")] = true;
+			this.bol_array[this.nameToIndex.get("TreatAsButton")] = true;
+		}
 	}
 	/**
 	 * Sets the property of is it a Bounding Area
@@ -212,31 +325,31 @@ public class ThemeRegionProp
 	 */
 	public void setIsBoundingArea(boolean value) 
 	{
-		this.isBoundingArea = value;
+		this.bol_array[this.nameToIndex.get("BoundingArea")] = value;
 	}
 	/**
-	 * Sets the property of is it a put in the Upper Bar
+	 * Sets the property of is it a put in the Top Bar
 	 * @param value The boolean to set this to.
 	 */
-	public void setIsPutInUpperBar(boolean value) 
+	public void setIsInTopBar(boolean value) 
 	{
-		this.isPutInUpperBar = value;
+		this.bol_array[this.nameToIndex.get("TopBar")] = value;
 	}
 	/**
 	 * Sets the property of is it a put in the middle
 	 * @param value The boolean to set this to.
 	 */
-	public void setIsPutInMiddle(boolean value) 
+	public void setIsInMiddle(boolean value) 
 	{
-		this.isPutInMiddle = value;
+		this.bol_array[this.nameToIndex.get("Middle")] = value;
 	}
 	/**
-	 * Sets the property of is it put in the left Pane
+	 * Sets the property of is it put in the left Bar
 	 * @param value The boolean to set this to.
 	 */
-	public void setIsPutInLeftPane(boolean value) 
+	public void setIsInLeftBar(boolean value) 
 	{
-		this.isPutInLeftPane = value;
+		this.bol_array[this.nameToIndex.get("LeftBar")] = value;
 	}
 	/**
 	 * Sets the property of is it contains text
@@ -244,23 +357,7 @@ public class ThemeRegionProp
 	 */
 	public void setIsContainsText(boolean value) 
 	{
-		this.isContainsText = value;
-	}
-	/**
-	 * Sets the property of is it a text input field includes password and text fields.
-	 * @param value The boolean to set this to.
-	 */
-	public void setIsTextInputField(boolean value)
-	{
-		this.isTextInputField = value;
-	}
-	/**
-	 * Sets the property of is it a combo box.
-	 * @param value The boolean to set this to.
-	 */
-	public void setIsComboBox(boolean value) 
-	{
-		this.isContainsText = value;
+		this.bol_array[this.nameToIndex.get("ContainsText")] = value;
 	}
 	/**
 	 * Sets the property of is has Colorable text.
@@ -268,83 +365,69 @@ public class ThemeRegionProp
 	 */
 	public void setIsContainsColorableText(boolean value) 
 	{
-		this.isContainsColorableText = value;
+		this.bol_array[this.nameToIndex.get("ContainsColorableText")] = value;
 	}
+	/**
+	 * 
+	 * @param value
+	 */
 	public void setIsContainsThemeableMainGUIImages(boolean value)
 	{
-		this.isContainsThemeableMainUIImages = value;
+		this.bol_array[this.nameToIndex.get("ContainsThemeableMainUIImages")] = value;
 	}
-	///////////////////////// ANSWER QUESTIONS METHODS ////////////////
-	public boolean canColorText() 
+	
+	/**
+	 * Used primarily for encoding Dynamic Theme generation.
+	 * Checks if every value represented by the integers in the input are true.
+	 * If they are, then the element this object represents the properties of is true given the expression.
+	 * Otherwise returns false.
+	 * @param domain A collection of ints that represent a sequence of True statements.
+	 * @return If every int in the collection maps to a true value, then return true. Otherwise returns false.
+	 */
+	public boolean isAllTrue(Collection<Integer> domain)
 	{
-		return this.isContainsColorableText;
+		Iterator<Integer> iter = domain.iterator();
+		while(iter.hasNext())
+		{
+			if (!this.bol_array[iter.next()])
+			{
+				return false;
+			}
+		}
+		return true;
 	}
-	public boolean isButton()
+	/**
+	 * Used primarily for encoding Dynamic Theme generation.
+	 * Checks if atleast one value represented by the integers in the input are true.
+	 * If they are, then the element this object represents the properties of is true given the expression.
+	 * Otherwise returns false.
+	 * @param domain A collection of ints that represent a sequence of True statements.
+	 * @return If atleast one int in the collection maps to a true value, then return true. Also returns true of the collection is empty. Otherwise returns false.
+	 */
+	public boolean isAtleastOneTrue(Collection<Integer> domain)
 	{
-		return this.isButton;
+		if (domain.size() == 0)
+		{
+			return true;
+		}
+		
+		Iterator<Integer> iter = domain.iterator();
+		while(iter.hasNext())
+		{
+			if (this.bol_array[iter.next()])
+			{
+				return true;
+			}
+		}
+		return false;
 	}
-	public boolean isPane()
+	public boolean isTrue(int domain)
 	{
-		return this.isGeneralPane;
+		return this.bol_array[domain];
 	}
-	public boolean isBoundingArea()
+	
+	public boolean isTrue(String propertyname)
 	{
-		return this.isBoundingArea;
-	}
-	public boolean isButtonWithText()
-	{
-		return (this.isButton && this.isContainsColorableText);
-	}
-	public boolean isContainsThemeableMainGUIImages()
-	{
-		return this.isContainsThemeableMainUIImages;
-	}
-	public boolean doNotTreatAsRegion()
-	{
-		return this.doNotTreatAsRegion;
-	}
-	public boolean isLabel()
-	{
-		return this.isLabel;
-	}
-	public boolean isComboBox()
-	{
-		return this.isComboBox;
-	}
-	public boolean isBorderPane()
-	{
-		return this.isBorderPane;
-	}
-	public boolean isGridPane()
-	{
-		return this.isGridPane;
-	}
-	public boolean isHBox()
-	{
-		return this.isHBox;
-	}
-	public boolean isVBox()
-	{
-		return this.isVBox;
-	}
-	public boolean isTableView()
-	{
-		return this.isTableView;
-	}
-	public boolean isProgressBar()
-	{
-		return this.isProgressBar;
-	}
-	public boolean isScrollPane()
-	{
-		return this.isScrollPane;
-	}
-	public boolean isTextInputField()
-	{
-		return this.isTextInputField;
-	}
-	public boolean isCheckBox()
-	{
-		return this.isCheckBox;
+		return this.bol_array[this.nameToIndex.get(propertyname)];
 	}
 }
