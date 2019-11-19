@@ -7,23 +7,28 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import Gamejam.GameIconItem;
+import model.Achievement;
+
 /**
- * Interacts with the database on behalf of the Main GUI, Does any interaction that dosn't directly involve account management.
+ * Interacts with the database on behalf of the Main GUI, Does any interaction that doesn't directly involve account management.
  * @author Joey McMaster
+ * @author Nicholas Fiegel
  *
  */
 public class DBGameManager
 {
-	private static DBGameManager _singleton = null;
-	private DBConnection DBconnection;
+	private static DBGameManager singleton = null;
+	private DBConnection conn;
 	private HashMap<String, Integer> gameListByName; // Maps game name to gameid
 	private HashMap<Integer, String> gameListByID; // Maps gameid to game name
+	private ArrayList<Achievement> achievements; // List of all the achievements in the DB
 	
 	private DBGameManager() {
-		DBconnection = DBConnection.getInstance();
+		conn = DBConnection.getInstance();
 		gameListByName = new HashMap<>();
 		gameListByID = new HashMap<>();
 		fetchAllGameSetUpInfo();
+		fillAchievements();
 	}
 
 	/**
@@ -31,10 +36,10 @@ public class DBGameManager
 	 * @return The only instance of the class.
 	 */
 	synchronized public static DBGameManager getInstance() {
-		if (_singleton == null) {
-			_singleton = new DBGameManager();
+		if (singleton == null) {
+			singleton = new DBGameManager();
 		}
-		return _singleton;
+		return singleton;
 	}
 	/**
 	 * Gets the relevant information from the games table.
@@ -45,7 +50,7 @@ public class DBGameManager
 		ArrayList<GameIconItem> retval = new ArrayList<GameIconItem>();
 		ResultSet rs = null;
 		try {
-			rs = DBconnection.executeQuery("SELECT name, iconpath, gameid FROM games");
+			rs = conn.executeQuery("SELECT name, iconpath, gameid FROM games");
 			while (rs.next()) {
 				String name = rs.getString("name");
 				Integer id = rs.getInt("gameid");
@@ -69,6 +74,31 @@ public class DBGameManager
 		return retval;
 	}
 
+	private void fillAchievements() {
+		achievements = new ArrayList<>();
+		ResultSet rs = null;
+
+		try {
+			rs = conn.executeQuery("SELECT * FROM achievements");
+
+			while (rs.next()) {
+				int achieveID = rs.getInt("achieveid");
+				int gameID = rs.getInt("gameid");
+				String description = rs.getString("description");
+				String condition = rs.getString("condition");
+				int amount = rs.getInt("amount");
+				int exp = rs.getInt("exp");
+				String iconPath = rs.getString("iconpath");
+				achievements.add(new Achievement(achieveID, gameID, description, condition, amount, exp, iconPath));
+			}
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+	}
+
+	// ---
+	// Begin Getters
+
 	public HashMap<String, Integer> getGameListByName() {
 		return gameListByName;
 	}
@@ -76,4 +106,23 @@ public class DBGameManager
 	public HashMap<Integer, String> getGameListByID() {
 		return gameListByID;
 	}
+
+	public ArrayList<Achievement> getAchievements() {
+		return achievements;
+	}
+
+	public String getAchievementIconPath(int achieveID) {
+
+		for (Achievement cur : achievements) {
+
+			if (cur.getAchieveID() == achieveID) {
+				return cur.getIconPath();
+			}
+		}
+
+		return null;
+	}
+
+	// ---
+	// End Getters
 }

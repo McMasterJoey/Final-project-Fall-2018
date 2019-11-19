@@ -49,7 +49,8 @@ public class GamejamMainScreenTheme
 	private void cacheImages()
 	{
 		this.imagecache = new ArrayList<Image>();
-		this.imagecache.add(new Image("/themeDefaultThemeMenuIcon.png"));
+		//this.imagecache.add(new Image("/themeDefaultThemeMenuIcon.png"));
+		this.imagecache.add(new Image(GamejamMainScreenTheme.class.getResource("/themeDefaultThemeMenuIcon.png").toString()));
 		this.imagecache.add(new Image("/themeNightThemeMenuIcon.png"));
 		this.imagecache.add(new Image("/themeUSAThemeMenuIcon.png"));
 		

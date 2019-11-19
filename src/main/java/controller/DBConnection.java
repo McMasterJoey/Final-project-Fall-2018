@@ -83,4 +83,15 @@ public class DBConnection {
 		
 		return result;
 	}
+
+	/**
+	 * Method to close the database connection.
+	 */
+	public void close() {
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }
