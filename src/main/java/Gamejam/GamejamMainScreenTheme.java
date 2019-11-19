@@ -31,7 +31,6 @@ import model.SanityCheckFailedException;
 public class GamejamMainScreenTheme 
 {
 	private ArrayList<Theme> themes;
-	private Theme customtheme;
 	private ArrayList<RegionPair> regions;
 	private ArrayList<PriorityPair> preInit;
 	private ThemeCreator themecreator;
@@ -108,12 +107,18 @@ public class GamejamMainScreenTheme
 			}
 			this.themecreator.doOnMainScreenThemeFinishInit();
 			this.basicthemecreator.finishConstructing();
-			resetCustomTheme();
+			
+			this.playerCustomThemes.add(generateDefaultTheme());
+			this.playerCustomThemes.add(generateDefaultTheme());
 			setUpThemes();
 			updateTheme(0);
 			// Undefine so it gets garbage collected
 			//this.preInit = null;
 		}
+	}
+	public Theme getBufferTheme()
+	{
+		return this.playerCustomThemes.get(0);
 	}
 	public ArrayList<RegionPair> getAllRegions()
 	{
@@ -142,70 +147,31 @@ public class GamejamMainScreenTheme
 	 */
 	public Theme getTheme(int themeid) 
 	{
-		if (themeid < -1 || themeid >= this.themes.size() || !this.doneAddingRegions) 
+		if (!this.doneAddingRegions)
 		{
-			if (!this.doneAddingRegions)
-			{
-				throw new SanityCheckFailedException("Can't get Themes while we're still adding regions to the object.");
-			}
-			throw new SanityCheckFailedException("Invalid themeid!");
+			throw new SanityCheckFailedException("Can't get Themes while we're still adding regions to the object.");
 		}
-		if (themeid == -1)
+		if (themeid < 0)
 		{
-			return this.customtheme;
+			themeid++;
+			themeid = Math.abs(themeid);
+			return this.playerCustomThemes.get(themeid);
 		}
-		return this.themes.get(themeid);
+		else 
+		{
+			return this.themes.get(themeid);
+		}
 	}
 	/**
 	 * Resets the Custom Theme to the default theme.
 	 */
-	public void resetCustomTheme() 
+	public void resetCustomTheme(int id) 
 	{
 		if (!this.doneAddingRegions)
 		{
 			throw new SanityCheckFailedException("Can't reset themes when we're still adding regions to the object.");
 		}
-		this.customtheme = new Theme("Custom Theme", getRegionCount());
-		this.customtheme.addNewImage("/usersettingsbuttonbackground.png");
-		this.customtheme.addNewImage("/usersettingsbuttonbackground.png");
-		HashSet<Integer> check3 = new HashSet<Integer>();
-		check3.add(26);
-		check3.add(27);
-		
-		for(int x = 0; x < this.regions.size(); x++) 
-		{
-			ThemePair p;
-			if (this.regions.get(x).getProperties().isTrue(37))
-			{
-				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.DARKGRAY, false), quickBorderSetup(Color.DARKBLUE), Color.BLACK);
-				this.customtheme.setThemeData(x, p);
-			} 
-			else if (this.regions.get(x).getProperties().isTrue(12))
-			{
-				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), noBorder());
-				this.customtheme.setThemeData(x, p);
-			}
-			else if (this.regions.get(x).getProperties().isAllTrue(check3))
-			{
-				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), noBorder(), Color.RED);
-				this.customtheme.setThemeData(x, p);
-			}
-			else
-			{
-				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.DARKGRAY,Color.GRAY, true), noBorder());
-				this.customtheme.setThemeData(x, p);
-			}
-		
-		}
-		
-		// DEBUG
-		/*
-		Theme t = ThemeGenerate.createThemeGenerated();
-		for(int x = 0; x < t.getTheme().length;x++)
-		{
-			this.customtheme.setThemeData(x, t.getTheme()[x]);
-		}
-		*/
+		this.playerCustomThemes.set(id, generateDefaultTheme());
 	}
 	/**
 	 * Updates the Theme of the Main GUI
@@ -218,25 +184,18 @@ public class GamejamMainScreenTheme
 			throw new SanityCheckFailedException("Can't update theme while we're still adding regions to the object.");
 		}
 		ThemePair[] themedata;
-		/*
+		
 		if (themeid < 0)
 		{
 			themeid++;
 			themeid = Math.abs(themeid);
+			Gamejam.DPrint("[DEBUG]: Custom theme with a custom theme id of " + themeid + " being set!");
 			themedata = this.playerCustomThemes.get(themeid).getTheme();
-		}
-		*/
-		if (themeid == -1) 
-		{
-			themedata = this.customtheme.getTheme();
 		}
 		else 
 		{
 			themedata = getTheme(themeid).getTheme();
 		}
-		
-		
-		//this.playerCustomThemes
 		
 		int themeimageid = 0;
 		HashSet<Integer> check2 = new HashSet<Integer>();
@@ -245,10 +204,12 @@ public class GamejamMainScreenTheme
 		
 		for(int x = 0; x < this.regions.size(); x++)
 		{
-			if (this.regions.get(x) == null || this.regions.get(x).getRegion() == null) {
+			if (this.regions.get(x) == null || this.regions.get(x).getRegion() == null) 
+			{
 				Gamejam.DPrint("[ERROR]: Region at index " + x + " was null!");
 				continue;
 			}
+			
 			if (!this.regions.get(x).getProperties().isTrue(29))
 			{
 				if (themedata[x] == null)
@@ -260,6 +221,7 @@ public class GamejamMainScreenTheme
 				this.regions.get(x).getRegion().setBorder(themedata[x].getBorder());
 				this.regions.get(x).getRegion().setStyle(themedata[x].getCSS());
 			}
+			
 			if (this.regions.get(x).getProperties().isAllTrue(check2)) 
 			{
 				if (themedata[x] == null)
@@ -271,6 +233,7 @@ public class GamejamMainScreenTheme
 				Labeled l = (Labeled) this.regions.get(x).getRegion();
 				l.setTextFill(themedata[x].getColor());
 			}
+			
 			if (this.regions.get(x).getProperties().isTrue(28))
 			{
 				Button b = (Button) this.regions.get(x).getRegion();
@@ -279,29 +242,29 @@ public class GamejamMainScreenTheme
 		}
 	}
 	/**
-	 * 
+	 * @param id
 	 * @param index
 	 * @param data
 	 */
-	public void setCustomThemeData(int index, ThemePair data) 
+	public void setCustomThemeData(int id, int index, ThemePair data) 
 	{
 		if (!this.doneAddingRegions)
 		{
 			throw new SanityCheckFailedException("Can't set custom theme data when we're still adding regions to the object.");
 		}
-		this.customtheme.setThemeData(index, data);
+		this.playerCustomThemes.get(id).setThemeData(index, data);
 	}
 	/**
 	 * Fetches the Stored Custom Theme
 	 * @return The Custom theme data
 	 */
-	public Theme getCustomTheme() 
+	public Theme getCustomTheme(int id) 
 	{
 		if (!this.doneAddingRegions)
 		{
 			throw new SanityCheckFailedException("Can't get custom theme when we're still adding regions to the object.");
 		}
-		return this.customtheme;
+		return this.playerCustomThemes.get(id);
 	}
 	private void setUpThemes() 
 	{
@@ -309,11 +272,11 @@ public class GamejamMainScreenTheme
 		{
 			throw new SanityCheckFailedException("Can't setup themes when we're still adding regions to the object.");
 		}
-		generateDefaultTheme();
+		themes.set(0, generateDefaultTheme());
 		themes.set(1,ThemeGenerate.createThemeGenerated_Night());
 		themes.set(2, ThemeGenerate.createThemeGenerated_USA());
 	}
-	private void generateDefaultTheme() 
+	public Theme generateDefaultTheme() 
 	{
 		Theme t1 = new Theme("Default Theme", getRegionCount());
 		t1.setIcon(this.imagecache.get(0));
@@ -327,7 +290,7 @@ public class GamejamMainScreenTheme
 		for(int x = 0; x < this.regions.size(); x++) 
 		{
 			ThemePair p;
-			if (this.regions.get(x).getProperties().isTrue(0))
+			if (this.regions.get(x).getProperties().isTrue(37))
 			{
 				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.DARKGRAY, false), quickBorderSetup(Color.DARKBLUE), Color.BLACK);
 				t1.setThemeData(x, p);
@@ -354,14 +317,18 @@ public class GamejamMainScreenTheme
 			}
 		
 		}
-		themes.set(0,t1);
+		return t1;
 	}
-	
 	public void addNewCustomTheme(Theme t)
 	{
 		this.playerCustomThemes.add(t);
 	}
-	
+	public void setCustomTheme(int id, Theme t)
+	{
+		this.playerCustomThemes.set(id, t);
+		this.playerCustomThemes.get(id).generateTheme();
+		this.updateTheme((id + 1) * -1); 
+	}
 	public void removeAllCustomThemes()
 	{
 		this.playerCustomThemes.clear();

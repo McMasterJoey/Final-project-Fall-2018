@@ -102,7 +102,7 @@ public class ThemeCreator extends HBox
 			} 
 			else 
 			{
-				this.screen.getCustomTheme().setThemeData(this.currentworkingid, p);
+				this.screen.getCustomTheme(0).setThemeData(this.currentworkingid, p);
 			}
 		});
 		Button setTheme = new Button("Set Custom Theme");
@@ -113,7 +113,7 @@ public class ThemeCreator extends HBox
 		Button resetCustomTheme = new Button("Reset Custom Theme");
 		resetCustomTheme.setOnAction((click) -> 
 		{
-			this.screen.resetCustomTheme();
+			this.screen.resetCustomTheme(0);
 		});
 		// DEBUG REMOVE WHEN DONE
 		Button debugger_codedumper = new Button("Dump Theme Code");
@@ -341,7 +341,6 @@ public class ThemeCreator extends HBox
 			System.out.println("wid: " + this.currentworkingid);
 		});
 		this.elementselector.setValue("Theme Creator left vbox background");
-		this.screen.resetCustomTheme();
 	}
 	
 	

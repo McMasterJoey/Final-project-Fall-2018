@@ -5,7 +5,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import javafx.scene.layout.Background;
+import javafx.scene.layout.Border;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import model.SanityCheckFailedException;
 
 /**
@@ -15,18 +18,20 @@ import model.SanityCheckFailedException;
  */
 public class ThemeDynamic extends Theme 
 {
-	private ArrayList<RulePair> rules;
-	private ArrayList<RegionPair> regions;
+	protected ArrayList<RulePair> rules;
+	protected ArrayList<RegionPair> regions;
+	protected GamejamMainScreenTheme screen;
 	
-	public ThemeDynamic(String name, int arraysize, ArrayList<RegionPair> regions) {
+	public ThemeDynamic(String name, int arraysize, ArrayList<RegionPair> regions, GamejamMainScreenTheme screen) {
 		super(name, arraysize);
 		this.rules = new ArrayList<RulePair>();
 		this.regions = regions;
+		this.screen = screen;
 		if (this.regions.size() != arraysize)
 		{
 			throw new SanityCheckFailedException("ThemeDynamic: Mismatch of Region list size and static theme pair array size!");
 		}
-		
+		generateTheme();
 	}
 	/**
 	 * Generates stored theme via the stored rules in the order they were inserted.
@@ -35,35 +40,16 @@ public class ThemeDynamic extends Theme
 	{
 		
 		// Reset it
-		HashSet<Integer> check3 = new HashSet<Integer>();
-		check3.add(26);
-		check3.add(27);
-		
-		for(int x = 0; x < this.regions.size(); x++) 
+		Theme t = this.screen.generateDefaultTheme();
+		for(int x = 0; x < this.regions.size(); x++)
 		{
-			ThemePair p;
-			if (this.regions.get(x).getProperties().isTrue(0))
+			this.setThemeData(x, t.getTheme()[x]);
+			if (this.themedata[x] == null)
 			{
-				p = new ThemePair(GamejamMainScreenTheme.linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.DARKGRAY, false), GamejamMainScreenTheme.quickBorderSetup(Color.DARKBLUE), Color.BLACK);
-				this.setThemeData(x, p);
-			} 
-			else if (this.regions.get(x).getProperties().isTrue(12))
-			{
-				p = new ThemePair(GamejamMainScreenTheme.linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), GamejamMainScreenTheme.noBorder());
-				this.setThemeData(x, p);
+				throw new SanityCheckFailedException("ThemeDynamic: Failed to reset the theme data back to default! Some values were null!");
 			}
-			else if (this.regions.get(x).getProperties().isAllTrue(check3))
-			{
-				p = new ThemePair(GamejamMainScreenTheme.linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), GamejamMainScreenTheme.noBorder(), Color.RED);
-				this.setThemeData(x, p);
-			}
-			else
-			{
-				p = new ThemePair(GamejamMainScreenTheme.linGrdSimpleBackgroundSetUp(Color.DARKGRAY,Color.GRAY, true), GamejamMainScreenTheme.noBorder());
-				this.setThemeData(x, p);
-			}
-		
 		}
+		
 		
 		Gamejam.DPrint("[DEBUG]: rules.size = " + this.rules.size());
 		
@@ -76,17 +62,42 @@ public class ThemeDynamic extends Theme
 			{
 				if (useAnd && this.regions.get(y).getProperties().isAllTrue(rp.getStatements()))
 				{
-					this.setThemeData(x, rp.getPair());
+					this.setThemeData(y, processBasicThemeEditorThemePair(rp.getPair(),y));
 					debug_countapplies++;
 				}
 				else if (!useAnd && this.regions.get(y).getProperties().isAtleastOneTrue(rp.getStatements()))
 				{
-					this.setThemeData(x, rp.getPair());
+					this.setThemeData(y, processBasicThemeEditorThemePair(rp.getPair(),y));
 					debug_countapplies++;
 				}
 			}
 			Gamejam.DPrint("[DEBUG]: Rule " + x + " applied theme settings to " +  debug_countapplies + " pairs! ");
 		}
+	}
+	private ThemePair processBasicThemeEditorThemePair(ThemePair p, int intendedindex)
+	{
+		Background b = p.getBackground();
+		Paint pa = p.getColor();
+		Border bo = p.getBorder();
+		if (b != null && pa != null && bo != null)
+		{
+			return p;
+		}
+		
+		if (b == null)
+		{
+			b = this.themedata[intendedindex].getBackground();
+		}
+		if (pa == null)
+		{
+			pa = this.themedata[intendedindex].getColor();
+		}
+		if (bo == null)
+		{
+			bo = this.themedata[intendedindex].getBorder();
+		}
+		ThemePair retval = new ThemePair(b,bo,pa);
+		return retval;
 	}
 	public static ArrayList<String> getSurportedEnglishRules()
 	{
@@ -242,7 +253,7 @@ public class ThemeDynamic extends Theme
 		this.rules.clear();
 	}
 	
-	private class RulePair
+	protected class RulePair
 	{
 		private HashSet<Integer> statements;
 		private ThemePair pair;
