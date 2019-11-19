@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import controller.AccountManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -12,6 +13,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStrokeStyle;
@@ -32,6 +34,7 @@ public class BasicThemeCreator extends GridPane
 	private VBox textSetter;
 	private VBox backgroundSetter;
 	private VBox mainarea;
+	private VBox themeUtil;
 	
 	private ComboBox<String> elementSetter;
 	private String elementStr;
@@ -61,10 +64,13 @@ public class BasicThemeCreator extends GridPane
 	private Button returntomainmenubutton;
 	private Button returntomainmenubutton1;
 	private Button returntomainmenubutton2;
+	private Button returntomainmenubutton3;
 	
 	private VBox textintermediatevbox;
 	private VBox backgroundintermediatevbox;
 	private VBox borderintermediatevbox;
+	
+	private int workingthemeindex = 1;
 	public BasicThemeCreator(GamejamMainScreenTheme screen)
 	{
 		this.screen = screen;
@@ -90,16 +96,16 @@ public class BasicThemeCreator extends GridPane
 		this.borderintermediatevbox = new VBox();
 		this.updateinrealtimecheckbox = new CheckBox("Update after making any change");
 		this.updateinrealtimecheckbox.setSelected(true);
+		this.themeUtil = setUpOtherThemeSettings();
 		
-		//this.brodergen = GamejamMainScreenTheme.noBorder();
-		//this.backgroundgen = GamejamMainScreenTheme.solidBackgroundSetup(Color.WHITE);
-		//this.textPaint = Color.BLACK;
 		
 		Label des = new Label("Select the part of the GUI to edit");
 		Button updateScreen = new Button("Send changes to GUI!");
 		Button loadTextEditor = new Button("Edit Text Color");
 		Button loadBackgroundEditor = new Button("Edit Border Color");
 		Button loadBorderEditor = new Button("Edit Border");
+		
+		Button restartThemeButton =  new Button("Theme Options");
 		
 		
 		des.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
@@ -160,6 +166,17 @@ public class BasicThemeCreator extends GridPane
 		{
 			this.getChildren().clear();
 			this.add(this.mainarea,1,0);
+		});
+		this.returntomainmenubutton3.setOnAction((click) -> 
+		{
+			this.getChildren().clear();
+			this.add(this.mainarea,1,0);
+		});
+		
+		restartThemeButton.setOnAction((click) -> 
+		{
+			this.getChildren().clear();
+			this.add(this.themeUtil,1,0);
 		});
 		
 		ColumnConstraints c1 = new ColumnConstraints();
@@ -282,6 +299,33 @@ public class BasicThemeCreator extends GridPane
 		
 		return internalbox;
 	}
+	private VBox setUpOtherThemeSettings()
+	{
+		VBox retval = new VBox();
+		retval.setAlignment(Pos.CENTER);
+		ArrayList<String> themenames = AccountManager.getInstance().getThemeNames();
+		if (themenames.size() == 0)
+		{
+			themenames.add("Default Custom Theme");
+			this.customthemename = "Default Custom Theme";
+		}
+		
+		Label namefieldlabel = new Label("Input your desired theme name");
+		TextField box = new TextField(this.customthemename);
+		
+		ComboBox<String> box1 = new ComboBox<String>();
+		box1.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		
+		box1.getItems().addAll(themenames);
+		box1.setOnAction((click) -> 
+		{
+			
+		});
+		box1.setValue(themenames.get(0));
+		
+		retval.getChildren().addAll(this.returntomainmenubutton3);
+		return retval;
+	}
 	private VBox setUpTextSetter()
 	{
 		VBox retval = new VBox();
@@ -333,7 +377,7 @@ public class BasicThemeCreator extends GridPane
 		});
 		ComboBox<String> box = new ComboBox<String>();
 		box.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
-		box.getItems().addAll("None","Very Thin","Thin","Normal","Wide","Thick","Thicker","Very Thick","????? Thick");
+		box.getItems().addAll("None","Very Thin","Thin","Normal","Wide","Thick","Thicker","Very Thick","VERY Thick");
 		box.setOnAction((click) -> 
 		{
 			String value = box.getValue();
@@ -421,27 +465,17 @@ public class BasicThemeCreator extends GridPane
 	{
 		if (this.updateinrealtimecheckbox.isSelected())
 		{
-			// TODO
+			this.workingtheme.removeLastRule();
+			this.workingtheme.addRule(new ThemePair(this.backgroundgen, this.brodergen, this.textPaint), ThemeDynamic.englishToRuleSet(this.elementStr), (this.elementStr.equals("Button") || this.elementStr.equals("Selection Boxes"))) ;
+			this.screen.setCustomTheme(0,this.workingtheme);
 		}
 	}
 	private void updateThemeData()
 	{
 		this.workingtheme.addRule(new ThemePair(this.backgroundgen, this.brodergen, this.textPaint), ThemeDynamic.englishToRuleSet(this.elementStr), (this.elementStr.equals("Button") || this.elementStr.equals("Selection Boxes"))) ;
-		this.screen.setCustomTheme(0,this.workingtheme);
+		this.screen.setCustomTheme(this.workingthemeindex,this.workingtheme);
 	}
 	private void printCurrentTheme()
 	{
-		ThemePair[] n = this.workingtheme.getTheme();
-		
-		for(int x = 0; x < n.length; x++)
-		{
-			Gamejam.DPrint("[DEBUG]: " + n[x]);
-		}
-		System.out.println("[DEBUG]: ===========================");
-		ThemePair[] d =  this.screen.generateDefaultTheme().getTheme();
-		for(int x = 0; x < n.length; x++)
-		{
-			Gamejam.DPrint("[DEBUG]: " + d[x]);
-		}
 	}
 }
