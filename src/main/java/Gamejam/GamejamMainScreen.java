@@ -627,7 +627,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		VBox screen = new VBox();
 		GridPane grid = new GridPane();
 		Label title = new Label(acctMgr.getCurUsername() + "'s Achievements");
-		title.setFont(new Font(66));
+		title.setFont(new Font(42));
 		grid.getColumnConstraints().add(new ColumnConstraints(140));
 		int row, col;
 		row = col = 0;
@@ -914,6 +914,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 				Integer numPlayed = acctMgr.getNumGamesPlayed().get(dbGameManager.getGameListByName().get(game));
 				leftBarStats.setText(leftBarStats.getText() + "\n" + game + ":");
 				leftBarStats.setText(leftBarStats.getText() + "\n High Score: " + acctMgr.getHighScore(game));
+
+				if (game.equals("Space Shooter")) {
+					leftBarStats.setText(leftBarStats.getText() + "\n  Game Overs: " + acctMgr.getGameLosses().get(id));
+					leftBarStats.setText(leftBarStats.getText() + "\n  Incomplete: " + acctMgr.getGameIncompletes().get(id));
+					leftBarStats.setText((leftBarStats.getText() + "\n   Total: " + numPlayed) + "\n");
+					continue;
+				}
+
 				leftBarStats.setText(leftBarStats.getText() + "\n  Wins: " + acctMgr.getGameWins().get(id));
 				leftBarStats.setText(leftBarStats.getText() + "\n  Losses: " + acctMgr.getGameLosses().get(id));
 				leftBarStats.setText(leftBarStats.getText() + "\n  Ties: " + acctMgr.getGameTies().get(id));
