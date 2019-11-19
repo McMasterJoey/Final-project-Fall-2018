@@ -278,7 +278,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		ArrayList<SpaceShooterEnemy> toRemove = new ArrayList<SpaceShooterEnemy>();
 		for (SpaceShooterEnemy enemy : enemyList) {
 			if (enemy.getCurrentHP() <= 0) {
-				gameModel.incrementScore(enemy.getPointValue());
+				gameModel.incrementScore(enemy.getPointValue() * enemySpeedMultiplier);
 				toRemove.add(enemy);
 			}
 		}
