@@ -18,8 +18,6 @@ public class ThemeRegionProp
 	private boolean[] bol_array;
 	
 	public static final byte NONE = 0;
-	public static final byte BUTTON = 13;
-	public static final byte BUTTON_WT = 11;
 	public static final byte VBOX = 1;
 	public static final byte HBOX = 2;
 	public static final byte LABEL = 3;
@@ -30,7 +28,10 @@ public class ThemeRegionProp
 	public static final byte SCROLLPANE = 8;
 	public static final byte TEXTINPUT = 9;
 	public static final byte COMBOBOX = 10;
+	public static final byte BUTTON_WT = 11;
 	public static final byte CHECKBOX = 12;
+	public static final byte BUTTON = 13;
+	public static final byte COLORPICKER = 14;
 	
 	// General UI Positioning
 	public static final byte LOC_TB = -1;
@@ -112,6 +113,8 @@ public class ThemeRegionProp
 		this.nameToIndex.put("ButtonWithImage",33);
 		this.nameToIndex.put("GameHistoryMenu",34);
 		this.nameToIndex.put("NotIntermediateArea",35);
+		this.nameToIndex.put("ColorPicker",36);
+		this.nameToIndex.put("TreatAsButton",37);
 		
 		this.bol_array = new boolean[this.nameToIndex.size()];
 		for(int x = 0; x < this.bol_array.length; x++)
@@ -243,12 +246,14 @@ public class ThemeRegionProp
 		{
 			this.bol_array[this.nameToIndex.get("Button")] = true;
 			this.bol_array[this.nameToIndex.get("ButtonWithImage")] = true;
+			this.bol_array[this.nameToIndex.get("TreatAsButton")] = true;
 		}
 		else if (primaryproperty == BUTTON_WT)
 		{
 			this.bol_array[this.nameToIndex.get("Button")] = true;
 			this.bol_array[this.nameToIndex.get("ContainsText")] = true;
 			this.bol_array[this.nameToIndex.get("ContainsColorableText")] = true;
+			this.bol_array[this.nameToIndex.get("TreatAsButton")] = true;
 		}
 		else if (primaryproperty == CHECKBOX)
 		{
@@ -306,6 +311,12 @@ public class ThemeRegionProp
 		else if (primaryproperty == COMBOBOX)
 		{
 			this.bol_array[this.nameToIndex.get("ComboBox")] = true;
+			this.bol_array[this.nameToIndex.get("TreatAsButton")] = true;
+		}
+		else if (primaryproperty == COLORPICKER)
+		{
+			this.bol_array[this.nameToIndex.get("ColorPicker")] = true;
+			this.bol_array[this.nameToIndex.get("TreatAsButton")] = true;
 		}
 	}
 	/**

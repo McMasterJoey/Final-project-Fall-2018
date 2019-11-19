@@ -5,7 +5,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -19,15 +22,18 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
-public class BasicThemeCreator extends VBox
+public class BasicThemeCreator extends GridPane
 {
+	public static final double BUTTON_PREF_X_SIZE = 250;
+	public static final double BUTTON_PREF_Y_SIZE = 75;
+	
 	private GamejamMainScreenTheme screen;
-	private HBox borderSetter;
-	private HBox textSetter;
-	private HBox backgroundSetter;
+	private VBox borderSetter;
+	private VBox textSetter;
+	private VBox backgroundSetter;
 	private VBox mainarea;
 	
-	private HBox elementSetter;
+	private ComboBox<String> elementSetter;
 	private String elementStr;
 	
 	private Paint borderPaint;
@@ -42,6 +48,8 @@ public class BasicThemeCreator extends VBox
 	private Button borderPreview;
 	private Button textPreview;
 	private Button backgroundPreview;
+	private CheckBox updateinrealtimecheckbox;
+	
 	
 	private ThemeDynamic workingtheme;
 	private String customthemename;
@@ -51,11 +59,23 @@ public class BasicThemeCreator extends VBox
 	Label backgroundlabel;
 	
 	private Button returntomainmenubutton;
+	private Button returntomainmenubutton1;
+	private Button returntomainmenubutton2;
+	
+	private VBox textintermediatevbox;
+	private VBox backgroundintermediatevbox;
+	private VBox borderintermediatevbox;
 	public BasicThemeCreator(GamejamMainScreenTheme screen)
 	{
 		this.screen = screen;
 		this.borderthickness = 2.0;
 		this.borderstyle = BorderStrokeStyle.SOLID;
+		this.returntomainmenubutton = new Button("Return to Previous Screen");
+		this.returntomainmenubutton.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.returntomainmenubutton1 = new Button("Return to Previous Screen");
+		this.returntomainmenubutton1.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.returntomainmenubutton2 = new Button("Return to Previous Screen");
+		this.returntomainmenubutton2.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		this.elementSetter = setUpElementSetter();
 		this.textSetter = setUpTextSetter();
 		this.borderSetter = setUpBorderSetter();
@@ -65,8 +85,11 @@ public class BasicThemeCreator extends VBox
 		this.textlabel = new Label("Select the color of the text of the selected parts of the GUI");
 		this.borderlabel = new Label("Select the properties of the borders of the selected parts of the GUI");
 		this.backgroundlabel = new Label("Select background color of the selected parts of the GUI");
-		this.returntomainmenubutton = new Button("Return to Previous Screen");
-		
+		this.textintermediatevbox = new VBox();
+		this.backgroundintermediatevbox = new VBox();
+		this.borderintermediatevbox = new VBox();
+		this.updateinrealtimecheckbox = new CheckBox("Update after making any change");
+		this.updateinrealtimecheckbox.setSelected(true);
 		
 		Label des = new Label("Select the part of the GUI to edit");
 		Button updateScreen = new Button("Send changes to GUI!");
@@ -74,7 +97,28 @@ public class BasicThemeCreator extends VBox
 		Button loadBackgroundEditor = new Button("Edit Border Color");
 		Button loadBorderEditor = new Button("Edit Border");
 		
-		this.mainarea.getChildren().addAll(des,this.elementSetter,loadTextEditor,loadBackgroundEditor,loadBorderEditor,updateScreen);
+		
+		des.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.elementSetter.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		loadTextEditor.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		loadBackgroundEditor.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		loadBorderEditor.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		updateScreen.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		
+		this.mainarea.getChildren().addAll(des,this.updateinrealtimecheckbox, this.elementSetter,loadTextEditor,loadBackgroundEditor,loadBorderEditor,updateScreen);
+		this.textintermediatevbox.getChildren().addAll(this.textlabel,this.textSetter);
+		this.backgroundintermediatevbox.getChildren().addAll(this.backgroundlabel,this.backgroundSetter);
+		this.borderintermediatevbox.getChildren().addAll(this.borderlabel,this.borderSetter);
+		
+		this.textintermediatevbox.setPadding(new Insets(50,0,50,0));
+		this.backgroundintermediatevbox.setPadding(new Insets(50,0,50,0));
+		this.borderintermediatevbox.setPadding(new Insets(50,0,50,0));
+		this.mainarea.setPadding(new Insets(50,0,50,0));
+		
+		this.textintermediatevbox.setAlignment(Pos.CENTER);
+		this.backgroundintermediatevbox.setAlignment(Pos.CENTER);
+		this.borderintermediatevbox.setAlignment(Pos.CENTER);
+		this.mainarea.setAlignment(Pos.CENTER);
 		
 		updateScreen.setOnAction((click) -> 
 		{
@@ -86,24 +130,62 @@ public class BasicThemeCreator extends VBox
 		loadTextEditor.setOnAction((click) -> 
 		{
 			this.getChildren().clear();
-			this.getChildren().addAll(this.textlabel,this.textSetter,this.returntomainmenubutton);
+			this.add(this.textintermediatevbox,1,0);
 		});
 		loadBackgroundEditor.setOnAction((click) -> 
 		{
 			this.getChildren().clear();
-			this.getChildren().addAll(this.backgroundlabel,this.backgroundSetter,this.returntomainmenubutton);
+			this.add(this.backgroundintermediatevbox,1,0);
 		});
 		loadBorderEditor.setOnAction((click) -> 
 		{
 			this.getChildren().clear();
-			this.getChildren().addAll(this.borderlabel,this.borderSetter,this.returntomainmenubutton);
+			this.add(this.borderintermediatevbox,1,0);
 		});
 		this.returntomainmenubutton.setOnAction((click) -> 
 		{
 			this.getChildren().clear();
-			this.getChildren().add(this.mainarea);
+			this.add(this.mainarea,1,0);
 		});
-		this.getChildren().add(this.mainarea);
+		this.returntomainmenubutton1.setOnAction((click) -> 
+		{
+			this.getChildren().clear();
+			this.add(this.mainarea,1,0);
+		});
+		this.returntomainmenubutton2.setOnAction((click) -> 
+		{
+			this.getChildren().clear();
+			this.add(this.mainarea,1,0);
+		});
+		
+		ColumnConstraints c1 = new ColumnConstraints();
+		ColumnConstraints c2 = new ColumnConstraints();
+		ColumnConstraints c3 = new ColumnConstraints();
+		c1.setPercentWidth(5);
+		c2.setPercentWidth(90);
+		c3.setPercentWidth(5);
+		this.getColumnConstraints().addAll(c1,c2,c3);
+		
+		this.add(this.mainarea,1,0);
+		
+		this.screen.addRegion(450, this.returntomainmenubutton , "Basic Theme Editor: Return to Main Menu Button (Background Editor) Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(451, this.returntomainmenubutton1 , "Basic Theme Editor: Return to Main Menu Button (Text Editor) Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(452, this.returntomainmenubutton2 , "Basic Theme Editor: Return to Main Menu Button (Border Editor) Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(453, updateScreen, "Basic Theme Editor: Update Screen Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		//this.screen.addRegion(454, loadTextEditor, "Basic Theme Editor: Load Text Editor Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		//this.screen.addRegion(455, loadBackgroundEditor, "Basic Theme Editor: Load Background Editor Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		//this.screen.addRegion(456, loadBorderEditor, "Basic Theme Editor: Load Border Editor Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(457, this.mainarea, "Basic Theme Editor: Main Section VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(457.01, this.textintermediatevbox, "Basic Theme Editor: Text Editor Intermediate VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(457.02, this.backgroundintermediatevbox, "Basic Theme Editor: Background Editor Intermediate VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(457.03, this.borderintermediatevbox, "Basic Theme Editor: Border Editor Intermediate VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		
+		this.screen.addRegion(458, this.textlabel, "Basic Theme Editor:  Text Editor Top Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(459, this.backgroundlabel, "Basic Theme Editor:  Background Editor Top Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(460, this.borderlabel, "Basic Theme Editor:  Border Editor Top Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(461, this.updateinrealtimecheckbox, "Basic Theme Editor:  Update UI after each edit Checkbox", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(462, des, "Basic Theme Editor:  Primary Top Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_BTM));
+	
 	}
 	private void updateMainScreenOnElementSelection(String element)
 	{
@@ -120,42 +202,42 @@ public class BasicThemeCreator extends VBox
 		
 		if (enable[0])
 		{
-			Button target = (Button) this.mainarea.getChildren().get(2);
+			Button target = (Button) this.mainarea.getChildren().get(3);
 			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.LIGHTGREEN));
 			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
 			target.setDisable(false);
 		} 
 		else 
 		{
-			Button target = (Button) this.mainarea.getChildren().get(2);
+			Button target = (Button) this.mainarea.getChildren().get(3);
 			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.INDIANRED));
 			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
 			target.setDisable(true);
 		}
 		if (enable[1])
 		{
-			Button target = (Button) this.mainarea.getChildren().get(4);
+			Button target = (Button) this.mainarea.getChildren().get(5);
 			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.LIGHTGREEN));
 			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
 			target.setDisable(false);
 		}
 		else 
 		{
-			Button target = (Button) this.mainarea.getChildren().get(4);
+			Button target = (Button) this.mainarea.getChildren().get(5);
 			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.INDIANRED));
 			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
 			target.setDisable(true);
 		}
 		if (enable[2])
 		{
-			Button target = (Button) this.mainarea.getChildren().get(3);
+			Button target = (Button) this.mainarea.getChildren().get(4);
 			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.LIGHTGREEN));
 			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
 			target.setDisable(false);
 		}
 		else 
 		{
-			Button target = (Button) this.mainarea.getChildren().get(3);
+			Button target = (Button) this.mainarea.getChildren().get(4);
 			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.INDIANRED));
 			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
 			target.setDisable(true);
@@ -165,42 +247,60 @@ public class BasicThemeCreator extends VBox
 	{
 		this.workingtheme = new ThemeDynamic("Test Theme", screen.getRegionCount(), screen.getAllRegions());
 		updateMainScreenOnElementSelection("Button");
+		this.setPrefHeight(9999);
 	}
 	private void updateThemeData()
 	{
 		this.workingtheme.addRule(new ThemePair(this.backgroundgen, this.brodergen, this.textPaint), ThemeDynamic.englishToRuleSet(this.elementStr), (this.elementStr.equals("Button") || this.elementStr.equals("Selection Boxes"))) ;
 	}
-	private HBox setUpBackgroundSetter()
+	private VBox setUpBackgroundSetter()
 	{
-		HBox retval = new HBox();
+		VBox internalbox = new VBox();
+		internalbox.setAlignment(Pos.CENTER);
+		
 		this.backgroundPreview = new Button("Background Preview");
 		ColorPicker color = new ColorPicker();
+		color.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		color.setOnAction((click) -> 
 		{
 			this.backgroundPaint = color.getValue();
 			this.backgroundgen = GamejamMainScreenTheme.solidBackgroundSetup(this.backgroundPaint);
 			this.backgroundPreview.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(this.backgroundPaint));
+			doAutoUpdate();
 		});
+		this.backgroundPreview.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		internalbox.getChildren().addAll(color,this.backgroundPreview,this.returntomainmenubutton);
+		internalbox.setPadding(new Insets(50,0,50,0));
 		
-		retval.getChildren().addAll(color,this.backgroundPreview);
-		return retval;
+		this.screen.addRegion(470, internalbox, "Basic Theme Editor: Intermidate Background Setter VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(471, color, "Basic Theme Editor: Background Color Picker", new ThemeRegionProp(ThemeRegionProp.COLORPICKER, ThemeRegionProp.LOC_MI_BTM));
+		
+		return internalbox;
 	}
-	private HBox setUpTextSetter()
+	private VBox setUpTextSetter()
 	{
-		HBox retval = new HBox();
+		VBox retval = new VBox();
+		retval.setAlignment(Pos.CENTER);
 		this.textPreview = new Button("Text Preview");
+		this.textPreview.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		ColorPicker color = new ColorPicker();
+		color.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		color.setOnAction((click) -> 
 		{
 			this.textPaint = color.getValue();
 			this.textPreview.setTextFill(this.textPaint);
+			doAutoUpdate();
 		});
-		retval.getChildren().addAll(color,this.textPreview);
+		
+		this.screen.addRegion(472, retval, "Basic Theme Editor: Intermidate Text Setter VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(473, color, "Basic Theme Editor: Text Color Picker", new ThemeRegionProp(ThemeRegionProp.COLORPICKER, ThemeRegionProp.LOC_MI_BTM));
+		
+		retval.getChildren().addAll(color,this.textPreview,this.returntomainmenubutton1);
+		
 		return retval;
 	}
-	private HBox setUpElementSetter()
+	private ComboBox<String> setUpElementSetter()
 	{
-		HBox retval = new HBox();
 		ComboBox<String> box = new ComboBox<String>();
 		ArrayList<String> rules = ThemeDynamic.getSurportedEnglishRules();
 		box.getItems().addAll(rules);
@@ -209,20 +309,25 @@ public class BasicThemeCreator extends VBox
 		{
 			this.elementStr = box.getValue();
 			updateMainScreenOnElementSelection(this.elementStr);
+			doAutoUpdate();
 		});
-		retval.getChildren().add(box);
-		return retval;
+		this.screen.addRegion(478, box, "Basic Theme Editor: Combobox Element Selector", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_BTM));
+		return box;
 	}
-	private HBox setUpBorderSetter()
+	private VBox setUpBorderSetter()
 	{
-		HBox retval = new HBox();
+		VBox retval = new VBox();
+		retval.setAlignment(Pos.CENTER);
 		ColorPicker color = new ColorPicker();
+		color.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		color.setOnAction((click) -> 
 		{
 			this.borderPaint = color.getValue();
 			updateBorderPreview();
+			doAutoUpdate();
 		});
 		ComboBox<String> box = new ComboBox<String>();
+		box.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		box.getItems().addAll("None","Very Thin","Thin","Normal","Wide","Thick","Thicker","Very Thick","????? Thick");
 		box.setOnAction((click) -> 
 		{
@@ -264,9 +369,11 @@ public class BasicThemeCreator extends VBox
 				this.borderthickness = 25.0;
 			}
 			updateBorderPreview();
+			doAutoUpdate();
 		});
 		box.setValue("Normal");
 		ComboBox<String> box1 = new ComboBox<String>();
+		box1.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		box1.getItems().addAll("Solid","Dashed","Dotted");
 		box1.setOnAction((click) -> 
 		{
@@ -284,18 +391,32 @@ public class BasicThemeCreator extends VBox
 				this.borderstyle = BorderStrokeStyle.DOTTED;
 			}
 			updateBorderPreview();
+			doAutoUpdate();
 		});
 		box1.setValue("Solid");
 		
 		this.borderPreview = new Button("Border Preview");
+		this.borderPreview.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		retval.getChildren().addAll(color,box,box1,this.borderPreview,this.returntomainmenubutton2);
 		
-		retval.getChildren().addAll(color,box,box1,this.borderPreview);
+		this.screen.addRegion(474, retval, "Basic Theme Editor: Intermidate Border Setter VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(475, color, "Basic Theme Editor: Text Color Picker", new ThemeRegionProp(ThemeRegionProp.COLORPICKER, ThemeRegionProp.LOC_MI_BTM));
+		
+		this.screen.addRegion(476, box, "Basic Theme Editor: Combo box Thickness", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(477, box1, "Basic Theme Editor: Combo box Style", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_BTM));
 		return retval;
 	}
 	private void updateBorderPreview()
 	{
 		this.brodergen = GamejamMainScreenTheme.simpleBorder(this.borderPaint,this.borderstyle,this.borderthickness);
 		this.borderPreview.setBorder(this.brodergen);
+	}
+	private void doAutoUpdate()
+	{
+		if (this.updateinrealtimecheckbox.isSelected())
+		{
+			// TODO
+		}
 	}
 	private void printCurrentTheme()
 	{

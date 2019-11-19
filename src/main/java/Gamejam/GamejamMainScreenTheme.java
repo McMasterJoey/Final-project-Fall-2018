@@ -48,7 +48,7 @@ public class GamejamMainScreenTheme
 		this.themecreator = new ThemeCreator(this);
 		this.basicthemecreator = new BasicThemeCreator(this);
 		addRegion(228, this.themecreator, "Theme Menu Theme Creator", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM));
-		addRegion(228.001, this.basicthemecreator, "Theme Menu Basic Theme Creator", new ThemeRegionProp(ThemeRegionProp.BORDERPANE, ThemeRegionProp.LOC_MI_TM));
+		addRegion(228.001, this.basicthemecreator, "Theme Menu Basic Theme Creator", new ThemeRegionProp(ThemeRegionProp.BORDERPANE, ThemeRegionProp.LOC_MI_TM, ThemeRegionProp.INT_REG));
 		cacheImages();
 		
 	}
@@ -175,7 +175,7 @@ public class GamejamMainScreenTheme
 		for(int x = 0; x < this.regions.size(); x++) 
 		{
 			ThemePair p;
-			if (this.regions.get(x).getProperties().isTrue(0))
+			if (this.regions.get(x).getProperties().isTrue(37))
 			{
 				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.DARKGRAY, false), quickBorderSetup(Color.DARKBLUE), Color.BLACK);
 				this.customtheme.setThemeData(x, p);
