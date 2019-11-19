@@ -1,6 +1,5 @@
 package Gamejam;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Observer;
 import battleship.BattleshipControllerView;
@@ -11,7 +10,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -27,18 +25,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import connectFour.ConnectFourControllerView;
 import controller.AccountManager;
 import controller.DBGameManager;
 import controller.GameControllerView;
-import model.Leaderboard;
-import model.SanityCheckFailedException;
-import model.Score;
+import model.*;
 import ticTacToe.TicTacToeControllerView;
 
 /**
@@ -64,6 +58,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private ProgressBar expBar;
 	private Label expBarLabel;
 	private Button moreStatsBtn;
+	private Button viewAchievesBtn;
 	private VBox initCreateAccountMenu;
 	private VBox leaderScreen;
 	private TableView<Score> scoresTable;
@@ -71,6 +66,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private VBox statsScreen;
 	private TableView<Score> statsTable;
 	private ComboBox<String> statsSelection;
+	private VBox achievementsScreen;
 	private AccountManager acctMgr;
 	private DBGameManager dbGameManager;
 	private Leaderboard leaderboard;
@@ -131,6 +127,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initUserSettingsMainMenu = initUserSettingsGUI();
 		this.initThemeMenu = initThemeMenu();
 		this.statsScreen = initStatsScreen();
+		this.achievementsScreen = initAchievementsScreen();
 		
 		// Set currently inuse views
 		this.setTop(this.initTopBar);
@@ -156,8 +153,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.leftBarStats = new Label();
 		this.expBarLabel = new Label();
 		this.expBar = new ProgressBar(0.0);
-		moreStatsBtn = new Button("View More Statistics");
+		moreStatsBtn = new Button("View Game History");
 		moreStatsBtn.setOnAction( (ae) -> {statisticsClick();});
+		viewAchievesBtn = new Button("View Achievements");
+		viewAchievesBtn.setOnAction( (ae) -> {viewAchievesClick();});
 		leftPane.setPrefHeight(750);
 		leftPane.setPrefWidth(180);
 		leftPaneScroll.setFitToWidth(true);
@@ -170,7 +169,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(102.01, this.expBarLabel, "Left EXP label", new ThemeRegionProp(ThemeRegionProp.LABEL));
 		this.initthemes.addRegion(102.02, this.expBar, "Left EXP Progress Bar", new ThemeRegionProp(ThemeRegionProp.PROGRESSBAR));
 		
-		leftPane.getChildren().addAll(this.leftBarMsg, expBarLabel, expBar, this.leftBarStats, moreStatsBtn);
+		leftPane.getChildren().addAll(this.leftBarMsg, expBarLabel, expBar, this.leftBarStats, moreStatsBtn, viewAchievesBtn);
 		return leftPaneScroll;
 	}
 
@@ -619,6 +618,42 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		return pane;
 	}
 
+	/**
+	 * Initializes the achievements view.
+	 *
+	 * @return A VBox with the achievements screen
+	 */
+	private VBox initAchievementsScreen() {
+		VBox screen = new VBox();
+		GridPane grid = new GridPane();
+		Label title = new Label(acctMgr.getCurUsername() + "'s Achievements");
+		title.setFont(new Font(66));
+		grid.getColumnConstraints().add(new ColumnConstraints(140));
+		int row, col;
+		row = col = 0;
+
+		if (acctMgr.isGuest() || acctMgr.isAdmin()) {
+			screen.getChildren().add(title);
+			return screen;
+		}
+
+		for (AccountAchievement cur : acctMgr.getUserAchievements()) {
+			Image icon = new Image(dbGameManager.getAchievementIconPath(cur.getAchieveID()));
+			ImageView view = new ImageView(icon);
+			grid.add(view, row, col);
+
+			if (row > 7) {
+				row = 0;
+				col++;
+			} else {
+				row++;
+			}
+		}
+
+		screen.getChildren().addAll(title, grid);
+		return screen;
+	}
+
 //////////////////////// Button Click Handlers go here  /////////////////////////////////////////////
 	/**
 	 * Handles the event where the user who is logged in is at the user settings menu and clicks the Theme Menu Button.
@@ -810,6 +845,13 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.setTop(initLoggedInInGameBar);
 	}
 
+	private void viewAchievesClick() {
+		this.setCenter(achievementsScreen);
+		this.gameInUseIndex = -1;
+		this.agamewasloaded = false;
+		this.setTop(initLoggedInInGameBar);
+	}
+
 /////////////////////////////// GUI Update Functions go here ///////////////////////////////////////////
 	/**
 	 * Updates the GUI after a new account is made succesfuly,
@@ -832,6 +874,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		expBarLabel.setText("Exp: 0/0");
 		leftBarStats.setText("Level: 0\nExp: 0\n\n");
 		moreStatsBtn.setDisable(true);
+		viewAchievesBtn.setDisable(true);
 	}
 
 	/**
@@ -842,6 +885,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		updateLeftPane();
 		handleLeaderBoardSelectionChange();
 		handleStatsSelectionChange();
+		achievementsScreen = initAchievementsScreen();
 	}
 
 	/**
@@ -855,6 +899,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			leftBarMsg.setText("Administrator Account");
 			leftBarStats.setText("\n");
 			moreStatsBtn.setDisable(true);
+			viewAchievesBtn.setDisable(true);
 		} else {
 			leftBarMsg.setText("Welcome to Gamejam,\n" + acctMgr.getCurUsername() + "!\n\n");
 			expBarLabel.setText("Account Statistics:\nExp: " + acctMgr.getExpInLevel() + "/" + acctMgr.getExpForLevel(acctMgr.getLevel() + 1));
@@ -878,6 +923,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 
 			leftBarStats.setText(leftBarStats.getText() + "\n");
 			moreStatsBtn.setDisable(false);
+			viewAchievesBtn.setDisable(false);
 		}
 	}
 
