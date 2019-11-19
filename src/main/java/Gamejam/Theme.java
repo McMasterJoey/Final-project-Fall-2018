@@ -92,6 +92,17 @@ public class Theme
 		return this.themedata;
 	}
 	/**
+	 * @return
+	 */
+	public boolean isStatic()
+	{
+		return true;
+	}
+	public void generateTheme()
+	{
+		// Does nothing, is only implemented by the Dynamic Theme class
+	}
+	/**
 	 * Dumps this theme into a form that can put directly into project code.
 	 * @return The hard coded version of this theme.
 	 */

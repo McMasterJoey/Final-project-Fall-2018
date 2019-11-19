@@ -50,8 +50,6 @@ public class BasicThemeCreator extends VBox
 	Label borderlabel;
 	Label backgroundlabel;
 	
-	private boolean[] ui_enable_editors;
-	
 	private Button returntomainmenubutton;
 	public BasicThemeCreator(GamejamMainScreenTheme screen)
 	{
@@ -67,7 +65,6 @@ public class BasicThemeCreator extends VBox
 		this.textlabel = new Label("Select the color of the text of the selected parts of the GUI");
 		this.borderlabel = new Label("Select the properties of the borders of the selected parts of the GUI");
 		this.backgroundlabel = new Label("Select background color of the selected parts of the GUI");
-		this.ui_enable_editors = new boolean[3];
 		this.returntomainmenubutton = new Button("Return to Previous Screen");
 		
 		
@@ -88,27 +85,18 @@ public class BasicThemeCreator extends VBox
 		});
 		loadTextEditor.setOnAction((click) -> 
 		{
-			if (this.ui_enable_editors[0])
-			{
-				this.getChildren().clear();
-				this.getChildren().addAll(this.textlabel,this.textSetter,this.returntomainmenubutton);
-			}
+			this.getChildren().clear();
+			this.getChildren().addAll(this.textlabel,this.textSetter,this.returntomainmenubutton);
 		});
 		loadBackgroundEditor.setOnAction((click) -> 
 		{
-			if (this.ui_enable_editors[2])
-			{
-				this.getChildren().clear();
-				this.getChildren().addAll(this.backgroundlabel,this.backgroundSetter,this.returntomainmenubutton);
-			}
+			this.getChildren().clear();
+			this.getChildren().addAll(this.backgroundlabel,this.backgroundSetter,this.returntomainmenubutton);
 		});
 		loadBorderEditor.setOnAction((click) -> 
 		{
-			if (this.ui_enable_editors[1])
-			{
-				this.getChildren().clear();
-				this.getChildren().addAll(this.borderlabel,this.borderSetter,this.returntomainmenubutton);
-			}
+			this.getChildren().clear();
+			this.getChildren().addAll(this.borderlabel,this.borderSetter,this.returntomainmenubutton);
 		});
 		this.returntomainmenubutton.setOnAction((click) -> 
 		{
@@ -119,58 +107,58 @@ public class BasicThemeCreator extends VBox
 	}
 	private void updateMainScreenOnElementSelection(String element)
 	{
-		this.ui_enable_editors = ThemeDynamic.englishToGUIRegionsToShowId(element);
+		boolean[] enable = ThemeDynamic.englishToGUIRegionsToShowId(element);
 		
 		// Fixes the bug where initially, all buttons are disabled. Assumes we are using an element that accepts everything such as Buttons.
 		// Also assumes if englishToGUIRegionsToShowId returns all false, that we have the start up case.    
-		if (!this.ui_enable_editors[0] && !this.ui_enable_editors[1] && !this.ui_enable_editors[2])
+		if (!enable[0] && !enable[1] && !enable[2])
 		{
-			this.ui_enable_editors[0] = true;
-			this.ui_enable_editors[1] = true;
-			this.ui_enable_editors[2] = true;
+			enable[0] = true;
+			enable[1] = true;
+			enable[2] = true;
 		}
 		
-		if (this.ui_enable_editors[0])
+		if (enable[0])
 		{
 			Button target = (Button) this.mainarea.getChildren().get(2);
 			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.LIGHTGREEN));
 			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
-			target.arm();
+			target.setDisable(false);
 		} 
 		else 
 		{
 			Button target = (Button) this.mainarea.getChildren().get(2);
 			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.INDIANRED));
 			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
-			target.disarm();
+			target.setDisable(true);
 		}
-		if (this.ui_enable_editors[1])
+		if (enable[1])
 		{
 			Button target = (Button) this.mainarea.getChildren().get(4);
 			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.LIGHTGREEN));
 			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
-			target.arm();
+			target.setDisable(false);
 		}
 		else 
 		{
 			Button target = (Button) this.mainarea.getChildren().get(4);
 			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.INDIANRED));
 			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
-			target.disarm();
+			target.setDisable(true);
 		}
-		if (this.ui_enable_editors[2])
+		if (enable[2])
 		{
 			Button target = (Button) this.mainarea.getChildren().get(3);
 			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.LIGHTGREEN));
 			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
-			target.arm();
+			target.setDisable(false);
 		}
 		else 
 		{
 			Button target = (Button) this.mainarea.getChildren().get(3);
 			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.INDIANRED));
 			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
-			target.disarm();
+			target.setDisable(true);
 		}
 	}
 	public void finishConstructing()

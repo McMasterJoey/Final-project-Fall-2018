@@ -510,8 +510,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		VBox left = new VBox();  // Used for Pre-made Themes Buttons
 		VBox right = new VBox(); // Used for Custom made themes.
 		
-		right.getChildren().add(this.emptythemecreator);
-		
 		Button backtosettings = new Button();
 		backtosettings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/themeBackButtonMenuIcon.png"))));
 		backtosettings.setOnMouseClicked((click) -> {
@@ -561,6 +559,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(221, left, "Theme Menu left side overall background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_TM, ThemeRegionProp.INT_REG));
 		this.initthemes.addRegion(222, right, "Theme Menu right side overall background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_TM, ThemeRegionProp.INT_REG));
 		this.initthemes.addRegion(223, backtosettings, "Theme Menu back to user settings menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
+		this.initthemes.addRegion(223.01, showBasicThemeEditorButton, "Theme Menu show basic theme editor menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
+		this.initthemes.addRegion(223.02, showAdvancedThemeEditorButton, "Theme Menu show advanced theme editor menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(224, theme0, "Theme Menu Default Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(225, theme1, "Theme Menu Night Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(226, theme2, "Theme Menu USA Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));

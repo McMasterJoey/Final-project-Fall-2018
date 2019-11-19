@@ -223,10 +223,25 @@ public class ThemeDynamic extends Theme
 		}
 		return retval;
 	}
+	
 	public void addRule(ThemePair p, HashSet<Integer> statements, boolean useAnd)
 	{
 		this.rules.add(new RulePair(statements, p, useAnd));
 	}
+	
+	public void removeLastRule()
+	{
+		if (this.rules.size() != 0)
+		{
+			this.rules.remove(this.rules.size() - 1);
+		}
+	}
+	
+	public void removeAllRules()
+	{
+		this.rules.clear();
+	}
+	
 	private class RulePair
 	{
 		private HashSet<Integer> statements;
@@ -271,6 +286,10 @@ public class ThemeDynamic extends Theme
 				}
 			}
 		}
+		return false;
+	}
+	public boolean isStatic()
+	{
 		return false;
 	}
 }

@@ -38,9 +38,11 @@ public class GamejamMainScreenTheme
 	private BasicThemeCreator basicthemecreator;
 	private boolean doneAddingRegions = false;
 	private ArrayList<Image> imagecache;
+	private ArrayList<Theme> playerCustomThemes;
 	public GamejamMainScreenTheme() 
 	{
 		this.themes = new ArrayList<Theme>(25);
+		this.playerCustomThemes = new ArrayList<Theme>(25);
 		this.regions = new ArrayList<RegionPair>(50);
 		this.preInit = new ArrayList<PriorityPair>(50);
 		this.themecreator = new ThemeCreator(this);
@@ -216,6 +218,14 @@ public class GamejamMainScreenTheme
 			throw new SanityCheckFailedException("Can't update theme while we're still adding regions to the object.");
 		}
 		ThemePair[] themedata;
+		/*
+		if (themeid < 0)
+		{
+			themeid++;
+			themeid = Math.abs(themeid);
+			themedata = this.playerCustomThemes.get(themeid).getTheme();
+		}
+		*/
 		if (themeid == -1) 
 		{
 			themedata = this.customtheme.getTheme();
@@ -224,6 +234,10 @@ public class GamejamMainScreenTheme
 		{
 			themedata = getTheme(themeid).getTheme();
 		}
+		
+		
+		//this.playerCustomThemes
+		
 		int themeimageid = 0;
 		HashSet<Integer> check2 = new HashSet<Integer>();
 		check2.add(26);
@@ -342,6 +356,17 @@ public class GamejamMainScreenTheme
 		}
 		themes.set(0,t1);
 	}
+	
+	public void addNewCustomTheme(Theme t)
+	{
+		this.playerCustomThemes.add(t);
+	}
+	
+	public void removeAllCustomThemes()
+	{
+		this.playerCustomThemes.clear();
+	}
+	
 	public static Background transparentBackground()
 	{
 		return new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, new Insets(0)));
