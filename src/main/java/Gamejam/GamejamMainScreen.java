@@ -971,7 +971,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 				leftBarStats.setText(leftBarStats.getText() + "\n" + game + ":");
 				leftBarStats.setText(leftBarStats.getText() + "\n High Score: " + acctMgr.getHighScore(game));
 
-				if (game.equals("Space Shooter")) {
+				if (game.equals("Space-Shooter")) {
 					leftBarStats.setText(leftBarStats.getText() + "\n  Game Overs: " + acctMgr.getGameLosses().get(id));
 					leftBarStats.setText(leftBarStats.getText() + "\n  Incomplete: " + acctMgr.getGameIncompletes().get(id));
 					leftBarStats.setText((leftBarStats.getText() + "\n   Total: " + numPlayed) + "\n");

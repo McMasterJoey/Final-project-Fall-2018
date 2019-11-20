@@ -96,7 +96,7 @@ public class BasicThemeCreator extends GridPane
 		this.borderintermediatevbox = new VBox();
 		this.updateinrealtimecheckbox = new CheckBox("Update after making any change");
 		this.updateinrealtimecheckbox.setSelected(true);
-		this.themeUtil = setUpOtherThemeSettings();
+		//this.themeUtil = setUpOtherThemeSettings();
 		
 		
 		Label des = new Label("Select the part of the GUI to edit");
@@ -167,11 +167,11 @@ public class BasicThemeCreator extends GridPane
 			this.getChildren().clear();
 			this.add(this.mainarea,1,0);
 		});
-		this.returntomainmenubutton3.setOnAction((click) -> 
-		{
-			this.getChildren().clear();
-			this.add(this.mainarea,1,0);
-		});
+		//this.returntomainmenubutton3.setOnAction((click) -> 
+		//{
+		//	this.getChildren().clear();
+		//	this.add(this.mainarea,1,0);
+		//});
 		
 		restartThemeButton.setOnAction((click) -> 
 		{
