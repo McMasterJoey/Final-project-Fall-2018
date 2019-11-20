@@ -125,10 +125,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.connectFourGameView = new ConnectFourControllerView();
 		this.battleshipGameView = new BattleshipControllerView();
 		this.spaceShooterGameView = new SpaceShooterControllerView();
-		this.initthemes.addRegion(350, this.tictactoegameview,"Tic-tac-toe general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
-		this.initthemes.addRegion(351, this.connectFourGameView,"Connect-4 general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
-		this.initthemes.addRegion(352, this.battleshipGameView,"Battleship general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
-		this.initthemes.addRegion(353, this.spaceShooterGameView, "Space-Shooter general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE));
+		this.initthemes.addRegion(350, this.tictactoegameview,"Tic-tac-toe general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE, ThemeRegionProp.LOC_MI_IG));
+		this.initthemes.addRegion(351, this.connectFourGameView,"Connect-4 general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE, ThemeRegionProp.LOC_MI_IG));
+		this.initthemes.addRegion(352, this.battleshipGameView,"Battleship general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE,ThemeRegionProp.LOC_MI_IG));
+		this.initthemes.addRegion(353, this.spaceShooterGameView, "Space-Shooter general background", new ThemeRegionProp(ThemeRegionProp.BORDERPANE, ThemeRegionProp.LOC_MI_IG));
 		
 		// Set up Extra menus
 		this.initUserSettingsMainMenu = initUserSettingsGUI();
