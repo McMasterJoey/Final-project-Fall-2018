@@ -6,14 +6,10 @@ public class SpaceShooterResources {
 	
 	// will need to add more images for different enemies and projectiles eventually 
 	private Image playerImage;
-	private Image enemyImage1_1;
-	private Image enemyImage1_2;
-	private Image enemyImage2_1;
-	private Image enemyImage2_2;
-	private Image enemyImage3_1;
-	private Image enemyImage3_2;
+	private Image[] enemy1 = new Image[2];
+	private Image[] enemy2 = new Image[2];
+	private Image[] enemy3 = new Image[2];
 	private Image playerProjectile;
-	private Image enemyProjectile;
 	private Image enemyImageBoss;
 	private Image enemyLaser1;
 	private Image enemyLaser2;
@@ -21,25 +17,36 @@ public class SpaceShooterResources {
 	private Image gameOver;
 	private Image pauseImage;
 	private Image continueImage;
+	private Image[] explosion = new Image[6];
 	
 	public SpaceShooterResources() {
-		playerImage = new Image(SpaceShooterResources.class.getResource("/spaceShooterPlayerImage.png").toString());
-		playerProjectile = new Image(SpaceShooterResources.class.getResource("/spaceShooterPlayerAttackImage.png").toString());
-		enemyImage1_1 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemy1_1.png").toString());
-		enemyImage1_2 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemy1_2.png").toString());
-		enemyImage2_1 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemy2_1.png").toString());
-		enemyImage2_2 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemy2_2.png").toString());
-		enemyImage3_1 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemy3_1.png").toString());
-		enemyImage3_2 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemy3_2.png").toString());
-		enemyImageBoss = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/AlienMothership.png").toString());
-		enemyLaser1 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/laser.png").toString());
-		enemyLaser2 = new Image(SpaceShooterResources.class.getResource("/spaceInvaders/enemylaser.png").toString());
-		logo = new Image(SpaceShooterResources.class.getResource("/SpaceShooterLogo.png").toString());
-		gameOver = new Image(SpaceShooterResources.class.getResource("/gameover.png").toString());
-		pauseImage = new Image(SpaceShooterResources.class.getResource("/pauseImage.png").toString());
-		continueImage = new Image(SpaceShooterResources.class.getResource("/continueImage.png").toString());
+		playerImage = makeImage("/spaceShooterPlayerImage.png");
+		playerProjectile = makeImage("/spaceShooterPlayerAttackImage.png");
+		enemy1[0] = makeImage("/spaceInvaders/enemy1_1.png");
+		enemy1[1] = makeImage("/spaceInvaders/enemy1_2.png");
+		enemy2[0] = makeImage("/spaceInvaders/enemy2_1.png");
+		enemy2[1] = makeImage("/spaceInvaders/enemy2_2.png");
+		enemy3[0] = makeImage("/spaceInvaders/enemy3_1.png");
+		enemy3[1] = makeImage("/spaceInvaders/enemy3_2.png");
+		enemyImageBoss = makeImage("/spaceInvaders/AlienMothership.png");
+		enemyLaser1 = makeImage("/spaceInvaders/laser.png");
+		enemyLaser2 = makeImage("/spaceInvaders/enemylaser.png");
+		logo = makeImage("/SpaceShooterLogo.png");
+		gameOver = makeImage("/gameover.png");
+		pauseImage = makeImage("/pauseImage.png");
+		continueImage = makeImage("/continueImage.png");
+		explosion[0] = makeImage("/spaceInvaders/explosionblue.png");
+		explosion[1] = makeImage("/spaceInvaders/explosionblue.png");
+		explosion[2] = makeImage("/spaceInvaders/explosiongreen.png");
+		explosion[3] = makeImage("/spaceInvaders/explosiongreen.png");
+		explosion[4] = makeImage("/spaceInvaders/explosionpurple.png");
+		explosion[5] = makeImage("/spaceInvaders/explosionpurple.png");
 	}
 	
+	private Image makeImage(String s) {
+		return new Image(SpaceShooterResources.class.getResource(s).toString());
+	}
+
 	public Image getPlayerImage() {
 		return playerImage;
 	}
@@ -52,16 +59,18 @@ public class SpaceShooterResources {
 		return ssp.getImagePath().equals("/enemylaser.png") ? enemyLaser2 : enemyLaser1;
 	}
 
-	public Image getEnemyImage(SpaceShooterEnemy enemy) {
-		if (enemy.getPointValue() == 10)
-			return enemyImage1_1;
-		if (enemy.getPointValue() == 20)
-			return enemyImage2_1;
-		if (enemy.getPointValue() == 30)
-			return enemyImage3_1;
-		if (enemy.getPointValue() == 500)
-			return enemyImageBoss;
-		return null;
+	public Image getEnemyImage(EnemyBoss enemy) {
+		return enemyImageBoss;
+	}
+	
+	public Image[] getEnemyImage(SpaceShooterEnemy enemy) {
+		if(enemy instanceof Enemy1) {
+			return enemy1;
+		} else if(enemy instanceof Enemy2) {
+			return enemy2;
+		} else {
+			return enemy3;
+		}
 	}
 
 	public Image getItemImage(SpaceShooterBuff item) {
@@ -83,5 +92,9 @@ public class SpaceShooterResources {
 
 	public Image getContinueImage() {
 		return continueImage;
+	}
+	
+	public Image[] getExplosionImage() {
+		return explosion;
 	}
 }

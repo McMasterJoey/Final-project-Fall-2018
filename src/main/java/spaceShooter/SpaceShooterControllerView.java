@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,9 +35,10 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private SpaceShooterModel gameModel;
 	private SpaceShooterPlayer player;
 	private ArrayList<AudioClip> soundfx = new ArrayList<AudioClip>();
+	private ArrayList<Point> animations = new ArrayList<Point>();
 	private GameMenu gameMenu;
 	private Canvas gameScreen;
-	private double gameClockCount = 0;
+	private int gameClockCount = 0;
 	private ArrayList<SpaceShooterEnemy> enemyList;
 	private ArrayList<SpaceShooterProjectile> enemyProjectiles;
 	private ArrayList<SpaceShooterProjectile> playerProjectiles;
@@ -110,12 +112,6 @@ public class SpaceShooterControllerView extends GameControllerView {
 	}
 
 	private void setupListeners() {
-		setupPlayerListeners();
-
-		// this listener will stop the gameClock while the canvas isn't focused.
-	}
-
-	private void setupPlayerListeners() {
 		Scene myScene = this.getScene();
 		myScene.setOnKeyPressed((key) -> {
 			if (key.getCode() == KeyCode.A || key.getCode() == KeyCode.S) {
@@ -139,12 +135,33 @@ public class SpaceShooterControllerView extends GameControllerView {
 		});
 	}
 
-	private void playerAttack() {
-		int x = player.getLocation().x + (player.getHitboxWidth() / 2) - 2;
-		Point projectilePosition = new Point(x, player.getLocation().y);
+	private void disableListeners() {
+		Scene myScene = this.getScene();
+		myScene.setOnKeyPressed((key) -> {
+		});
+		myScene.setOnKeyReleased((key) -> {
+		});
+		gameScreen.setOnMouseClicked((click) -> {
+		});
+	}
 
-		playerProjectiles
-				.add(new SpaceShooterProjectile(projectilePosition, 4, 8, 5, "/spaceShooterPlayerAttackImage.png"));
+	private void playerAttack() {
+		if (player.getCurrentHP() == 2) {
+			int x = player.getLocation().x + (player.getHitboxWidth() / 4) - 2;
+			Point projectilePosition = new Point(x, player.getLocation().y);
+			Point projectilePosition2 = new Point(x + player.getHitboxWidth() / 2, player.getLocation().y);
+			playerProjectiles
+					.add(new SpaceShooterProjectile(projectilePosition, 4, 8, 5, "/spaceShooterPlayerAttackImage.png"));
+			playerProjectiles.add(
+					new SpaceShooterProjectile(projectilePosition2, 4, 8, 5, "/spaceShooterPlayerAttackImage.png"));
+		} else {
+			int x = player.getLocation().x + (player.getHitboxWidth() / 2) - 2;
+			Point projectilePosition = new Point(x, player.getLocation().y);
+
+			playerProjectiles
+					.add(new SpaceShooterProjectile(projectilePosition, 4, 8, 5, "/spaceShooterPlayerAttackImage.png"));
+		}
+		soundfx.add(new AudioClip(sformat("/laserShot.wav")));
 	}
 
 	private void checkGameOver() {
@@ -172,7 +189,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		GraphicsContext gc = gameScreen.getGraphicsContext2D();
 		gc.setFill(Color.rgb(0, 0, 0, 0.7));
 		gc.fillRect(0, 0, WIDTH, HEIGHT);
-		gc.drawImage(resources.getPauseImage(), 300, 150, WIDTH-600, 350);
+		gc.drawImage(resources.getPauseImage(), 300, 150, WIDTH - 600, 350);
 		getScene().setOnKeyPressed((key) -> {
 			unPauseGame();
 			setupListeners();
@@ -182,8 +199,8 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private void displayContinueScreen() {
 		GraphicsContext gc = gameScreen.getGraphicsContext2D();
 		gc.setFill(Color.BLACK);
-		gc.fillRect(0,  0, WIDTH, HEIGHT);
-		gc.drawImage(resources.getContinueImage(), 300, 150, WIDTH-600, 350);
+		gc.fillRect(0, 0, WIDTH, HEIGHT);
+		gc.drawImage(resources.getContinueImage(), 300, 150, WIDTH - 600, 350);
 
 		gameScreen.setOnMouseClicked((click) -> {
 			startGame();
@@ -221,8 +238,15 @@ public class SpaceShooterControllerView extends GameControllerView {
 		checkCollisions();
 		checkDeaths();
 		checkLevelOver();
+		decrementStall();
 		update(gameModel, this);
 		checkGameOver();
+	}
+
+	private void decrementStall() {
+		if (player.stalled()) {
+			player.decrementStall();
+		}
 	}
 
 	private void enemyAttack() {
@@ -270,6 +294,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	private void checkDeaths() {
 		if (player.getCurrentHP() <= 0) {
+			soundfx.add(new AudioClip(sformat("/explosion.wav")));
 			player.setLocation(new Point(startingLocation.x, startingLocation.y));
 			gameModel.setLives(gameModel.getLives() - 1);
 			player.setCurrentHP(1);
@@ -298,19 +323,17 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private void updateEnemyPositions() {
 		int xMovement;
 		if (beginningOfLevel) {
-			synchronized(this) {
+			synchronized (this) {
 				for (int i = 0; i < enemyList.size(); i++) {
-						SpaceShooterEnemy enemy = enemyList.get(i);
-						Point referenceEnemy = referenceEnemyMap.get(enemy);
-		
-						double ticksLeft = 240 - transitionClockCount;
-						double xMovementPerTick = (referenceEnemy.getX() - enemy.getLocation().getX())
-								/ ticksLeft;
-						double yMovementPerTick = (referenceEnemy.getY() - enemy.getLocation().getY())
-								/ ticksLeft;
-						Point enemyDelta = new Point();
-						enemyDelta.setLocation(xMovementPerTick, yMovementPerTick);
-						enemy.updatePosition(enemyDelta);
+					SpaceShooterEnemy enemy = enemyList.get(i);
+					Point referenceEnemy = referenceEnemyMap.get(enemy);
+
+					double ticksLeft = 240 - transitionClockCount;
+					double xMovementPerTick = (referenceEnemy.getX() - enemy.getLocation().getX()) / ticksLeft;
+					double yMovementPerTick = (referenceEnemy.getY() - enemy.getLocation().getY()) / ticksLeft;
+					Point enemyDelta = new Point();
+					enemyDelta.setLocation(xMovementPerTick, yMovementPerTick);
+					enemy.updatePosition(enemyDelta);
 				}
 			}
 			transitionClockCount++;
@@ -366,7 +389,16 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 		for (SpaceShooterProjectile ssp : enemyProjectiles) {
 			if (collisionExists(player, ssp)) {
-				player.setCurrentHP(player.getCurrentHP() - 1);
+				if (!player.stalled()) {
+					player.setCurrentHP(player.getCurrentHP() - 1);
+					player.addStall(179);
+				}
+				if (player.getCurrentHP() == 0) {
+					animations.add(new Point(player.getLocation().x, player.getLocation().y));
+					disableListeners();
+					aPressed = false;
+					dPressed = false;
+				}
 				toRemove.add(ssp);
 			} else if (isOffScreen(ssp)) {
 				toRemove.add(ssp);
@@ -419,6 +451,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		Iterator<AudioClip> clips = soundfx.iterator();
 		while (clips.hasNext()) {
 			AudioClip a = clips.next();
+			a.setVolume(0.5);
 			a.play();
 			clips.remove();
 		}
@@ -428,12 +461,30 @@ public class SpaceShooterControllerView extends GameControllerView {
 		gc.setFill(Color.BLACK);
 		gc.fillRect(0, 0, WIDTH, HEIGHT);
 
-		gc.drawImage(resources.getPlayerImage(), player.getLocation().x, player.getLocation().y,
-				player.getHitboxWidth(), player.getHitboxHeight());
+		if (animations.isEmpty()) {
+			if (!player.stalled() || player.getStall() % 20 == 0) {
+				if (player.getCurrentHP() == 2) {
+					gc.drawImage(resources.getPlayerImage(), player.getLocation().x, player.getLocation().y,
+							player.getHitboxWidth() / 2, player.getHitboxHeight());
+					gc.drawImage(resources.getPlayerImage(), player.getLocation().x + player.getHitboxWidth() / 2,
+							player.getLocation().y, player.getHitboxWidth() / 2, player.getHitboxHeight());
+				} else {
+					gc.drawImage(resources.getPlayerImage(), player.getLocation().x, player.getLocation().y,
+							player.getHitboxWidth(), player.getHitboxHeight());
+				}
+			}
+		} else {
+			drawExplosion();
+		}
 
 		for (SpaceShooterEnemy enemy : enemyList) {
-			gc.drawImage(resources.getEnemyImage(enemy), enemy.getLocation().x, enemy.getLocation().y,
-					enemy.getHitboxWidth(), enemy.getHitboxHeight());
+			if (enemy instanceof EnemyBoss) {
+				gc.drawImage(resources.getEnemyImage((EnemyBoss) enemy), enemy.getLocation().x, enemy.getLocation().y,
+						enemy.getHitboxWidth(), enemy.getHitboxHeight());
+			} else {
+				gc.drawImage(resources.getEnemyImage(enemy)[(gameClockCount / 45) % 2], enemy.getLocation().x,
+						enemy.getLocation().y, enemy.getHitboxWidth(), enemy.getHitboxHeight());
+			}
 		}
 
 		for (SpaceShooterProjectile ssp : playerProjectiles) {
@@ -463,12 +514,33 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	}
 
+	private void drawExplosion() {
+		int time = player.getStall();
+		System.out.println("time raw is " + time);
+		if (time < 120) {
+			animations.clear();
+			setupListeners();
+			return;
+		}
+		time = (time - 120) / 10;
+		int x = animations.get(0).x;
+		int y = animations.get(0).y;
+		GraphicsContext gc = gameScreen.getGraphicsContext2D();
+		int width = 5 + (player.getHitboxWidth() - 5) / (time + 1);
+		int height = 5 + (player.getHitboxHeight() - 5) / (time + 1);
+		int xLocation = x + (player.getHitboxWidth() / 2 - width / 2);
+		int yLocation = y + (player.getHitboxHeight() / 2 - height / 2);
+		gc.drawImage(resources.getExplosionImage()[5 - time], xLocation, yLocation, width, height);
+		System.out.printf("time = %d", time);
+		System.out.printf("Drawing explosion at (%d, %d), with width = %d and height = %d\n", xLocation, yLocation,
+				width, height);
+	}
+
 	@Override
 	protected void updateStatistics() {
-		if(gameModel.isStillRunning()) {
+		if (gameModel.isStillRunning()) {
 			statsManager.logGameStat("Space-Shooter", LogStatType.INCOMPLETE, 1, getScore());
-		}
-		else {
+		} else {
 			statsManager.logGameStat("Space-Shooter", LogStatType.LOSS, 1, getScore());
 		}
 	}
@@ -525,7 +597,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 	 */
 	public boolean loadSaveGame() {
 		gameClock.stop();
-		gameClockCount=0;
+		gameClockCount = 0;
 		boolean retVal = true;
 		try {
 			String fname = accountManager.getCurUsername() + "-" + gameName + ".dat";
@@ -583,5 +655,18 @@ public class SpaceShooterControllerView extends GameControllerView {
 		} catch (Exception ex) {
 			return false;
 		}
+	}
+
+	/**
+	 * formats a passed in string as a URL string to be used in getting audio
+	 * resources
+	 * 
+	 * @param s the string representing the audio clip's path relative to the
+	 *          project src folder
+	 * @return the url string representing the string's location
+	 */
+	private String sformat(String s) {
+		URL url = SpaceShooterControllerView.class.getResource(s);
+		return url.toString();
 	}
 }
