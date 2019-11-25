@@ -1,13 +1,19 @@
 package controller;
 
 import Gamejam.Gamejam;
+import model.AccountAchievement;
+import model.Achievement;
 import model.SanityCheckFailedException;
+import model.Score;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
+import java.util.TreeSet;
 
 /**
  * Manager user accounts such as logging in, creating accounts, and updating user
@@ -31,6 +37,7 @@ public class AccountManager extends Observable
     private HashMap<Integer, Integer> gameTies; // maps gameid to # ties
     private HashMap<Integer, Integer> gameIncompletes; // maps gameid to # incomplete games
     private HashMap<Integer, Integer> numGamesPlayed; // maps gameid (key) to # of times played (value)
+    private ArrayList<AccountAchievement> userAchievements;
 
     // Use the singleton pattern for this class
     private static AccountManager singleton = null;
@@ -56,6 +63,7 @@ public class AccountManager extends Observable
         conn = DBConnection.getInstance();
         dbGameManager = DBGameManager.getInstance();
         this.databaseGameID = new HashMap<String, Integer>();
+        userAchievements = null;
     }
 
     /**
@@ -102,6 +110,14 @@ public class AccountManager extends Observable
                     totalExp = getTotalExpForLevel(level) + expInLevel;
                     accountID = rs.getInt("accountid");
                     fillUserStats();
+                    // TESTING: REMOVE COMMENT ON MERGE
+                    fillUserAchievements();
+
+                    for (int gameID : dbGameManager.getGameListByID().keySet())
+                    {
+                        awardAchievements(gameID);
+                    }
+                    // END TESTING: REMOVE COMMENT ON MERGE
 
                     System.out.println("Login: " + curUsername + " " + isAdmin + " " + isGuest);
 
@@ -142,14 +158,14 @@ public class AccountManager extends Observable
             Gamejam.DPrint("\nFetching game from a string!");
             int gameID = getGameIdFromString(game);
             Gamejam.DPrint(gameID);
-            String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score) VALUES(?, ?, ?, ?, ?, ?, ?)";
+            String transaction = "INSERT INTO gamelog(statsid, win, loss, tie, incomplete, timeplayed, score, date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 
             if (!userStatsIDs.containsKey(gameID))
             { // The game the user just played was added after the user's account creation
                 createStatisticsEntries(); // So, create an entry in the DB for the user in the statistics table
             }
 
-            conn.execute(transaction, userStatsIDs.get(gameID), win, loss, tie, incomplete, time, score);
+            conn.execute(transaction, userStatsIDs.get(gameID), win, loss, tie, incomplete, time, score, LocalDateTime.now());
 
             // Update the statistics table with the game outcome
             if (win)
@@ -175,6 +191,7 @@ public class AccountManager extends Observable
 
             awardExp(score);
             fillUserStats();
+            awardAchievements(dbGameManager.getGameListByName().get(game));
             setChanged();
             notifyObservers();
 
@@ -338,17 +355,6 @@ public class AccountManager extends Observable
         {
             rs = conn.executeQuery("SELECT gameid FROM statistics WHERE accountid = ?", accountID);
 
-//			if (rs.next()) { // An entry already exists for this user
-//				return;
-//			} else {
-//				rs = conn.executeQuery("SELECT gameid FROM games");
-//
-//				while (rs.next()) {
-//					int gameID = rs.getInt("gameid");
-//					conn.execute("INSERT INTO statistics(accountid, gameid) VALUES(?, ?)", accountID, gameID);
-//				}
-//			}
-
             while (rs.next())
             {
                 games.add(rs.getInt("gameid"));
@@ -389,6 +395,12 @@ public class AccountManager extends Observable
         gameTies = new HashMap<>();
         gameIncompletes = new HashMap<>();
         numGamesPlayed = new HashMap<>();
+
+        if (isGuest || isAdmin)
+        {
+            return;
+        }
+
         try
         {
             Gamejam.DPrint("\nfillUserStatsIDs: accountID = " + accountID);
@@ -437,6 +449,32 @@ public class AccountManager extends Observable
     }
 
     /**
+     * Queries the DB to fill userAchievements with the listings in the account_achievements table.
+     */
+    private void fillUserAchievements()
+    {
+        userAchievements = new ArrayList<>();
+        ResultSet rs = null;
+
+        try
+        {
+            rs = conn.executeQuery("SELECT * FROM account_achievements WHERE accountid = ?", accountID);
+
+            while (rs.next())
+            {
+                int achieveID = rs.getInt("achieveid");
+                Timestamp ts = rs.getTimestamp("date");
+                LocalDateTime date = ts.toLocalDateTime();
+                userAchievements.add(new AccountAchievement(accountID, achieveID, date));
+            }
+        }
+        catch (SQLException se)
+        {
+            se.printStackTrace();
+        }
+    }
+
+    /**
      * Returns the high score for given game for the current user.
      *
      * @param gameName A String indicating the name of the game to retrieve a high score for
@@ -478,6 +516,76 @@ public class AccountManager extends Observable
             se.printStackTrace();
             return -1;
         }
+    }
+
+    /**
+     * Gets the list of user's scores for a given game.
+     *
+     * @param game A String with the name of the game to fetch scores for
+     * @return An ArrayList<Score> of the user's scores for that game
+     */
+    public ArrayList<Score> getScores(String game)
+    {
+        ArrayList<Score> scores = new ArrayList<>();
+
+        if (game.equals("All Games"))
+        {
+            for (String gameName : dbGameManager.getGameListByName().keySet())
+            {
+                ArrayList<Score> temp = scoresQuery(gameName);
+                scores.addAll(temp);
+            }
+        }
+        else
+        {
+            scores = scoresQuery(game);
+        }
+
+        return scores;
+    }
+
+    /**
+     * Queries the database to get the user's scores for a given game.
+     *
+     * @param game A String indicating the name of the game to fetch scores for
+     * @return An ArrayList<Score> of the user's scores for that game
+     */
+    private ArrayList<Score> scoresQuery(String game)
+    {
+        ArrayList<Score> scores = new ArrayList<>();
+        ResultSet rs = null;
+        int gameID = dbGameManager.getGameListByName().get(game);
+        int statsID = userStatsIDs.get(gameID);
+
+        try
+        {
+            rs = conn.executeQuery("SELECT * FROM gamelog WHERE statsid = ? ORDER BY date DESC", statsID);
+
+            while (rs.next())
+            {
+                boolean win = rs.getBoolean("win");
+                boolean loss = rs.getBoolean("loss");
+                boolean tie = rs.getBoolean("tie");
+                boolean incomplete = rs.getBoolean("incomplete");
+                int score = rs.getInt("score");
+                Timestamp ts = rs.getTimestamp("date");
+                LocalDateTime date = ts.toLocalDateTime();
+                String outcome = Score.determineOutcome(win, loss, tie, incomplete);
+
+                if (game.equals("Space Shooter") && loss)
+                {
+                    outcome = "Game Over";
+                }
+
+                scores.add(new Score(gameID, game, accountID, curUsername, score, date, outcome));
+            }
+        }
+        catch (SQLException se)
+        {
+            se.printStackTrace();
+        }
+
+        return scores;
     }
 
     /**
@@ -532,6 +640,96 @@ public class AccountManager extends Observable
     }
 
     /**
+     * Given a gameid, awards achievements to the current user for that game.
+     *
+     * @param gameID An int represent the gameid in the DB for the game to award achievements for
+     */
+    public void awardAchievements(int gameID)
+    {
+        ArrayList<Achievement> gameAchievs = new ArrayList<>();
+        TreeSet<Integer> userAchieveIDs = new TreeSet<>();
+
+        for (Achievement cur : dbGameManager.getAchievements())
+        {
+            if (cur.getGameID() == gameID)
+            {
+                gameAchievs.add(cur);
+            }
+        }
+
+        for (AccountAchievement cur : userAchievements)
+        {
+            userAchieveIDs.add(cur.getAchieveID());
+        }
+
+        for (Achievement cur : gameAchievs)
+        {
+            int achieveID = cur.getAchieveID();
+
+            if (!userAchieveIDs.contains(achieveID) && userDeserves(cur))
+            {
+                try
+                {
+                    LocalDateTime currentTime = LocalDateTime.now();
+                    userAchievements.add(new AccountAchievement(accountID, achieveID, currentTime));
+                    userAchieveIDs.add(cur.getAchieveID());
+                    conn.execute("INSERT INTO account_achievements(accountid, achieveid, date) VALUES(?, ?, ?)", accountID, cur.getAchieveID(), currentTime);
+                }
+                catch (SQLException se)
+                {
+                    se.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper method for awardAchievements. Given an Achievement, determines if the user has met the
+     * requirements to earn the achievement.
+     *
+     * @param achiev An Achievement to check to see if the current user has earned it
+     * @return A boolean indicating if the user has earned the Achievement
+     */
+    private boolean userDeserves(Achievement achiev)
+    {
+        if (achiev.getCondition().equals("play"))
+        {
+            if (numGamesPlayed.get(achiev.getGameID()) >= achiev.getAmount())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else if (achiev.getCondition().equals("win"))
+        {
+            if (gameWins.get(achiev.getGameID()) >= achiev.getAmount())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else if (achiev.getCondition().equals("score"))
+        {
+            if (getHighScore(dbGameManager.getGameListByID().get(achiev.getGameID())) >= achiev.getAmount())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns the total amount of exp a user needs to reach a given level.
      *
      * @param level An int indicating the desired level
@@ -539,7 +737,6 @@ public class AccountManager extends Observable
      */
     public int getTotalExpForLevel(int level)
     {
-
         if (level == 2)
         {
             return 1000;
@@ -560,7 +757,6 @@ public class AccountManager extends Observable
      */
     public int getExpForLevel(int level)
     {
-
         if (level == 2)
         {
             return 1000;
@@ -584,7 +780,6 @@ public class AccountManager extends Observable
      */
     public int deleteAccount(String username)
     {
-
         try
         {
             conn.execute("DELETE from accounts where username = '" + username + "'");
@@ -665,6 +860,11 @@ public class AccountManager extends Observable
         return numGamesPlayed;
     }
 
+    public ArrayList<AccountAchievement> getUserAchievements()
+    {
+        return userAchievements;
+    }
+
     // End getters for account information
     // ---
 
@@ -705,5 +905,14 @@ public class AccountManager extends Observable
             throw new SanityCheckFailedException("getGameIdFromString tired to return gameid = " + gameid);
         }
         return gameid;
+    }
+    /**
+     * TODO: Prior to using this function, themes should be loaded into the GamejamMainScreenTheme Object. 
+     * This then returns a list of names of the themes the user has stored within the data base. 
+     * @return
+     */
+    public ArrayList<String> getThemeNames()
+    {
+    	return new ArrayList<String>();
     }
 }

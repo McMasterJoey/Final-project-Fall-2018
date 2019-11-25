@@ -1,13 +1,15 @@
--- MySQL dump 10.13  Distrib 8.0.13, for Win64 (x86_64)
+CREATE DATABASE  IF NOT EXISTS `gamejam` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `gamejam`;
+-- MySQL dump 10.13  Distrib 8.0.17, for Win64 (x86_64)
 --
 -- Host: localhost    Database: gamejam
 -- ------------------------------------------------------
--- Server version	8.0.13
+-- Server version	8.0.17
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
- SET NAMES utf8 ;
+/*!50503 SET NAMES utf8 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -16,12 +18,40 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `account_achievements`
+--
+
+DROP TABLE IF EXISTS `account_achievements`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `account_achievements` (
+  `accountid` int(11) NOT NULL,
+  `achieveid` int(11) NOT NULL,
+  `date` datetime NOT NULL,
+  PRIMARY KEY (`accountid`,`achieveid`),
+  KEY `aa_achieveid_FK` (`achieveid`),
+  CONSTRAINT `aa_accountid_FK` FOREIGN KEY (`accountid`) REFERENCES `accounts` (`accountid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `aa_achieveid_FK` FOREIGN KEY (`achieveid`) REFERENCES `achievements` (`achieveid`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `account_achievements`
+--
+
+LOCK TABLES `account_achievements` WRITE;
+/*!40000 ALTER TABLE `account_achievements` DISABLE KEYS */;
+INSERT INTO `account_achievements` VALUES (3,1,'2019-11-18 18:09:33'),(3,3,'2019-11-18 18:10:57');
+/*!40000 ALTER TABLE `account_achievements` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `accounts`
 --
 
 DROP TABLE IF EXISTS `accounts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `accounts` (
   `accountid` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
@@ -31,8 +61,9 @@ CREATE TABLE `accounts` (
   `admin` tinyint(1) NOT NULL DEFAULT '0',
   `guest` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`accountid`),
-  UNIQUE KEY `username_UNIQUE` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=93 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `username_UNIQUE` (`username`),
+  CONSTRAINT `accounts_chk_1` CHECK ((`exp` >= 0))
+) ENGINE=InnoDB AUTO_INCREMENT=158 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,8 +72,41 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` VALUES (7,'guest','guest',0,1,0,1),(10,'admin','admin',0,1,1,0),(26,'test','test',0,1,0,0),(51,'john','john',0,1,0,0),(52,'adam','adam',0,1,0,0);
+INSERT INTO `accounts` VALUES (1,'admin','admin',0,1,1,0),(2,'guest','guest',0,1,0,1),(3,'test','test',358,2,0,0);
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `achievements`
+--
+
+DROP TABLE IF EXISTS `achievements`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `achievements` (
+  `achieveid` int(11) NOT NULL AUTO_INCREMENT,
+  `gameid` int(11) DEFAULT NULL,
+  `description` varchar(256) NOT NULL,
+  `condition` varchar(5) NOT NULL,
+  `amount` int(11) NOT NULL,
+  `exp` int(11) DEFAULT '0',
+  `iconpath` varchar(128) NOT NULL,
+  PRIMARY KEY (`achieveid`),
+  KEY `gameid_idx` (`gameid`),
+  CONSTRAINT `achievements_gameid_FK` FOREIGN KEY (`gameid`) REFERENCES `games` (`gameid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `achievements_chk_1` CHECK ((`condition` in (_utf8mb4'play',_utf8mb4'win',_utf8mb4'score'))),
+  CONSTRAINT `achievements_chk_2` CHECK ((`exp` >= 0))
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `achievements`
+--
+
+LOCK TABLES `achievements` WRITE;
+/*!40000 ALTER TABLE `achievements` DISABLE KEYS */;
+INSERT INTO `achievements` VALUES (1,1,'Play 5 games of Tic-Tac-Toe','play',5,0,'/TTTPlay5.png'),(2,1,'Win 5 games of Tic-Tac-Toe','win',5,0,'/TTTWin5.png'),(3,1,'Play 10 games of Tic-Tac-Toe','play',10,0,'/TTTPlay10.png'),(4,1,'Win 10 games of Tic-Tac-Toe','win',10,0,'/TTTWin10.png');
+/*!40000 ALTER TABLE `achievements` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -51,7 +115,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `gamelog`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `gamelog` (
   `logid` int(11) NOT NULL AUTO_INCREMENT,
   `statsid` int(11) NOT NULL,
@@ -61,10 +125,11 @@ CREATE TABLE `gamelog` (
   `incomplete` tinyint(1) NOT NULL DEFAULT '0',
   `timeplayed` time NOT NULL DEFAULT '00:00:00',
   `score` int(11) NOT NULL DEFAULT '0',
+  `date` datetime NOT NULL,
   PRIMARY KEY (`logid`),
   KEY `accountid_idx` (`statsid`),
   CONSTRAINT `statsid` FOREIGN KEY (`statsid`) REFERENCES `statistics` (`statsid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=93 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -73,7 +138,7 @@ CREATE TABLE `gamelog` (
 
 LOCK TABLES `gamelog` WRITE;
 /*!40000 ALTER TABLE `gamelog` DISABLE KEYS */;
-INSERT INTO `gamelog` VALUES (5,14,1,0,0,0,'00:00:01',1),(6,14,1,0,0,0,'00:00:01',2),(7,15,1,0,0,0,'00:00:00',0),(8,14,1,0,0,0,'00:00:01',3),(9,15,0,0,1,0,'00:00:00',4),(10,15,0,1,0,0,'00:00:00',5),(11,14,0,0,0,1,'00:00:01',6),(12,52,1,0,0,0,'00:00:01',7),(13,52,1,0,0,0,'00:00:01',8),(14,52,0,0,1,0,'00:00:00',9),(15,53,1,0,0,0,'00:00:00',10),(16,54,1,0,0,0,'00:00:01',11),(17,54,0,0,1,0,'00:00:00',12),(18,54,0,1,0,0,'00:00:01',13),(19,55,0,1,0,0,'00:00:00',14),(20,55,0,1,0,0,'00:00:00',15),(21,52,1,0,0,0,'00:00:01',0),(22,52,1,0,0,0,'00:00:01',0),(23,54,1,0,0,0,'00:00:01',0),(24,54,1,0,0,0,'00:00:01',0),(25,14,0,0,1,0,'00:00:00',0),(26,14,0,0,0,1,'00:00:01',0),(27,14,0,0,1,0,'00:00:00',52),(28,14,1,0,0,0,'00:00:01',108),(29,15,0,0,1,0,'00:00:00',220),(30,15,1,0,0,0,'00:00:00',200),(31,14,1,0,0,0,'00:00:01',108),(32,52,1,0,0,0,'00:00:01',108);
+INSERT INTO `gamelog` VALUES (80,1,1,0,0,0,'00:00:01',108,'2019-11-14 10:27:10'),(81,1,0,0,1,0,'00:00:00',52,'2019-11-15 11:02:13'),(82,1,1,0,0,0,'00:00:01',108,'2019-11-15 11:06:41'),(83,2,0,1,0,0,'00:00:00',104,'2019-11-15 11:14:56'),(84,3,0,0,0,1,'00:00:01',0,'2019-11-15 11:16:05'),(85,3,0,1,0,0,'00:00:01',510,'2019-11-15 11:17:43'),(86,1,0,0,1,0,'00:00:00',52,'2019-11-18 17:40:10'),(87,1,1,0,0,0,'00:00:01',108,'2019-11-18 17:40:23'),(88,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:05'),(89,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:21'),(90,1,1,0,0,0,'00:00:01',108,'2019-11-18 18:10:34'),(91,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:49'),(92,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:57');
 /*!40000 ALTER TABLE `gamelog` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -83,13 +148,13 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `games`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `games` (
   `gameid` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `iconpath` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`gameid`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -98,7 +163,7 @@ CREATE TABLE `games` (
 
 LOCK TABLES `games` WRITE;
 /*!40000 ALTER TABLE `games` DISABLE KEYS */;
-INSERT INTO `games` VALUES (1,'Tic-Tac-Toe','/tictactoeicon.png'),(2,'Connect-Four','/connectFourIcon.png'),(3,'Battleship','/battleshipIcon.png');
+INSERT INTO `games` VALUES (1,'Tic-Tac-Toe','/tictactoeicon.png'),(2,'Connect-Four','/connectFourIcon.png'),(3,'Battleship','/battleshipIcon.png'),(4,'Space Shooter','/spaceShooterIcon.png');
 /*!40000 ALTER TABLE `games` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -108,7 +173,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `statistics`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `statistics` (
   `statsid` int(11) NOT NULL AUTO_INCREMENT,
   `accountid` int(11) NOT NULL,
@@ -123,7 +188,7 @@ CREATE TABLE `statistics` (
   KEY `gameid_idx` (`gameid`),
   CONSTRAINT `accountid` FOREIGN KEY (`accountid`) REFERENCES `accounts` (`accountid`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `gameid` FOREIGN KEY (`gameid`) REFERENCES `games` (`gameid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=263 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -132,7 +197,7 @@ CREATE TABLE `statistics` (
 
 LOCK TABLES `statistics` WRITE;
 /*!40000 ALTER TABLE `statistics` DISABLE KEYS */;
-INSERT INTO `statistics` VALUES (14,26,1,5,0,2,2,'00:00:00'),(15,26,2,2,1,2,0,'00:00:00'),(52,51,1,5,0,1,0,'00:00:00'),(53,51,2,1,0,0,0,'00:00:00'),(54,52,1,3,1,1,0,'00:00:00'),(55,52,2,0,2,0,0,'00:00:00');
+INSERT INTO `statistics` VALUES (1,3,1,4,0,6,0,'00:00:00'),(2,3,2,0,1,0,0,'00:00:00'),(3,3,3,0,1,0,1,'00:00:00');
 /*!40000 ALTER TABLE `statistics` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -145,4 +210,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-11-04 15:45:24
+-- Dump completed on 2019-11-18 18:19:05

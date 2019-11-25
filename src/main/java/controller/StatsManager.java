@@ -1,6 +1,9 @@
 package controller;
 
 import model.Leaderboard;
+import model.Score;
+
+import java.time.LocalDateTime;
 
 /**
  * Class to unify updates to user statistics.
@@ -8,8 +11,8 @@ import model.Leaderboard;
  * @author Nicholas Fiegel
  */
 public class StatsManager {
-    AccountManager acctMgr;
-    Leaderboard leaderboard;
+    private AccountManager acctMgr;
+    private Leaderboard leaderboard;
     // Use the singleton pattern for this class
     private static StatsManager singleton = null;
 
@@ -46,7 +49,13 @@ public class StatsManager {
         }
     }
     public void logGameStat(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time, int score) {
+        String outcome = Score.determineOutcome(win, loss, tie, incomplete);
+
+        if (game.equals("Space Shooter") && loss) {
+            outcome = "Game Over";
+        }
+
         acctMgr.logGameInDB(game, win, loss, tie, incomplete, time, score);
-        leaderboard.addScore(acctMgr.getAccountID(), game, score);
+        leaderboard.addScore(acctMgr.getAccountID(), game, score, LocalDateTime.now(), outcome);
     }
 }
