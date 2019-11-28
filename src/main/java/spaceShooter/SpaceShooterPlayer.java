@@ -9,9 +9,10 @@ public class SpaceShooterPlayer extends SpaceShooterShip implements Serializable
 	
 	private int movementSpeed;
 	private int stallTime;
+	private int speedTime;
 	
 	public SpaceShooterPlayer() {
-		currentHP = 2;
+		currentHP = 1;
 		maxHP = 2;
 		movementSpeed = 5;
 		hitboxWidth = 40;
@@ -42,12 +43,20 @@ public class SpaceShooterPlayer extends SpaceShooterShip implements Serializable
 		stallTime--;
 	}
 	
-	public int getHitboxWidth() {
-		return currentHP == 1 ? hitboxWidth : hitboxWidth * 2;
-	}
-	
 	public Point getLocation() {
 		return currentHP == 1 ? location : new Point(location.x - hitboxWidth/2, location.y);	
+	}
+
+	public void addSpeedTime(int i) {
+		speedTime += i;
+	}
+	
+	public void decrementSpeedTimer() {
+		speedTime--;
+	}
+
+	public int getSpeedTimer() {
+		return speedTime;
 	}
 
 }

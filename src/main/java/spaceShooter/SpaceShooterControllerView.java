@@ -26,6 +26,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
+import spaceShooter.SpaceShooterBuff.BuffType;
 
 public class SpaceShooterControllerView extends GameControllerView {
 
@@ -147,9 +148,9 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	private void playerAttack() {
 		if (player.getCurrentHP() == 2) {
-			int x = player.getLocation().x + (player.getHitboxWidth() / 4) - 2;
+			int x = player.getLocation().x + (player.getHitboxWidth() / 2) - 2;
 			Point projectilePosition = new Point(x, player.getLocation().y);
-			Point projectilePosition2 = new Point(x + player.getHitboxWidth() / 2, player.getLocation().y);
+			Point projectilePosition2 = new Point(x + player.getHitboxWidth(), player.getLocation().y);
 			playerProjectiles
 					.add(new SpaceShooterProjectile(projectilePosition, 4, 8, 5, "/spaceShooterPlayerAttackImage.png"));
 			playerProjectiles.add(
@@ -236,11 +237,19 @@ public class SpaceShooterControllerView extends GameControllerView {
 		enemyAttack();
 		updateProjectilePositions();
 		checkCollisions();
+		updateDropPosition();
 		checkDeaths();
 		checkLevelOver();
 		decrementStall();
 		update(gameModel, this);
 		checkGameOver();
+	}
+
+	private void updateDropPosition() {
+		for (SpaceShooterBuff buff : itemDrops) {
+			Point delta = new Point(0, 2);
+			buff.updatePosition(delta);
+		}
 	}
 
 	private void decrementStall() {
@@ -305,13 +314,21 @@ public class SpaceShooterControllerView extends GameControllerView {
 			if (enemy.getCurrentHP() <= 0) {
 				gameModel.incrementScore(enemy.getPointValue() * enemySpeedMultiplier);
 				toRemove.add(enemy);
+				if (enemy.didLootDrop()) {
+					itemDrops.add(enemy.lootDrop());
+				}
 			}
 		}
 		enemyList.removeAll(toRemove);
 	}
 
 	private void updatePlayerPosition() {
-		int xSpeed = (dPressed ? player.getMovementSpeed() : 0) - (aPressed ? player.getMovementSpeed() : 0);
+		int speed = player.getMovementSpeed();
+		if (player.getSpeedTimer() > 0) {
+			speed += 3;
+			player.decrementSpeedTimer();
+		}
+		int xSpeed = (dPressed ? speed : 0) - (aPressed ? speed : 0);
 		// check that the player won't be off screen
 		if (player.getLocation().x + xSpeed < 0 || player.getLocation().x + xSpeed + player.getHitboxWidth() > WIDTH) {
 			xSpeed = 0;
@@ -407,7 +424,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		enemyProjectiles.removeAll(toRemove);
 		toRemove.clear();
 
-		ArrayList<SpaceShooterObject> toRemove2 = new ArrayList<SpaceShooterObject>();
+		ArrayList<SpaceShooterBuff> toRemove2 = new ArrayList<SpaceShooterBuff>();
 		for (SpaceShooterBuff item : itemDrops) {
 			if (collisionExists(player, item)) {
 				buffPlayer(item);
@@ -465,9 +482,9 @@ public class SpaceShooterControllerView extends GameControllerView {
 			if (!player.stalled() || player.getStall() % 20 == 0) {
 				if (player.getCurrentHP() == 2) {
 					gc.drawImage(resources.getPlayerImage(), player.getLocation().x, player.getLocation().y,
-							player.getHitboxWidth() / 2, player.getHitboxHeight());
-					gc.drawImage(resources.getPlayerImage(), player.getLocation().x + player.getHitboxWidth() / 2,
-							player.getLocation().y, player.getHitboxWidth() / 2, player.getHitboxHeight());
+							player.getHitboxWidth(), player.getHitboxHeight());
+					gc.drawImage(resources.getPlayerImage(), player.getLocation().x + player.getHitboxWidth(),
+							player.getLocation().y, player.getHitboxWidth(), player.getHitboxHeight());
 				} else {
 					gc.drawImage(resources.getPlayerImage(), player.getLocation().x, player.getLocation().y,
 							player.getHitboxWidth(), player.getHitboxHeight());
@@ -498,8 +515,18 @@ public class SpaceShooterControllerView extends GameControllerView {
 		}
 
 		for (SpaceShooterBuff item : itemDrops) {
-			gc.drawImage(resources.getItemImage(item), item.getLocation().getX(), item.getLocation().getY(),
-					item.getHitboxWidth(), item.getHitboxHeight());
+			if (item.getType() == BuffType.SPEED) {
+				gc.drawImage(resources.getSpeedBuff(), item.getLocation().getX(), item.getLocation().getY(),
+						item.getHitboxWidth(), item.getHitboxHeight());
+			} else {
+				gc.drawImage(resources.getPlayerImage(), item.getLocation().getX() + item.getHitboxWidth() / 4,
+						item.getLocation().getY() + item.getHitboxWidth() / 4, player.getHitboxWidth() / 2,
+						item.getHitboxHeight() / 2);
+				gc.setStroke(Color.WHITE);
+				gc.setLineWidth(2);
+				gc.strokeOval(item.getLocation().getX(), item.getLocation().getY(), item.getHitboxWidth(), item.getHitboxHeight());
+			}
+
 		}
 
 		gc.setFill(Color.WHITE);

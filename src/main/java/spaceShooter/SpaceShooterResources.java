@@ -18,6 +18,7 @@ public class SpaceShooterResources {
 	private Image pauseImage;
 	private Image continueImage;
 	private Image[] explosion = new Image[6];
+	private Image speedBuff;
 	
 	public SpaceShooterResources() {
 		playerImage = makeImage("/spaceShooterPlayerImage.png");
@@ -41,6 +42,11 @@ public class SpaceShooterResources {
 		explosion[3] = makeImage("/spaceInvaders/explosiongreen.png");
 		explosion[4] = makeImage("/spaceInvaders/explosionpurple.png");
 		explosion[5] = makeImage("/spaceInvaders/explosionpurple.png");
+		speedBuff = makeImage("/speedBuff.png");
+	}
+	
+	public Image getSpeedBuff() {
+		return speedBuff;
 	}
 	
 	private Image makeImage(String s) {
