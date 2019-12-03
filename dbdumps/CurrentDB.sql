@@ -63,7 +63,7 @@ CREATE TABLE `accounts` (
   PRIMARY KEY (`accountid`),
   UNIQUE KEY `username_UNIQUE` (`username`),
   CONSTRAINT `accounts_chk_1` CHECK ((`exp` >= 0))
-) ENGINE=InnoDB AUTO_INCREMENT=158 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=166 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -138,7 +138,7 @@ CREATE TABLE `gamelog` (
 
 LOCK TABLES `gamelog` WRITE;
 /*!40000 ALTER TABLE `gamelog` DISABLE KEYS */;
-INSERT INTO `gamelog` VALUES (80,1,1,0,0,0,'00:00:01',108,'2019-11-14 10:27:10'),(81,1,0,0,1,0,'00:00:00',52,'2019-11-15 11:02:13'),(82,1,1,0,0,0,'00:00:01',108,'2019-11-15 11:06:41'),(83,2,0,1,0,0,'00:00:00',104,'2019-11-15 11:14:56'),(84,3,0,0,0,1,'00:00:01',0,'2019-11-15 11:16:05'),(85,3,0,1,0,0,'00:00:01',510,'2019-11-15 11:17:43'),(86,1,0,0,1,0,'00:00:00',52,'2019-11-18 17:40:10'),(87,1,1,0,0,0,'00:00:01',108,'2019-11-18 17:40:23'),(88,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:05'),(89,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:21'),(90,1,1,0,0,0,'00:00:01',108,'2019-11-18 18:10:34'),(91,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:49'),(92,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:57');
+INSERT INTO `gamelog` VALUES (80,1,1,0,0,0,'00:00:01',108,'2019-11-14 10:27:10'),(81,1,0,0,1,0,'00:00:00',52,'2019-11-15 11:02:13'),(82,1,1,0,0,0,'00:00:01',108,'2019-11-15 11:06:41'),(83,2,0,1,0,0,'00:00:00',104,'2019-11-15 11:14:56'),(86,1,0,0,1,0,'00:00:00',52,'2019-11-18 17:40:10'),(87,1,1,0,0,0,'00:00:01',108,'2019-11-18 17:40:23'),(88,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:05'),(89,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:21'),(90,1,1,0,0,0,'00:00:01',108,'2019-11-18 18:10:34'),(91,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:49'),(92,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:57');
 /*!40000 ALTER TABLE `gamelog` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -188,7 +188,7 @@ CREATE TABLE `statistics` (
   KEY `gameid_idx` (`gameid`),
   CONSTRAINT `accountid` FOREIGN KEY (`accountid`) REFERENCES `accounts` (`accountid`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `gameid` FOREIGN KEY (`gameid`) REFERENCES `games` (`gameid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=263 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=290 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -197,8 +197,37 @@ CREATE TABLE `statistics` (
 
 LOCK TABLES `statistics` WRITE;
 /*!40000 ALTER TABLE `statistics` DISABLE KEYS */;
-INSERT INTO `statistics` VALUES (1,3,1,4,0,6,0,'00:00:00'),(2,3,2,0,1,0,0,'00:00:00'),(3,3,3,0,1,0,1,'00:00:00');
+INSERT INTO `statistics` VALUES (1,3,1,4,0,6,0,'00:00:00'),(2,3,2,0,1,0,0,'00:00:00'),(276,3,3,0,0,0,0,'00:00:00'),(289,3,4,0,0,0,0,'00:00:00');
 /*!40000 ALTER TABLE `statistics` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `themes`
+--
+
+DROP TABLE IF EXISTS `themes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `themes` (
+  `themeid` int(11) NOT NULL AUTO_INCREMENT,
+  `accountid` int(11) NOT NULL,
+  `themename` varchar(256) NOT NULL,
+  `themepath` varchar(128) NOT NULL,
+  PRIMARY KEY (`themeid`),
+  UNIQUE KEY `themename_UNIQUE` (`themename`),
+  UNIQUE KEY `themepath_UNIQUE` (`themepath`),
+  KEY `accountid_themes_FK_idx` (`accountid`),
+  CONSTRAINT `accountid_themes_FK` FOREIGN KEY (`accountid`) REFERENCES `accounts` (`accountid`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `themes`
+--
+
+LOCK TABLES `themes` WRITE;
+/*!40000 ALTER TABLE `themes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `themes` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -210,4 +239,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-11-18 18:19:05
+-- Dump completed on 2019-12-03 12:50:50

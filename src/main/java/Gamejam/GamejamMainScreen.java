@@ -769,6 +769,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.loggedinusername = username.getText();
 			UpdateLoggedInBarsWithUserNameOfCurrentUser();
 			handleStatsSelectionChange();
+			basicthemecreator.updateObjectOnUserChange();
 			this.setTop(this.initLoggedInBar);
 			username.setText("");
 			password.setText("");
@@ -939,7 +940,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		updateLeftPane();
 		handleLeaderBoardSelectionChange();
 		handleStatsSelectionChange();
-		achievementsScreen = initAchievementsScreen();
+		//achievementsScreen = initAchievementsScreen();
 	}
 
 	/**

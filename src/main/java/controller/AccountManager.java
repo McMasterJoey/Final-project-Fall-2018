@@ -6,6 +6,7 @@ import model.Achievement;
 import model.SanityCheckFailedException;
 import model.Score;
 
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -906,6 +907,7 @@ public class AccountManager extends Observable
         }
         return gameid;
     }
+
     /**
      * TODO: Prior to using this function, all themes should be loaded into the GamejamMainScreenTheme Object. 
      * This then returns a list of names of the themes the user has stored within the data base. 
@@ -913,9 +915,26 @@ public class AccountManager extends Observable
      */
     public ArrayList<String> getThemeNames()
     {
-    	// TODO: Implement me!
-    	return new ArrayList<String>();
+        ArrayList<String> themeNames = new ArrayList<>();
+        ResultSet rs = null;
+
+        try
+        {
+            rs = conn.executeQuery("SELECT * FROM themes WHERE accountid = ?", accountID);
+
+            while (rs.next())
+            {
+                themeNames.add(rs.getString("themename"));
+            }
+        }
+        catch (SQLException se)
+        {
+            se.printStackTrace();
+        }
+
+    	return themeNames;
     }
+
     /**
      * TODO: Will be called when the theme creator knows who the user is and knows the desired theme to be loaded.
      * @param themename The name of the theme whose path is to be fetched.
@@ -923,13 +942,33 @@ public class AccountManager extends Observable
      */
     public String getThemePath(String themename)
     {
+        ResultSet rs = null;
+
     	// When a user has no saved themes, a place holder will be inserted on the theme editor side and will input null.
     	if (themename == null) {
     		return null;
     	}
-    	// TODO: Handle other cases where the user has atleast one theme saved.
+
+        try
+        {
+            rs = conn.executeQuery("SELECT * FROM themes WHERE accountid = ? AND themename = ?", accountID, themename);
+
+            if (rs.next())
+            {
+                return rs.getString("themepath");
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (SQLException se)
+        {
+            se.printStackTrace();
+        }
     	return null;
     }
+
     /**
      * TODO: Will be called when a player saves a theme to their account. If the theme already exists, overwrites it. 
      * @param themename The name of the theme, assumed to be unique on a per user basis. 
@@ -937,6 +976,13 @@ public class AccountManager extends Observable
      */
     public void addNewTheme(String themename, String path)
     {
-    	// TODO: Implement me!
+    	try
+        {
+            conn.execute("INSERT INTO themes(accountid, themename, themepath) VALUES(?, ?, ?)", accountID, themename, path);
+        }
+    	catch (SQLException se)
+        {
+            se.printStackTrace();
+        }
     }
 }
