@@ -1,7 +1,11 @@
 package controller;
 
 import java.util.Observer;
+import java.util.Optional;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -45,7 +49,17 @@ public abstract class GameControllerView extends BorderPane implements Observer 
 	public void setAccountManager(AccountManager accountManager) {
 		this.accountManager = accountManager;
 	}
-
+	
+	protected void showEndScreen() {
+		Alert verifyAlert = new Alert(AlertType.INFORMATION);
+		verifyAlert.setTitle("Game Over");
+		verifyAlert.setHeaderText("You " + this.wonString() + "!");
+		verifyAlert.setContentText("This game earned you " + this.getScore() + " points");
+		verifyAlert.show();
+	}
+	
+	protected abstract String wonString();
+	
 	protected abstract void updateStatistics();
 
 	public abstract int getScore();

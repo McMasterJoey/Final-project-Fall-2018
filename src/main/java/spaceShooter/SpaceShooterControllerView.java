@@ -24,6 +24,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import spaceShooter.SpaceShooterBuff.BuffType;
@@ -132,7 +133,9 @@ public class SpaceShooterControllerView extends GameControllerView {
 			}
 		});
 		gameScreen.setOnMouseClicked((click) -> {
-			playerAttack();
+			if(click.getButton().equals(MouseButton.PRIMARY)) {
+				playerAttack();
+			}
 		});
 	}
 
@@ -216,7 +219,7 @@ public class SpaceShooterControllerView extends GameControllerView {
 		gc.fillRect(0, 0, WIDTH, HEIGHT);
 		gc.drawImage(resources.getGameOver(), 300, 150, WIDTH - 600, 350);
 		updateStatistics();
-
+		showEndScreen();
 	}
 
 	private void startGame() {
@@ -543,7 +546,6 @@ public class SpaceShooterControllerView extends GameControllerView {
 
 	private void drawExplosion() {
 		int time = player.getStall();
-		System.out.println("time raw is " + time);
 		if (time < 120) {
 			animations.clear();
 			setupListeners();
@@ -558,9 +560,6 @@ public class SpaceShooterControllerView extends GameControllerView {
 		int xLocation = x + (player.getHitboxWidth() / 2 - width / 2);
 		int yLocation = y + (player.getHitboxHeight() / 2 - height / 2);
 		gc.drawImage(resources.getExplosionImage()[5 - time], xLocation, yLocation, width, height);
-		System.out.printf("time = %d", time);
-		System.out.printf("Drawing explosion at (%d, %d), with width = %d and height = %d\n", xLocation, yLocation,
-				width, height);
 	}
 
 	@Override
@@ -695,5 +694,10 @@ public class SpaceShooterControllerView extends GameControllerView {
 	private String sformat(String s) {
 		URL url = SpaceShooterControllerView.class.getResource(s);
 		return url.toString();
+	}
+
+	@Override
+	protected String wonString() {
+		return "lost";
 	}
 }

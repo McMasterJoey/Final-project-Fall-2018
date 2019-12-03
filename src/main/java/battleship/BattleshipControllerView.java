@@ -677,6 +677,7 @@ public class BattleshipControllerView extends GameControllerView {
 				loseSound.play();
 				statsManager.logGameStat("Battleship",  LogStatType.LOSS, 1, getScore());
 			}
+			showEndScreen();
 		}
 		if (shipsSet) {
 			hbgc.clearRect(0, 0, WIDTH, HEIGHT);
@@ -818,5 +819,10 @@ public class BattleshipControllerView extends GameControllerView {
 		public Ship getShip() {
 			return ship;
 		}
+	}
+
+	@Override
+	protected String wonString() {
+		return gameModel.won(true) ? "won" : "lost";
 	}
 }

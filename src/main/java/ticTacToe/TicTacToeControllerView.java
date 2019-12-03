@@ -270,6 +270,7 @@ public class TicTacToeControllerView extends GameControllerView {
 		Gamejam.DPrint("----------");
 		if(!gameModel.isStillRunning()) {
 			System.out.println("Score is " + getScore());
+			showEndScreen();
 		}
 		if (gameModel.tied()) {
 			//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
@@ -422,5 +423,10 @@ public class TicTacToeControllerView extends GameControllerView {
 		temp = temp * winModifier + 3;
 		baseScore = temp * 14 + 2;
 		return (int) (baseScore * difficultyModifier);
+	}
+
+	@Override
+	protected String wonString() {
+		return gameModel.won('X') ? "won" : "lost";
 	}
 }
