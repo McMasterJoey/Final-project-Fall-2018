@@ -31,7 +31,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
-public class BasicThemeCreator extends GridPane
+public class ThemeCreator extends GridPane
 {
 	public static final double BUTTON_PREF_X_SIZE = 250;
 	public static final double BUTTON_PREF_Y_SIZE = 75;
@@ -82,7 +82,7 @@ public class BasicThemeCreator extends GridPane
 	
 	boolean debugger = true;
 	
-	public BasicThemeCreator(GamejamMainScreenTheme screen)
+	public ThemeCreator(GamejamMainScreenTheme screen)
 	{
 		this.screen = screen;
 		this.borderthickness = 2.0;

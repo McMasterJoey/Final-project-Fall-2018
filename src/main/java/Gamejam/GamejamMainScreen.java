@@ -84,7 +84,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private GameIconItem[] initgamelist;
 	private GamejamMainScreenTheme initthemes;
 	private int initthemeinuseid = 0;
-	private BasicThemeCreator basicthemecreator;
+	private ThemeCreator basicthemecreator;
 	private HBox emptythemecreator;
 	public GamejamMainScreen() {
 		super();
