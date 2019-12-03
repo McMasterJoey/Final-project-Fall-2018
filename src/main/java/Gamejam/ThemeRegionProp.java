@@ -1,5 +1,6 @@
 package Gamejam;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,8 +12,9 @@ import java.util.Iterator;
  * @author Joey McMaster
  *
  */
-public class ThemeRegionProp 
+public class ThemeRegionProp implements Serializable
 {
+	private static final long serialVersionUID = 3;
 	
 	private HashMap<String,Integer> nameToIndex = new HashMap<String,Integer>();
 	private boolean[] bol_array;

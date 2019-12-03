@@ -1,9 +1,13 @@
 package Gamejam;
 
+import java.io.Serializable;
+
 import javafx.scene.layout.Region;
 
-public class RegionPair 
+public class RegionPair implements Serializable
 {
+	private static final long serialVersionUID = 3;
+	
 	private Region region;
 	private String description;
 	private int index;

@@ -33,10 +33,9 @@ public class GamejamMainScreenTheme
 	private ArrayList<Theme> themes;
 	private ArrayList<RegionPair> regions;
 	private ArrayList<PriorityPair> preInit;
-	private ThemeCreator themecreator;
-	private BasicThemeCreator basicthemecreator;
+	private ThemeCreator basicthemecreator;
 	private boolean doneAddingRegions = false;
-	private ArrayList<Image> imagecache;
+	private ArrayList<String> imagecache;
 	private ArrayList<Theme> playerCustomThemes;
 	public GamejamMainScreenTheme() 
 	{
@@ -44,20 +43,17 @@ public class GamejamMainScreenTheme
 		this.playerCustomThemes = new ArrayList<Theme>(25);
 		this.regions = new ArrayList<RegionPair>(50);
 		this.preInit = new ArrayList<PriorityPair>(50);
-		this.themecreator = new ThemeCreator(this);
-		this.basicthemecreator = new BasicThemeCreator(this);
-		addRegion(228, this.themecreator, "Theme Menu Theme Creator", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM));
+		this.basicthemecreator = new ThemeCreator(this);
 		addRegion(228.001, this.basicthemecreator, "Theme Menu Basic Theme Creator", new ThemeRegionProp(ThemeRegionProp.BORDERPANE, ThemeRegionProp.LOC_MI_TM, ThemeRegionProp.INT_REG));
 		cacheImages();
 		
 	}
 	private void cacheImages()
 	{
-		this.imagecache = new ArrayList<Image>();
-		//this.imagecache.add(new Image("/themeDefaultThemeMenuIcon.png"));
-		this.imagecache.add(new Image(GamejamMainScreenTheme.class.getResource("/themeDefaultThemeMenuIcon.png").toString()));
-		this.imagecache.add(new Image("/themeNightThemeMenuIcon.png"));
-		this.imagecache.add(new Image("/themeUSAThemeMenuIcon.png"));
+		this.imagecache = new ArrayList<String>();
+		this.imagecache.add("/themeDefaultThemeMenuIcon.png");
+		this.imagecache.add("/themeNightThemeMenuIcon.png");
+		this.imagecache.add("/themeUSAThemeMenuIcon.png");
 		
 		Theme t1 = new Theme("Default Theme", 10);
 		t1.setIcon(this.imagecache.get(0));
@@ -75,11 +71,7 @@ public class GamejamMainScreenTheme
 		t3.addNewImage("/usersettingsbuttonbackground.png");
 		this.themes.add(t3);
 	}
-	public ThemeCreator getThemeCreator()
-	{
-		return this.themecreator;
-	}
-	public BasicThemeCreator getBasicThemeCreator()
+	public ThemeCreator getBasicThemeCreator()
 	{
 		return this.basicthemecreator;
 	}
@@ -106,7 +98,6 @@ public class GamejamMainScreenTheme
 				this.regions.add(this.preInit.get(x).getRegionPair());
 				this.regions.get(this.regions.size() - 1).setIndex(x);
 			}
-			this.themecreator.doOnMainScreenThemeFinishInit();
 			this.basicthemecreator.finishConstructing();
 			
 			this.playerCustomThemes.add(generateDefaultTheme());
@@ -396,7 +387,23 @@ public class GamejamMainScreenTheme
 	{
 		return new Background(new BackgroundFill(color, CornerRadii.EMPTY, new Insets(0)));
 	}
-	
+	public static Border SimpleIntBorder(Paint color, String style, int widths)
+	{
+		BorderStrokeStyle stylee;
+		if (style.equals("Solid"))
+		{
+			stylee = BorderStrokeStyle.SOLID;
+		} 
+		else if (style.equals("Dashed"))
+		{
+			stylee = BorderStrokeStyle.DASHED;
+		}
+		else
+		{
+			stylee = BorderStrokeStyle.DOTTED;
+		}
+		return new Border(new BorderStroke(color, stylee, CornerRadii.EMPTY, new BorderWidths(widths)));
+	}
 	/**
 	 * Generates a border.
 	 * @param color The color of the border
@@ -433,6 +440,13 @@ public class GamejamMainScreenTheme
 		double blue = (double) b;
 		return new Background(new BackgroundFill(Color.color(red / 255.0, green / 255.0, blue / 255.0),
 				CornerRadii.EMPTY, new Insets(0)));
+	}
+	public static Color colorSetUpRBG(int r, int g, int b)
+	{
+		double red = (double) r;
+		double green = (double) g;
+		double blue = (double) b;
+		return new Color(red / 255, green / 255, blue / 255, 1);
 	}
 	/**
 	 * Acts as a temporary object to be used when initing the object.

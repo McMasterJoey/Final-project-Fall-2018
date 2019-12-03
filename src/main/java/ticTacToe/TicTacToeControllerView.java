@@ -11,19 +11,22 @@ import java.util.Observable;
 
 import Gamejam.Gamejam;
 import controller.*;
-import Gamejam.RegionColors;
 import controller.AccountManager;
 import controller.GameControllerView;
 import controller.GameMenu;
 import controller.LogStatType;
-
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.AudioClip;
+import javafx.scene.paint.Color;
 
 /**
  * Provides a GUI view and the listeners required for players to make Tic Tac
@@ -65,7 +68,7 @@ public class TicTacToeControllerView extends GameControllerView {
 		this.setHeight(HEIGHT);
 		_primarypane.setPrefWidth(WIDTH);
 		_primarypane.setPrefHeight(HEIGHT);
-		_primarypane.setBackground(RegionColors.BDEFAULTBACKGROUND);
+		_primarypane.setBackground(new Background(new BackgroundFill(Color.color(0.953125, 0.953125, 0.953125),CornerRadii.EMPTY,new Insets(0))));
 		
 	}
 

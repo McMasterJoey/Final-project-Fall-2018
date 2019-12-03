@@ -60,7 +60,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private Label expBarLabel;
 	private Button moreStatsBtn;
 	private Button viewAchievesBtn;
-	private VBox initCreateAccountMenu;
+	private GridPane initCreateAccountMenu;
 	private VBox leaderScreen;
 	private TableView<Score> scoresTable;
 	private ComboBox<String> leaderBoardSelection;
@@ -84,8 +84,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private GameIconItem[] initgamelist;
 	private GamejamMainScreenTheme initthemes;
 	private int initthemeinuseid = 0;
-	private BasicThemeCreator basicthemecreator;
-	private ThemeCreator advancedthemecreator;
+	private ThemeCreator basicthemecreator;
 	private HBox emptythemecreator;
 	public GamejamMainScreen() {
 		super();
@@ -175,7 +174,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(102, this.leftBarStats, "Left Stats label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_LB));
 		this.initthemes.addRegion(102.01, this.expBarLabel, "Left EXP label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_LB));
 		this.initthemes.addRegion(102.02, this.expBar, "Left EXP Progress Bar", new ThemeRegionProp(ThemeRegionProp.PROGRESSBAR, ThemeRegionProp.LOC_LB));
-		
+		this.initthemes.addRegion(102.03, moreStatsBtn, "Left Bar More Stats Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_LB));
+		this.initthemes.addRegion(102.04, viewAchievesBtn, "Left Bar View Achievements Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_LB));
 		leftPane.getChildren().addAll(this.leftBarMsg, expBarLabel, expBar, this.leftBarStats, moreStatsBtn, viewAchievesBtn);
 		return leftPaneScroll;
 	}
@@ -406,18 +406,23 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * 
 	 * @return The VBox containing the elements of the screen.
 	 */
-	private VBox initCreateAccountScreen() {
-		VBox retval = new VBox();
+	private GridPane initCreateAccountScreen() {
+		GridPane retval = new GridPane();
+		ColumnConstraints c1 = new ColumnConstraints();
+		ColumnConstraints c2 = new ColumnConstraints();
+		ColumnConstraints c3 = new ColumnConstraints();
+		c1.setPercentWidth(30);
+		c2.setPercentWidth(40);
+		c3.setPercentWidth(30);
+		retval.getColumnConstraints().addAll(c1,c2,c3);
+		VBox box = new VBox();
 		Label info = new Label("Type in your Username and Password, then click the Create Account Button.");
 		TextField username = new TextField();
 		username.setPromptText("username");
-		username.setPrefWidth(300);
-		username.setPrefHeight(25);
+		username.setPrefSize(99999, 50);
 		PasswordField password = new PasswordField();
 		password.setPromptText("password");
-		password.setPrefWidth(300);
-		password.setPrefHeight(25);
-		
+		password.setPrefSize(99999, 50);
 		password.setOnKeyPressed((key) ->{
 			if(key.getCode() == KeyCode.ENTER) {
 				createNewAccountButtonOnFinishedClick();
@@ -429,11 +434,12 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			createNewAccountButtonOnFinishedClick();
 		});
 				
-		retval.getChildren().addAll(info, username, password, makeaccount);
-		retval.setPrefWidth(600);
-		retval.setPrefHeight(600);
+		box.getChildren().addAll(info, username, password, makeaccount);
+		makeaccount.setPrefSize(99999, 50);
 		
-		this.initthemes.addRegion(201, retval, "Create Account Screen background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_CA));
+		retval.add(box,1,0);
+		this.initthemes.addRegion(201, retval, "Create Account Screen background", new ThemeRegionProp(ThemeRegionProp.GRIDPANE, ThemeRegionProp.LOC_MI_CA,ThemeRegionProp.INT_REG));
+		this.initthemes.addRegion(201.1, retval, "Create Account Screen background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_CA,ThemeRegionProp.INT_REG));
 		this.initthemes.addRegion(202, info, "Create Account info label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_CA));
 		this.initthemes.addRegion(203, username, "Create Account Screen username input", new ThemeRegionProp(ThemeRegionProp.TEXTINPUT, ThemeRegionProp.LOC_MI_CA));
 		this.initthemes.addRegion(204, password, "Create Account Screen password input", new ThemeRegionProp(ThemeRegionProp.TEXTINPUT, ThemeRegionProp.LOC_MI_CA));
@@ -527,7 +533,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private VBox initStatsScreen() {
 		VBox screen = new VBox();
 		statsTable = new TableView<>();
-		statsSelection = new ComboBox();
+		statsSelection = new ComboBox<String>();
 
 		// Fill the combobox to select various statistics
 		statsSelection.getItems().add("All Games");
@@ -554,6 +560,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		statsTable.getColumns().addAll(gameName, outcome, score, date);
 		handleStatsSelectionChange();
 		screen.getChildren().addAll(statsSelection, statsTable);
+		
+		this.initthemes.addRegion(289.001, screen, "Stats Screen: VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_USM, ThemeRegionProp.INT_REG));
+		this.initthemes.addRegion(289.002, statsTable, "Stats Screen: Table View", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_USM));
+		this.initthemes.addRegion(289.003, statsSelection, "Stats Screen: Table View", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_USM));
 		return screen;
 	}
 
@@ -563,7 +573,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private GridPane initThemeMenu() {
 		this.basicthemecreator = this.initthemes.getBasicThemeCreator();
-		this.advancedthemecreator = this.initthemes.getThemeCreator();
 		this.emptythemecreator = new HBox();
 		
 		GridPane retval = new GridPane();
@@ -577,22 +586,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		backtosettings.setOnMouseClicked((click) -> {
 			this.setCenter(this.initUserSettingsMainMenu);
 		});
-		Button showBasicThemeEditorButton = new Button();
-		Button showAdvancedThemeEditorButton = new Button();
 		
-		showBasicThemeEditorButton.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/themeButtonSwitchToBasicThemeEditor.png"))));
-		showBasicThemeEditorButton.setOnMouseClicked((click) -> {
-			right.getChildren().set(0,this.basicthemecreator);
-			left.getChildren().set(1, showAdvancedThemeEditorButton);
-			
-		});
-		showAdvancedThemeEditorButton.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/themeButtonSwitchToAdvancedThemeEditor.png"))));
-		showAdvancedThemeEditorButton.setOnMouseClicked((click) -> {
-			right.getChildren().set(0,this.advancedthemecreator);
-			left.getChildren().set(1, showBasicThemeEditorButton);
-		});
-		
-		left.getChildren().addAll(backtosettings,showAdvancedThemeEditorButton);
+		left.getChildren().addAll(backtosettings);
 		
 		Button theme0 = new Button();
 		theme0.setGraphic(this.initthemes.getThemeIcon(0));
@@ -621,8 +616,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(221, left, "Theme Menu left side overall background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_TM, ThemeRegionProp.INT_REG));
 		this.initthemes.addRegion(222, right, "Theme Menu right side overall background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_TM, ThemeRegionProp.INT_REG));
 		this.initthemes.addRegion(223, backtosettings, "Theme Menu back to user settings menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
-		this.initthemes.addRegion(223.01, showBasicThemeEditorButton, "Theme Menu show basic theme editor menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
-		this.initthemes.addRegion(223.02, showAdvancedThemeEditorButton, "Theme Menu show advanced theme editor menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(224, theme0, "Theme Menu Default Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(225, theme1, "Theme Menu Night Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(226, theme2, "Theme Menu USA Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
@@ -693,6 +686,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		}
 
 		screen.getChildren().addAll(title, grid);
+		
+		this.initthemes.addRegion(288.001, screen, "Achievements Screen: VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_USM, ThemeRegionProp.INT_REG));
+		this.initthemes.addRegion(288.002, grid, "Achievements Screen: Gridpane", new ThemeRegionProp(ThemeRegionProp.GRIDPANE, ThemeRegionProp.LOC_MI_USM, ThemeRegionProp.INT_REG));
+		this.initthemes.addRegion(288.003, title, "Achievements Screen: Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_USM));
 		return screen;
 	}
 
@@ -789,8 +786,9 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private void createNewAccountButtonClick() {
 		// Reset state of the Create Account Menu
-		Label info = (Label) this.initCreateAccountMenu.getChildren().get(0);
-		Button button = (Button) this.initCreateAccountMenu.getChildren().get(3);
+		VBox it = (VBox) this.initCreateAccountMenu.getChildren().get(0);
+		Label info = (Label) it.getChildren().get(0);
+		Button button = (Button) it.getChildren().get(3);
 		info.setText("Type in your Username and Password, then click the Create Account Button.");
 		button.setTextFill(Color.BLACK);
 		// Set it

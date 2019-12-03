@@ -1,420 +1,606 @@
 package Gamejam;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import controller.AccountManager;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
-import model.SanityCheckFailedException;
 
-/**
- * The UI and relevant functions to create custom themes.
- * @author Joey McMaster
- *
- */
-public class ThemeCreator extends HBox 
+public class ThemeCreator extends GridPane
 {
-	private ColorPicker colorpicker;
-	private Paint currentworkingcolor;
-	private Paint gradient_color_1;
-	private Paint gradient_color_2;
+	public static final double BUTTON_PREF_X_SIZE = 250;
+	public static final double BUTTON_PREF_Y_SIZE = 75;
 	
-	private Paint curTextColor;
-	private Paint curBorderColor;
-	private Paint curBackgroundColor;
-	
-	private VBox leftcol;
 	private GamejamMainScreenTheme screen;
-	private Rectangle previewarea;
-	private ChoiceBox<String> elementselector;
-	private ChoiceBox<String> groupselector;
-	private ArrayList<RegionPair> regions;
-	private HashMap<String,Integer> regiondescriptionmap;
-	private HashMap<String,Integer> regiongroupmap;
-	private int currentworkingid = 0;
-	private int currentgroupid = 0;
-	private boolean themegroupmode = false;
-	private boolean doinitonce = true;
-	private BorderStrokeStyle currentborderstyle = BorderStrokeStyle.SOLID;
-	private Border currentborder = GamejamMainScreenTheme.noBorder();
-	private double currentborderwidths = 1;
-	public ThemeCreator(GamejamMainScreenTheme screen) 
+	private VBox borderSetter;
+	private VBox textSetter;
+	private VBox backgroundSetter;
+	private VBox mainarea;
+	private VBox themeUtil;
+	
+	private ComboBox<String> elementSetter;
+	private ComboBox<String> userThemeNames;
+	private String elementStr;
+	
+	private Paint borderPaint;
+	private Paint backgroundPaint;
+	private Paint textPaint;
+	
+	private Background backgroundgen;
+	private Border brodergen;
+	
+	private double borderthickness;
+	private BorderStrokeStyle borderstyle;
+	private Button borderPreview;
+	private Button textPreview;
+	private Button backgroundPreview;
+	private CheckBox updateinrealtimecheckbox;
+	
+	
+	private ThemeDynamic workingtheme;
+	private String customthemename = "Custom Theme 1";
+	
+	Label textlabel;
+	Label borderlabel;
+	Label backgroundlabel;
+	
+	private Button returntomainmenubutton;
+	private Button returntomainmenubutton1;
+	private Button returntomainmenubutton2;
+	private Button returntomainmenubutton3;
+	
+	private VBox textintermediatevbox;
+	private VBox backgroundintermediatevbox;
+	private VBox borderintermediatevbox;
+	
+	private int workingthemeindex = 0;
+	
+	boolean debugger = false;
+	
+	public ThemeCreator(GamejamMainScreenTheme screen)
 	{
 		this.screen = screen;
-		this.previewarea = new Rectangle(150,28, Color.WHITESMOKE);
-		this.currentworkingcolor = Color.WHITE;
-		this.gradient_color_1 = Color.WHITE;
-		this.gradient_color_2 = Color.WHITE;
-		this.curTextColor = Color.BLACK;
-		this.curBorderColor = Color.BLACK;
-		this.curBackgroundColor = Color.WHITE;
-		this.leftcol = new VBox();
-		this.colorpicker = new ColorPicker();
-		this.groupselector = new ChoiceBox<String>();
-		this.elementselector = new ChoiceBox<String>();
-		this.regiondescriptionmap = new HashMap<String,Integer>();
-		this.regiongroupmap = new HashMap<String,Integer>();
-		populateRegionGroups();
+		this.borderthickness = 2.0;
+		this.borderstyle = BorderStrokeStyle.SOLID;
+		this.returntomainmenubutton = new Button("Return to Previous Screen");
+		this.returntomainmenubutton.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.returntomainmenubutton1 = new Button("Return to Previous Screen");
+		this.returntomainmenubutton1.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.returntomainmenubutton2 = new Button("Return to Previous Screen");
+		this.returntomainmenubutton2.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.returntomainmenubutton3 = new Button("Return to Previous Screen");
+		this.returntomainmenubutton3.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.elementSetter = setUpElementSetter();
+		this.textSetter = setUpTextSetter();
+		this.borderSetter = setUpBorderSetter();
+		this.backgroundSetter = setUpBackgroundSetter();
+		this.mainarea = new VBox();
+		this.elementStr = "Buttons";
+		this.textlabel = new Label("Select the color of the text of the selected parts of the GUI");
+		this.borderlabel = new Label("Select the properties of the borders of the selected parts of the GUI");
+		this.backgroundlabel = new Label("Select background color of the selected parts of the GUI");
+		this.textintermediatevbox = new VBox();
+		this.backgroundintermediatevbox = new VBox();
+		this.borderintermediatevbox = new VBox();
+		this.updateinrealtimecheckbox = new CheckBox("Update after making any change");
+		this.updateinrealtimecheckbox.setSelected(true);
+		this.themeUtil = setUpOtherThemeSettings();
 		
-		this.groupselector.getItems().addAll(this.regiongroupmap.keySet());
-		this.groupselector.setValue("All Buttons");
-		this.groupselector.setOnAction((click) -> 
+		
+		Label des = new Label("Select the part of the GUI to edit");
+		Button updateScreen = new Button("Send changes to GUI!");
+		Button loadTextEditor = new Button("Edit Text Color");
+		Button loadBackgroundEditor = new Button("Edit Background Color");
+		Button loadBorderEditor = new Button("Edit Border");
+		
+		Button restartThemeButton =  new Button("Theme Options");
+		restartThemeButton.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		
+		des.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.elementSetter.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		loadTextEditor.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		loadBackgroundEditor.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		loadBorderEditor.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		updateScreen.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		
+		this.mainarea.getChildren().addAll(des,this.updateinrealtimecheckbox, this.elementSetter,loadTextEditor,loadBackgroundEditor,loadBorderEditor,restartThemeButton,updateScreen);
+		this.textintermediatevbox.getChildren().addAll(this.textlabel,this.textSetter);
+		this.backgroundintermediatevbox.getChildren().addAll(this.backgroundlabel,this.backgroundSetter);
+		this.borderintermediatevbox.getChildren().addAll(this.borderlabel,this.borderSetter);
+		
+		this.textintermediatevbox.setPadding(new Insets(50,0,50,0));
+		this.backgroundintermediatevbox.setPadding(new Insets(50,0,50,0));
+		this.borderintermediatevbox.setPadding(new Insets(50,0,50,0));
+		this.mainarea.setPadding(new Insets(50,0,50,0));
+		
+		this.textintermediatevbox.setAlignment(Pos.CENTER);
+		this.backgroundintermediatevbox.setAlignment(Pos.CENTER);
+		this.borderintermediatevbox.setAlignment(Pos.CENTER);
+		this.mainarea.setAlignment(Pos.CENTER);
+		
+		updateScreen.setOnAction((click) -> 
 		{
-			this.themegroupmode = true;
-			this.currentgroupid =  this.regiongroupmap.get(this.groupselector.getValue());
+			updateThemeData();
+			this.workingtheme.generateTheme();
+			this.screen.updateTheme(-1);
+			printCurrentTheme();
 		});
-		this.colorpicker.setOnAction((click) -> 
+		loadTextEditor.setOnAction((click) -> 
 		{
-			this.currentworkingcolor = this.colorpicker.getValue();
-			this.previewarea.setFill(this.colorpicker.getValue());
+			this.getChildren().clear();
+			this.add(this.textintermediatevbox,1,0);
+		});
+		loadBackgroundEditor.setOnAction((click) -> 
+		{
+			this.getChildren().clear();
+			this.add(this.backgroundintermediatevbox,1,0);
+		});
+		loadBorderEditor.setOnAction((click) -> 
+		{
+			this.getChildren().clear();
+			this.add(this.borderintermediatevbox,1,0);
+		});
+		this.returntomainmenubutton.setOnAction((click) -> 
+		{
+			this.getChildren().clear();
+			this.add(this.mainarea,1,0);
+		});
+		this.returntomainmenubutton1.setOnAction((click) -> 
+		{
+			this.getChildren().clear();
+			this.add(this.mainarea,1,0);
+		});
+		this.returntomainmenubutton2.setOnAction((click) -> 
+		{
+			this.getChildren().clear();
+			this.add(this.mainarea,1,0);
+		});
+		this.returntomainmenubutton3.setOnAction((click) -> 
+		{
+			this.getChildren().clear();
+			this.add(this.mainarea,1,0);
 		});
 		
-		HBox topleftbox = new HBox();
-		HBox middletopleftbox = new HBox();
-		Label infotext = new Label("        Color Selector                                            Element Selector                                                          Group Selector                               Preview");
-		topleftbox.getChildren().add(infotext);
-		middletopleftbox.getChildren().addAll(this.colorpicker,this.elementselector,this.groupselector,this.previewarea);
-		
-		HBox updatebox = new HBox();
-		Button updateTheme = new Button("Update Custom Theme Data");
-		updateTheme.setOnAction((click) -> 
+		restartThemeButton.setOnAction((click) -> 
 		{
-			ThemePair p = new ThemePair(GamejamMainScreenTheme.solidBackgroundSetup(this.curBackgroundColor),this.currentborder,this.curTextColor);
-			if (this.themegroupmode)
+			this.getChildren().clear();
+			this.add(this.themeUtil,1,0);
+		});
+		
+		ColumnConstraints c1 = new ColumnConstraints();
+		ColumnConstraints c2 = new ColumnConstraints();
+		ColumnConstraints c3 = new ColumnConstraints();
+		c1.setPercentWidth(5);
+		c2.setPercentWidth(90);
+		c3.setPercentWidth(5);
+		this.getColumnConstraints().addAll(c1,c2,c3);
+		
+		this.add(this.mainarea,1,0);
+		
+		this.screen.addRegion(450, this.returntomainmenubutton , "Basic Theme Editor: Return to Main Menu Button (Background Editor) Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(451, this.returntomainmenubutton1 , "Basic Theme Editor: Return to Main Menu Button (Text Editor) Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(452, this.returntomainmenubutton2 , "Basic Theme Editor: Return to Main Menu Button (Border Editor) Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(452.1, this.returntomainmenubutton3 , "Basic Theme Editor: Return to Main Menu Button (Other Editor) Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(453, updateScreen, "Basic Theme Editor: Update Screen Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(454, restartThemeButton, "Basic Theme Editor: Switch to Util Menu", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		//this.screen.addRegion(454, loadTextEditor, "Basic Theme Editor: Load Text Editor Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		//this.screen.addRegion(455, loadBackgroundEditor, "Basic Theme Editor: Load Background Editor Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		//this.screen.addRegion(456, loadBorderEditor, "Basic Theme Editor: Load Border Editor Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(457, this.mainarea, "Basic Theme Editor: Main Section VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(457.01, this.textintermediatevbox, "Basic Theme Editor: Text Editor Intermediate VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(457.02, this.backgroundintermediatevbox, "Basic Theme Editor: Background Editor Intermediate VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(457.03, this.borderintermediatevbox, "Basic Theme Editor: Border Editor Intermediate VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		
+		this.screen.addRegion(458, this.textlabel, "Basic Theme Editor:  Text Editor Top Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(459, this.backgroundlabel, "Basic Theme Editor:  Background Editor Top Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(460, this.borderlabel, "Basic Theme Editor:  Border Editor Top Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(461, this.updateinrealtimecheckbox, "Basic Theme Editor:  Update UI after each edit Checkbox", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(462, des, "Basic Theme Editor:  Primary Top Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_BTM));
+	
+	}
+	/**
+	 * Should be called everytime a new user logs in.
+	 */
+	public void updateObjectOnUserChange()
+	{
+		ArrayList<String> themenames = AccountManager.getInstance().getThemeNames();
+		if (themenames.size() == 0)
+		{
+			themenames.add("Default Custom Theme");
+			this.customthemename = "Default Custom Theme";
+		}
+		this.userThemeNames = new ComboBox<String>();
+		this.userThemeNames.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.userThemeNames.getItems().addAll(themenames);
+		this.userThemeNames.setValue(themenames.get(0));
+	}
+	private void updateMainScreenOnElementSelection(String element)
+	{
+		boolean[] enable = ThemeDynamic.englishToGUIRegionsToShowId(element);
+		
+		// Fixes the bug where initially, all buttons are disabled. Assumes we are using an element that accepts everything such as Buttons.
+		// Also assumes if englishToGUIRegionsToShowId returns all false, that we have the start up case.    
+		if (!enable[0] && !enable[1] && !enable[2])
+		{
+			enable[0] = true;
+			enable[1] = true;
+			enable[2] = true;
+		}
+		
+		if (enable[0])
+		{
+			Button target = (Button) this.mainarea.getChildren().get(3);
+			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.LIGHTGREEN));
+			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
+			target.setDisable(false);
+		} 
+		else 
+		{
+			Button target = (Button) this.mainarea.getChildren().get(3);
+			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.INDIANRED));
+			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
+			target.setDisable(true);
+		}
+		if (enable[1])
+		{
+			Button target = (Button) this.mainarea.getChildren().get(5);
+			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.LIGHTGREEN));
+			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
+			target.setDisable(false);
+		}
+		else 
+		{
+			Button target = (Button) this.mainarea.getChildren().get(5);
+			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.INDIANRED));
+			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
+			target.setDisable(true);
+		}
+		if (enable[2])
+		{
+			Button target = (Button) this.mainarea.getChildren().get(4);
+			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.LIGHTGREEN));
+			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
+			target.setDisable(false);
+		}
+		else 
+		{
+			Button target = (Button) this.mainarea.getChildren().get(4);
+			target.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.INDIANRED));
+			target.setBorder(GamejamMainScreenTheme.simpleBorder(Color.BLACK, BorderStrokeStyle.SOLID, 2));
+			target.setDisable(true);
+		}
+		
+		// Resets the coloring
+		this.brodergen = null;
+		this.backgroundgen = null;
+		this.textPaint = null;
+	}
+	public void finishConstructing()
+	{
+		this.workingtheme = new ThemeDynamic(this.customthemename, screen.getRegionCount(), screen.getAllRegions(),this.screen);
+		updateMainScreenOnElementSelection("Button");
+		this.setPrefHeight(9999);
+	}
+	private VBox setUpBackgroundSetter()
+	{
+		VBox internalbox = new VBox();
+		internalbox.setAlignment(Pos.CENTER);
+		
+		this.backgroundPreview = new Button("Background Preview");
+		ColorPicker color = new ColorPicker();
+		color.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		color.setOnAction((click) -> 
+		{
+			this.backgroundPaint = color.getValue();
+			this.backgroundgen = GamejamMainScreenTheme.solidBackgroundSetup(this.backgroundPaint);
+			this.backgroundPreview.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(this.backgroundPaint));
+			doAutoUpdate();
+		});
+		this.backgroundPreview.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		internalbox.getChildren().addAll(color,this.backgroundPreview,this.returntomainmenubutton);
+		internalbox.setPadding(new Insets(50,0,50,0));
+		
+		this.screen.addRegion(470, internalbox, "Basic Theme Editor: Intermidate Background Setter VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(471, color, "Basic Theme Editor: Background Color Picker", new ThemeRegionProp(ThemeRegionProp.COLORPICKER, ThemeRegionProp.LOC_MI_BTM));
+		
+		return internalbox;
+	}
+	private VBox setUpOtherThemeSettings()
+	{
+		VBox retval = new VBox();
+		retval.setAlignment(Pos.CENTER);
+		
+		Label namefieldlabel = new Label("Input your desired theme name");
+		TextField box = new TextField(this.customthemename);
+		box.setPrefSize(100, BUTTON_PREF_Y_SIZE);
+		updateObjectOnUserChange();
+		this.userThemeNames.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.userThemeNames.setOnAction((click) -> 
+		{
+			boolean result = loadCustomDynamicTheme(this.userThemeNames.getValue(),AccountManager.getInstance().getThemePath(this.userThemeNames.getValue()));
+			if (!result)
 			{
-				applySettingToGroup(p);
-			} 
-			else 
-			{
-				this.screen.getCustomTheme(0).setThemeData(this.currentworkingid, p);
+				Gamejam.DPrint("[DEBUG]: Failed to load Custom Theme " + this.userThemeNames.getValue());
 			}
 		});
-		Button setTheme = new Button("Set Custom Theme");
-		setTheme.setOnAction((click) -> 
-		{
-			this.screen.updateTheme(-1);
-		});
-		Button resetCustomTheme = new Button("Reset Custom Theme");
-		resetCustomTheme.setOnAction((click) -> 
-		{
-			this.screen.resetCustomTheme(0);
-		});
-		// DEBUG REMOVE WHEN DONE
-		Button debugger_codedumper = new Button("Dump Theme Code");
-		debugger_codedumper.setOnAction((click) -> 
-		{
-			System.out.println(this.screen.getTheme(-1).dumpThemeToCode());
-		});
-		//
-		//updatebox.getChildren().addAll(updateTheme,setTheme,resetCustomTheme,debugger_codedumper);
-		updatebox.getChildren().addAll(updateTheme,setTheme,resetCustomTheme);
 		
-		
-		// Create the Border Creator
-		HBox borderopts = new HBox();
-		Button border_fetchPaint = new Button("Set Border Color");
-		Button border_finish = new Button("Set Border");
-		ChoiceBox<String> border_styleing = new ChoiceBox<String>();
-		TextField border_widths = new TextField();
-		CheckBox border_top = new CheckBox("Draw Top");
-		CheckBox border_bottom = new CheckBox("Draw Bottom");
-		CheckBox border_left = new CheckBox("Draw Left");
-		CheckBox border_right = new CheckBox("Draw Right");
-		HBox border_preview = new HBox();                              // This is a preview element and should not be themeable from the system.
-		border_preview.setBackground(GamejamMainScreenTheme.solidBackgroundSetup(Color.WHITESMOKE));
-		Label border_preview_showlabel = new Label("Border Preview");  // This is a preview element and should not be themeable from the system.
-		border_preview.getChildren().add(border_preview_showlabel);
-		Label border_label = new Label("Border Type                   Border Width                                       Border Drawing                                                               Border Preview");
-		border_top.setSelected(true);
-		border_bottom.setSelected(true);
-		border_left.setSelected(true);
-		border_right.setSelected(true);
-		
-		border_styleing.getItems().addAll("Solid","Dashed","Dotted");
-		border_styleing.setValue("Solid");
-		border_styleing.setOnAction((click) -> 
+		Button b = new Button("Save Current Theme");
+		b.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		b.setOnAction((click) -> 
 		{
-			String borderstyle = border_styleing.getValue();
-			if (borderstyle.equals("Solid"))
+			this.customthemename = box.getText();
+			updateThemeData();
+			boolean result =  saveCustomDynamicTheme(this.customthemename);
+			if (!result)
 			{
-				this.currentborderstyle = BorderStrokeStyle.SOLID;
-			} 
-			else if (borderstyle.equals("Dashed"))
+				Gamejam.DPrint("[DEBUG]: Failed to save Custom Theme " + this.userThemeNames.getValue());
+			}
+		});
+		
+		Button debug_button = new Button("DEBUG: Load");
+		debug_button.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		debug_button.setOnAction((click) -> 
+		{
+			boolean result =  loadCustomDynamicTheme("debugtheme","/custom-theme/test-debugtheme.ct");
+			if (!result)
 			{
-				this.currentborderstyle = BorderStrokeStyle.DASHED;
+				Gamejam.DPrint("[DEBUG]: Failed to load Custom debug Theme ");
+			}
+		});
+		retval.getChildren().addAll(namefieldlabel, box, this.userThemeNames, b, this.returntomainmenubutton3);
+		
+		this.screen.addRegion(491, retval, "Basic Theme Editor: Other Theme Settings Menu HBox", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(492, namefieldlabel, "Basic Theme Editor: Other Theme Settings Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(493, box, "Basic Theme Editor: Theme Name Input", new ThemeRegionProp(ThemeRegionProp.TEXTINPUT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(494, this.userThemeNames, "Basic Theme Editor: Select Custom Theme Combo Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_BTM));
+		return retval;
+	}
+	
+	public boolean saveCustomDynamicTheme(String themename)
+	{
+		if (themename == null)
+		{
+			return false;
+		}
+		FileOutputStream fos;
+		ObjectOutputStream oos;
+		try {
+			String fname = AccountManager.getInstance().getCurUsername() + "-" + themename + ".ct";
+			if (debugger)
+			{
+				fname = AccountManager.getInstance().getCurUsername() + "-debugtheme.ct";
+			}
+			String sep = System.getProperty("file.separator");
+			String filepath = System.getProperty("user.dir") + sep + "custom-theme";
+			if(!new File(filepath).exists()) {
+				new File(filepath).mkdir();
+			}
+			filepath += sep + fname;
+			System.out.println("Saving theme!");
+			fos = new FileOutputStream(filepath);			
+			oos = new ObjectOutputStream(fos);
+			oos.writeObject(this.workingtheme.dumpCoreData());
+			oos.close();
+			
+			AccountManager.getInstance().addNewTheme(themename, filepath);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean loadCustomDynamicTheme(String themename, String filepath)
+	{
+		if (debugger)
+		{
+			String fname = AccountManager.getInstance().getCurUsername() + "-debugtheme.ct";
+			String sep = System.getProperty("file.separator");
+			filepath = System.getProperty("user.dir") + sep + "custom-theme" + sep + fname;
+		} 
+		
+		if (filepath == null) {
+			return false; // Tried to load a non-existant theme
+		}
+		try {
+			File file = new File(filepath);
+			System.out.println("In loading try block!");
+			if (file.exists()) {
+				System.out.println("In If statment block");
+				FileInputStream fis = new FileInputStream(file);
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				ThemeSerializable tse = (ThemeSerializable) ois.readObject();
+				this.workingtheme.importCoreData(tse);
+				this.customthemename = themename;
+				System.out.println("Loaded theme!");
+				ois.close();
+				file.delete();
+			}
+		} catch(IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		}
+		System.out.println("Left loaded try block");
+		if (this.updateinrealtimecheckbox.isSelected())
+		{
+			this.screen.setCustomTheme(0,this.workingtheme);
+		}
+		return true;
+	}
+	private VBox setUpTextSetter()
+	{
+		VBox retval = new VBox();
+		retval.setAlignment(Pos.CENTER);
+		this.textPreview = new Button("Text Preview");
+		this.textPreview.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		ColorPicker color = new ColorPicker();
+		color.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		color.setOnAction((click) -> 
+		{
+			this.textPaint = color.getValue();
+			this.textPreview.setTextFill(this.textPaint);
+			doAutoUpdate();
+		});
+		
+		this.screen.addRegion(472, retval, "Basic Theme Editor: Intermidate Text Setter VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(473, color, "Basic Theme Editor: Text Color Picker", new ThemeRegionProp(ThemeRegionProp.COLORPICKER, ThemeRegionProp.LOC_MI_BTM));
+		
+		retval.getChildren().addAll(color,this.textPreview,this.returntomainmenubutton1);
+		
+		return retval;
+	}
+	private ComboBox<String> setUpElementSetter()
+	{
+		ComboBox<String> box = new ComboBox<String>();
+		ArrayList<String> rules = ThemeDynamic.getSurportedEnglishRules();
+		box.getItems().addAll(rules);
+		box.setValue(rules.get(0));
+		box.setOnAction((click) -> 
+		{
+			this.elementStr = box.getValue();
+			updateMainScreenOnElementSelection(this.elementStr);
+			doAutoUpdate();
+		});
+		this.screen.addRegion(478, box, "Basic Theme Editor: Combobox Element Selector", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_BTM));
+		return box;
+	}
+	private VBox setUpBorderSetter()
+	{
+		VBox retval = new VBox();
+		retval.setAlignment(Pos.CENTER);
+		ColorPicker color = new ColorPicker();
+		color.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		color.setOnAction((click) -> 
+		{
+			this.borderPaint = color.getValue();
+			updateBorderPreview();
+			doAutoUpdate();
+		});
+		ComboBox<String> box = new ComboBox<String>();
+		box.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		box.getItems().addAll("None","Very Thin","Thin","Normal","Wide","Thick","Thicker","Very Thick","VERY Thick");
+		box.setOnAction((click) -> 
+		{
+			String value = box.getValue();
+			if (value.equals("None"))
+			{
+				this.borderthickness = 0.0;
+			}
+			else if (value.equals("Very Thin"))
+			{
+				this.borderthickness = 0.5;
+			}
+			else if (value.equals("Thin"))
+			{
+				this.borderthickness = 1.0;
+			}
+			else if (value.equals("Normal"))
+			{
+				this.borderthickness = 2.0;
+			}
+			else if (value.equals("Wide"))
+			{
+				this.borderthickness = 3.0;
+			}
+			else if (value.equals("Thick"))
+			{
+				this.borderthickness = 4.0;
+			}
+			else if (value.equals("Thicker"))
+			{
+				this.borderthickness = 6.0;
+			}
+			else if (value.equals("Very Thick"))
+			{
+				this.borderthickness = 10.0;
 			}
 			else
 			{
-				this.currentborderstyle = BorderStrokeStyle.DOTTED;
+				this.borderthickness = 25.0;
 			}
+			updateBorderPreview();
+			doAutoUpdate();
 		});
-		
-		border_finish.setOnAction((click) -> 
+		box.setValue("Normal");
+		ComboBox<String> box1 = new ComboBox<String>();
+		box1.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		box1.getItems().addAll("Solid","Dashed","Dotted");
+		box1.setOnAction((click) -> 
 		{
-			// Apply Checkbox settings
-			BorderStrokeStyle ts = this.currentborderstyle;
-			BorderStrokeStyle bs = this.currentborderstyle;
-			BorderStrokeStyle ls = this.currentborderstyle;
-			BorderStrokeStyle rs = this.currentborderstyle;
-			if (!border_top.isSelected())
+			String borderstyle = box1.getValue();
+			if (borderstyle.equals("Solid"))
 			{
-				ts = BorderStrokeStyle.NONE;
-			}
-			if (!border_bottom.isSelected())
+				this.borderstyle = BorderStrokeStyle.SOLID;
+			} 
+			else if (borderstyle.equals("Dashed"))
 			{
-				bs = BorderStrokeStyle.NONE;
+				this.borderstyle = BorderStrokeStyle.DASHED;
 			}
-			if (!border_left.isSelected())
+			else
 			{
-				ls = BorderStrokeStyle.NONE;
+				this.borderstyle = BorderStrokeStyle.DOTTED;
 			}
-			if (!border_right.isSelected())
-			{
-				rs = BorderStrokeStyle.NONE;
-			}
-			// Fetch width
-			this.currentborderwidths = getWidthFromStr(border_widths.getText());
-			
-			this.currentborder = new Border(new BorderStroke(this.curBorderColor,this.curBorderColor,this.curBorderColor,this.curBorderColor,ts,rs,bs,ls,CornerRadii.EMPTY,new BorderWidths(this.currentborderwidths),new Insets(0)));
-			border_preview.setBorder(this.currentborder);
+			updateBorderPreview();
+			doAutoUpdate();
 		});
-		// Set preview to default settings
-		this.currentborder = new Border(new BorderStroke(this.curBorderColor,this.curBorderColor,this.curBorderColor,this.curBorderColor,this.currentborderstyle,this.currentborderstyle,this.currentborderstyle,this.currentborderstyle,CornerRadii.EMPTY,new BorderWidths(this.currentborderwidths),new Insets(0)));
-		border_preview.setBorder(this.currentborder);
+		box1.setValue("Solid");
 		
-		borderopts.getChildren().addAll(border_styleing,border_widths,border_top,border_bottom,border_left,border_right,border_finish,border_preview);
+		this.borderPreview = new Button("Border Preview");
+		this.borderPreview.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		retval.getChildren().addAll(color,box,box1,this.borderPreview,this.returntomainmenubutton2);
 		
-		// Create the Basic Gradient Creator!
-		HBox backgroundopts = new HBox();
-		Button bg_gradient_simple_paint_set_primary = new Button("Get Gradient Color 1");
-		Button bg_gradient_simple_paint_set_secondary = new Button("Get Gradient Color 2");
-		Button bg_gradient_set_paint = new Button("Set Curent Color to Gradient");
-		CheckBox bg_gradient_directional_checkbox = new CheckBox("Up/Down");
-		Rectangle gradient_c1_preview = new Rectangle(90,28, Color.WHITE);
-		Rectangle gradient_c2_preview = new Rectangle(90,28, Color.WHITE);
-		Rectangle gradient_preview = new Rectangle(100,28, Color.WHITE);
-		bg_gradient_directional_checkbox.setOnAction((click) -> 
-		{
-			gradient_preview.setFill(GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected()));
-		});
+		this.screen.addRegion(474, retval, "Basic Theme Editor: Intermidate Border Setter VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(475, color, "Basic Theme Editor: Text Color Picker", new ThemeRegionProp(ThemeRegionProp.COLORPICKER, ThemeRegionProp.LOC_MI_BTM));
 		
-		bg_gradient_simple_paint_set_primary.setOnAction((click) -> 
-		{
-			if (this.currentworkingcolor instanceof LinearGradient)
-			{
-				// Only solid colors can be used for this
-				return;
-			}
-			this.gradient_color_1 = this.currentworkingcolor;
-			gradient_c1_preview.setFill(this.currentworkingcolor);
-			gradient_preview.setFill(GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected()));
-		});
-		bg_gradient_simple_paint_set_secondary.setOnAction((click) -> 
-		{
-			if (this.currentworkingcolor instanceof LinearGradient)
-			{
-				// Only solid colors can be used for this
-				return;
-			}
-			this.gradient_color_2 = this.currentworkingcolor;
-			gradient_c2_preview.setFill(this.currentworkingcolor);
-			gradient_preview.setFill(GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected()));
-		});
-		bg_gradient_set_paint.setOnAction((click) -> 
-		{
-			this.currentworkingcolor = GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected());
-			this.previewarea.setFill(GamejamMainScreenTheme.linGrdSimpleSetup(this.gradient_color_1,this.gradient_color_2,!bg_gradient_directional_checkbox.isSelected()));
-		});
-		
-		backgroundopts.getChildren().addAll(bg_gradient_simple_paint_set_primary,gradient_c1_preview,bg_gradient_simple_paint_set_secondary,gradient_c2_preview,bg_gradient_directional_checkbox,bg_gradient_set_paint,gradient_preview);
-		
-		// Other Color Setters
-		HBox othercolorsetterhbox = new HBox();
-		Button bg_getPaint = new Button("Set Background Color");
-		Button txt_getPaint = new Button("Set Text Color");
-		Rectangle txtPaintPreview = new Rectangle(150,28, Color.WHITESMOKE);
-		Rectangle bgPaintPreview = new Rectangle(150,28, Color.WHITESMOKE);
-		Rectangle borderPaintPreview = new Rectangle(150,28, Color.WHITESMOKE);
-		border_fetchPaint.setOnAction((click) -> 
-		{
-			this.curBorderColor = this.currentworkingcolor;
-			borderPaintPreview.setFill(this.currentworkingcolor);
-		});
-		bg_getPaint.setOnAction((click) -> 
-		{
-			this.curBackgroundColor = this.currentworkingcolor;
-			bgPaintPreview.setFill(this.currentworkingcolor);
-		});
-		txt_getPaint.setOnAction((click) -> 
-		{
-			this.curTextColor = this.currentworkingcolor;
-			txtPaintPreview.setFill(this.currentworkingcolor);
-		});
-		
-		othercolorsetterhbox.getChildren().addAll(border_fetchPaint,borderPaintPreview,bg_getPaint,bgPaintPreview,txt_getPaint,txtPaintPreview);
-		
-		
-		this.leftcol.getChildren().addAll(topleftbox,middletopleftbox,othercolorsetterhbox,border_label,borderopts,backgroundopts,updatebox);
-		this.getChildren().addAll(this.leftcol);
-		
-		this.screen.addRegion(400, this.leftcol, "Theme Creator left vbox background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
-		this.screen.addRegion(401, this.elementselector, "Theme Creator Element Selector Combo Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(402, this.groupselector, "Theme Creator Element Group Combo Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(403, topleftbox, "Theme Creator top label background box", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
-		this.screen.addRegion(404, middletopleftbox, "Theme Creator top selections background box", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
-		this.screen.addRegion(405, infotext, "Theme Creator top left label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(406, updatebox, "Theme Creator middle update buttons background box", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
-		this.screen.addRegion(408, updateTheme, "Theme Creator update theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(409, setTheme, "Theme Creator set theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(410, resetCustomTheme, "Theme Creator reset theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(411, borderopts, "Theme Creator Borders Creator HBox", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
-		this.screen.addRegion(412, border_fetchPaint, "Theme Creator get color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(413, border_finish, "Theme Creator Border Finalize Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(414, border_styleing, "Theme Creator Border Styling Choice Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(415, border_widths, "Theme Creator Border TextField", new ThemeRegionProp(ThemeRegionProp.TEXTINPUT, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(416, border_top, "Theme Creator Top Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(417, border_bottom, "Theme Creator Bottom Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(418, border_left, "Theme Creator Left Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(419, border_right, "Theme Creator Right Border Toggle Check Box", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(420, backgroundopts, "Theme Creator Basic Graident and Background HBox", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
-		this.screen.addRegion(421, border_label, "Theme Creator Border Info Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(422, bg_gradient_simple_paint_set_primary, "Theme Creator Get Primary Graident Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(423, bg_gradient_simple_paint_set_secondary, "Theme Creator Get Secondary Graident Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(425, bg_gradient_set_paint, "Theme Creator Set Graident Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(426, bg_gradient_directional_checkbox, "Theme Creator Graident Dirrection Checkbox", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(427, bg_getPaint, "Theme Creator Set Background Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(428, txt_getPaint, "Theme Creator Set Text Color Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_ATM));
-		this.screen.addRegion(429,  othercolorsetterhbox, "Theme Creator Other Color Setters HBox", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM, ThemeRegionProp.INT_REG));
-	}
-	/**
-	 * Itended to take numbers from strings and format them as int
-	 * @param str The input string containing only numbers.
-	 * @return The number within the input string, If no valid number is found, returns 1.
-	 */
-	public static double getWidthFromStr(String str)
-	{
-		double retval = 0.0;
-		try
-		{
-			retval = Double.valueOf(str);
-		} 
-		catch (NumberFormatException e)
-		{
-			return 1.0;
-		}
+		this.screen.addRegion(476, box, "Basic Theme Editor: Combo box Thickness", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(477, box1, "Basic Theme Editor: Combo box Style", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_BTM));
 		return retval;
 	}
-	public void doOnMainScreenThemeFinishInit()
+	private void updateBorderPreview()
 	{
-		if (!this.doinitonce) 
-		{
-			return;
-		}
-		this.doinitonce = false;
-		this.regions = this.screen.getAllRegions();
-		for(int x = 0; x < this.screen.getRegionCount(); x++) 
-		{
-			this.elementselector.getItems().add(this.regions.get(x).getDescription());
-			this.regiondescriptionmap.put(this.regions.get(x).getDescription(), this.regions.get(x).getIndex());
-		}
-		
-		this.elementselector.setOnAction((click) -> 
-		{
-			this.themegroupmode = false;
-			this.currentworkingid = this.regiondescriptionmap.get(elementselector.getValue());
-			System.out.println("wid: " + this.currentworkingid);
-		});
-		this.elementselector.setValue("Theme Creator left vbox background");
+		this.brodergen = GamejamMainScreenTheme.simpleBorder(this.borderPaint,this.borderstyle,this.borderthickness);
+		this.borderPreview.setBorder(this.brodergen);
+		printCurrentTheme();
 	}
-	
-	
-	
-	private void populateRegionGroups()
+	private void doAutoUpdate()
 	{
-		this.regiongroupmap.put("All Buttons",0);
-		this.regiongroupmap.put("All Buttons with Themeable Text",1);
-		this.regiongroupmap.put("All Background Regions",2);
-		this.regiongroupmap.put("All Labels",3);
-		this.regiongroupmap.put("All Text Input Fields",4);
-		this.regiongroupmap.put("All Panes",5);
-		this.regiongroupmap.put("All Themeable Text",6);
-		this.regiongroupmap.put("Everything",7);
-	}
-	private void applySettingToGroup(ThemePair p)
-	{
-		/*
-		for(int x = 0; x < this.regions.size(); x++)
+		if (this.updateinrealtimecheckbox.isSelected())
 		{
-			if (this.currentgroupid == 7)
-			{
-				this.screen.setCustomThemeData(x,p);
-				continue;
-			}
-			ThemeRegionProp pr = this.regions.get(x).getProperties();
-			if (pr.isButton() && this.currentgroupid < 2)
-			{
-				if (this.currentgroupid == 0)
-				{
-					this.screen.setCustomThemeData(x,p);
-					continue;
-				}
-				else if (pr.isButtonWithText())
-				{
-					this.screen.setCustomThemeData(x,p);
-					continue;
-				}
-			}
-			
-			if (pr.isBoundingArea() && (this.currentgroupid == 2 || this.currentgroupid == 5))
-			{
-				if (this.currentgroupid == 2)
-				{
-					this.screen.setCustomThemeData(x,p);
-					continue;
-				}
-				else if (pr.isPane())
-				{
-					this.screen.setCustomThemeData(x,p);
-					continue;
-				}
-			}
-			
-			if (pr.canColorText() && (this.currentgroupid == 3 || this.currentgroupid == 6))
-			{
-				if (this.currentgroupid == 6)
-				{
-					this.screen.setCustomThemeData(x,p);
-					continue;
-				}
-				else if (pr.isLabel())
-				{
-					this.screen.setCustomThemeData(x,p);
-					continue;
-				}
-			}
-			
-			if (pr.isTextInputField() && this.currentgroupid == 4)
-			{
-				this.screen.setCustomThemeData(x,p);
-				continue;
-			}
+			this.workingtheme.removeLastRule();
+			this.workingtheme.addRule(new ThemePair(this.backgroundgen, this.brodergen, this.textPaint), ThemeDynamic.englishToRuleSet(this.elementStr), (this.elementStr.equals("Button") || this.elementStr.equals("Selection Boxes"))) ;
+			this.screen.setCustomTheme(0,this.workingtheme);
 		}
-		*/
+	}
+	private void updateThemeData()
+	{
+		this.workingtheme.addRule(new ThemePair(this.backgroundgen, this.brodergen, this.textPaint), ThemeDynamic.englishToRuleSet(this.elementStr), (this.elementStr.equals("Button") || this.elementStr.equals("Selection Boxes"))) ;
+		this.screen.setCustomTheme(this.workingthemeindex,this.workingtheme);
+	}
+	private void printCurrentTheme()
+	{
 	}
 }
