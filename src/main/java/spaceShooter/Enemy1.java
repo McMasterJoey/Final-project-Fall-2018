@@ -3,6 +3,8 @@ package spaceShooter;
 import java.awt.Point;
 import java.io.Serializable;
 
+import spaceShooter.SpaceShooterBuff.BuffType;
+
 public class Enemy1 extends SpaceShooterEnemy implements Serializable{
 
 	/**
@@ -18,6 +20,16 @@ public class Enemy1 extends SpaceShooterEnemy implements Serializable{
 		setCurrentHP(1);
 		setDamagePerShot(1);
 		setLocation(new Point(x, y));
+		lootChance = 2;
+		SpaceShooterBuff hp = new SpaceShooterBuff(BuffType.HP, this.getLocation());
+		SpaceShooterBuff speed = new SpaceShooterBuff(BuffType.SPEED, this.getLocation());
+		drops.put(1, speed);
+		drops.put(2, speed);
+		drops.put(3, speed);
+		drops.put(4, hp);
+		drops.put(5, hp);
+		drops.put(6, hp);
+		drops.put(0, speed);
 	}
 	
 	

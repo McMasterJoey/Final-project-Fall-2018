@@ -293,6 +293,7 @@ public class ConnectFourControllerView extends GameControllerView {
 		//System.out.println("--------------");
 	    if(!gameModel.isStillRunning()) {
 	        System.out.println("\nGame score is " + getScore());
+	        showEndScreen();
 	    }
 		if (gameModel.tied()) {
 			//accountManager.logGlobalStat(true, "Connect-Four", logStatType.TIE, 1);
@@ -416,4 +417,9 @@ public class ConnectFourControllerView extends GameControllerView {
         baseScore = (int) (temp * 2.5 + 25);
         return baseScore * difficultyModifier;
     }
+
+	@Override
+	protected String wonString() {
+		return gameModel.won('R') ? "won" : "lost";
+	}
 }
