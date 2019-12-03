@@ -907,12 +907,36 @@ public class AccountManager extends Observable
         return gameid;
     }
     /**
-     * TODO: Prior to using this function, themes should be loaded into the GamejamMainScreenTheme Object. 
+     * TODO: Prior to using this function, all themes should be loaded into the GamejamMainScreenTheme Object. 
      * This then returns a list of names of the themes the user has stored within the data base. 
-     * @return
+     * @return A list of 0 or more theme names.
      */
     public ArrayList<String> getThemeNames()
     {
+    	// TODO: Implement me!
     	return new ArrayList<String>();
+    }
+    /**
+     * TODO: Will be called when the theme creator knows who the user is and knows the desired theme to be loaded.
+     * @param themename The name of the theme whose path is to be fetched.
+     * @return The file path of the saved object file.
+     */
+    public String getThemePath(String themename)
+    {
+    	// When a user has no saved themes, a place holder will be inserted on the theme editor side and will input null.
+    	if (themename == null) {
+    		return null;
+    	}
+    	// TODO: Handle other cases where the user has atleast one theme saved.
+    	return null;
+    }
+    /**
+     * TODO: Will be called when a player saves a theme to their account. If the theme already exists, overwrites it. 
+     * @param themename The name of the theme, assumed to be unique on a per user basis. 
+     * @param path The path that loads the theme object.
+     */
+    public void addNewTheme(String themename, String path)
+    {
+    	// TODO: Implement me!
     }
 }

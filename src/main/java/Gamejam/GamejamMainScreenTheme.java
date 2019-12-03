@@ -33,7 +33,6 @@ public class GamejamMainScreenTheme
 	private ArrayList<Theme> themes;
 	private ArrayList<RegionPair> regions;
 	private ArrayList<PriorityPair> preInit;
-	private ThemeCreator themecreator;
 	private BasicThemeCreator basicthemecreator;
 	private boolean doneAddingRegions = false;
 	private ArrayList<Image> imagecache;
@@ -44,9 +43,7 @@ public class GamejamMainScreenTheme
 		this.playerCustomThemes = new ArrayList<Theme>(25);
 		this.regions = new ArrayList<RegionPair>(50);
 		this.preInit = new ArrayList<PriorityPair>(50);
-		this.themecreator = new ThemeCreator(this);
 		this.basicthemecreator = new BasicThemeCreator(this);
-		addRegion(228, this.themecreator, "Theme Menu Theme Creator", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_ATM));
 		addRegion(228.001, this.basicthemecreator, "Theme Menu Basic Theme Creator", new ThemeRegionProp(ThemeRegionProp.BORDERPANE, ThemeRegionProp.LOC_MI_TM, ThemeRegionProp.INT_REG));
 		cacheImages();
 		
@@ -75,10 +72,6 @@ public class GamejamMainScreenTheme
 		t3.addNewImage("/usersettingsbuttonbackground.png");
 		this.themes.add(t3);
 	}
-	public ThemeCreator getThemeCreator()
-	{
-		return this.themecreator;
-	}
 	public BasicThemeCreator getBasicThemeCreator()
 	{
 		return this.basicthemecreator;
@@ -106,7 +99,6 @@ public class GamejamMainScreenTheme
 				this.regions.add(this.preInit.get(x).getRegionPair());
 				this.regions.get(this.regions.size() - 1).setIndex(x);
 			}
-			this.themecreator.doOnMainScreenThemeFinishInit();
 			this.basicthemecreator.finishConstructing();
 			
 			this.playerCustomThemes.add(generateDefaultTheme());

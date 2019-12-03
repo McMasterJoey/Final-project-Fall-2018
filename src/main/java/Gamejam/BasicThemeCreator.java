@@ -1,10 +1,17 @@
 package Gamejam;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import connectFour.ConnectFourModel;
 import controller.AccountManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -37,6 +44,7 @@ public class BasicThemeCreator extends GridPane
 	private VBox themeUtil;
 	
 	private ComboBox<String> elementSetter;
+	private ComboBox<String> userThemeNames;
 	private String elementStr;
 	
 	private Paint borderPaint;
@@ -71,6 +79,9 @@ public class BasicThemeCreator extends GridPane
 	private VBox borderintermediatevbox;
 	
 	private int workingthemeindex = 1;
+	
+	boolean debugger = true;
+	
 	public BasicThemeCreator(GamejamMainScreenTheme screen)
 	{
 		this.screen = screen;
@@ -82,6 +93,8 @@ public class BasicThemeCreator extends GridPane
 		this.returntomainmenubutton1.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		this.returntomainmenubutton2 = new Button("Return to Previous Screen");
 		this.returntomainmenubutton2.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.returntomainmenubutton3 = new Button("Return to Previous Screen");
+		this.returntomainmenubutton3.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		this.elementSetter = setUpElementSetter();
 		this.textSetter = setUpTextSetter();
 		this.borderSetter = setUpBorderSetter();
@@ -96,17 +109,17 @@ public class BasicThemeCreator extends GridPane
 		this.borderintermediatevbox = new VBox();
 		this.updateinrealtimecheckbox = new CheckBox("Update after making any change");
 		this.updateinrealtimecheckbox.setSelected(true);
-		//this.themeUtil = setUpOtherThemeSettings();
+		this.themeUtil = setUpOtherThemeSettings();
 		
 		
 		Label des = new Label("Select the part of the GUI to edit");
 		Button updateScreen = new Button("Send changes to GUI!");
 		Button loadTextEditor = new Button("Edit Text Color");
-		Button loadBackgroundEditor = new Button("Edit Border Color");
+		Button loadBackgroundEditor = new Button("Edit Background Color");
 		Button loadBorderEditor = new Button("Edit Border");
 		
 		Button restartThemeButton =  new Button("Theme Options");
-		
+		restartThemeButton.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		
 		des.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		this.elementSetter.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
@@ -115,7 +128,7 @@ public class BasicThemeCreator extends GridPane
 		loadBorderEditor.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		updateScreen.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		
-		this.mainarea.getChildren().addAll(des,this.updateinrealtimecheckbox, this.elementSetter,loadTextEditor,loadBackgroundEditor,loadBorderEditor,updateScreen);
+		this.mainarea.getChildren().addAll(des,this.updateinrealtimecheckbox, this.elementSetter,loadTextEditor,loadBackgroundEditor,loadBorderEditor,restartThemeButton,updateScreen);
 		this.textintermediatevbox.getChildren().addAll(this.textlabel,this.textSetter);
 		this.backgroundintermediatevbox.getChildren().addAll(this.backgroundlabel,this.backgroundSetter);
 		this.borderintermediatevbox.getChildren().addAll(this.borderlabel,this.borderSetter);
@@ -167,11 +180,11 @@ public class BasicThemeCreator extends GridPane
 			this.getChildren().clear();
 			this.add(this.mainarea,1,0);
 		});
-		//this.returntomainmenubutton3.setOnAction((click) -> 
-		//{
-		//	this.getChildren().clear();
-		//	this.add(this.mainarea,1,0);
-		//});
+		this.returntomainmenubutton3.setOnAction((click) -> 
+		{
+			this.getChildren().clear();
+			this.add(this.mainarea,1,0);
+		});
 		
 		restartThemeButton.setOnAction((click) -> 
 		{
@@ -207,6 +220,22 @@ public class BasicThemeCreator extends GridPane
 		this.screen.addRegion(461, this.updateinrealtimecheckbox, "Basic Theme Editor:  Update UI after each edit Checkbox", new ThemeRegionProp(ThemeRegionProp.CHECKBOX, ThemeRegionProp.LOC_MI_BTM));
 		this.screen.addRegion(462, des, "Basic Theme Editor:  Primary Top Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_BTM));
 	
+	}
+	/**
+	 * Should be called everytime a new user logs in.
+	 */
+	public void updateObjectOnUserChange()
+	{
+		ArrayList<String> themenames = AccountManager.getInstance().getThemeNames();
+		if (themenames.size() == 0)
+		{
+			themenames.add("Default Custom Theme");
+			this.customthemename = "Default Custom Theme";
+		}
+		this.userThemeNames = new ComboBox<String>();
+		this.userThemeNames.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.userThemeNames.getItems().addAll(themenames);
+		this.userThemeNames.setValue(themenames.get(0));
 	}
 	private void updateMainScreenOnElementSelection(String element)
 	{
@@ -303,28 +332,107 @@ public class BasicThemeCreator extends GridPane
 	{
 		VBox retval = new VBox();
 		retval.setAlignment(Pos.CENTER);
-		ArrayList<String> themenames = AccountManager.getInstance().getThemeNames();
-		if (themenames.size() == 0)
-		{
-			themenames.add("Default Custom Theme");
-			this.customthemename = "Default Custom Theme";
-		}
 		
 		Label namefieldlabel = new Label("Input your desired theme name");
 		TextField box = new TextField(this.customthemename);
-		
-		ComboBox<String> box1 = new ComboBox<String>();
-		box1.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
-		
-		box1.getItems().addAll(themenames);
-		box1.setOnAction((click) -> 
+		box.setPrefSize(100, BUTTON_PREF_Y_SIZE);
+		updateObjectOnUserChange();
+		this.userThemeNames.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		this.userThemeNames.setOnAction((click) -> 
 		{
-			
+			boolean result = loadCustomDynamicTheme(this.userThemeNames.getValue(),AccountManager.getInstance().getThemePath(this.userThemeNames.getValue()));
+			if (!result)
+			{
+				Gamejam.DPrint("[DEBUG]: Failed to load Custom Theme " + this.userThemeNames.getValue());
+			}
 		});
-		box1.setValue(themenames.get(0));
 		
-		retval.getChildren().addAll(this.returntomainmenubutton3);
+		Button b = new Button("Save Current Theme");
+		b.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		b.setOnAction((click) -> 
+		{
+			this.customthemename = box.getText();
+			boolean result =  saveCustomDynamicTheme(this.customthemename);
+			if (!result)
+			{
+				Gamejam.DPrint("[DEBUG]: Failed to save Custom Theme " + this.userThemeNames.getValue());
+			}
+		});
+		
+		Button debug_button = new Button("DEBUG: Load");
+		debug_button.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
+		debug_button.setOnAction((click) -> 
+		{
+			boolean result =  loadCustomDynamicTheme("debugtheme","");
+			if (!result)
+			{
+				Gamejam.DPrint("[DEBUG]: Failed to load Custom debug Theme ");
+			}
+		});
+		retval.getChildren().addAll(namefieldlabel, box, this.userThemeNames, b, debug_button, this.returntomainmenubutton3);
 		return retval;
+	}
+	
+	private boolean saveCustomDynamicTheme(String themename)
+	{
+		if (themename == null)
+		{
+			return false;
+		}
+		FileOutputStream fos;
+		ObjectOutputStream oos;
+		try {
+			String fname = AccountManager.getInstance().getCurUsername() + "-" + themename + ".ct";
+			if (debugger)
+			{
+				fname = AccountManager.getInstance().getCurUsername() + "-debugtheme.ct";
+			}
+			String sep = System.getProperty("file.separator");
+			String filepath = System.getProperty("user.dir") + sep + "custom-theme";
+			if(!new File(filepath).exists()) {
+				new File(filepath).mkdir();
+			}
+			filepath += sep + fname;
+			fos = new FileOutputStream(filepath);			
+			oos = new ObjectOutputStream(fos);
+			oos.writeObject(this.workingtheme);
+			oos.close();
+			
+			AccountManager.getInstance().addNewTheme(themename, filepath);
+		} catch (IOException e) {
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean loadCustomDynamicTheme(String themename, String filepath)
+	{
+		if (debugger)
+		{
+			String fname = AccountManager.getInstance().getCurUsername() + "-debugtheme.ct";
+			String sep = System.getProperty("file.separator");
+			filepath = System.getProperty("user.dir") + sep + "custom-theme" + fname;
+		} 
+		
+		if (filepath == null) {
+			return false; // Tried to load a non-existant theme
+		}
+		try {
+			File file = new File(filepath);
+			if(file.exists()) {
+				FileInputStream fis = new FileInputStream(file);
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				this.workingtheme = (ThemeDynamic) ois.readObject();
+				this.customthemename = themename;
+				ois.close();
+				file.delete();
+			}
+		} catch(IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		}
+		doAutoUpdate();
+		return true;
 	}
 	private VBox setUpTextSetter()
 	{

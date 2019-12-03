@@ -1,5 +1,6 @@
 package Gamejam;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -16,8 +17,10 @@ import model.SanityCheckFailedException;
  * @author 16jmc
  *
  */
-public class ThemeDynamic extends Theme 
+public class ThemeDynamic extends Theme implements Serializable
 {
+	private static final long serialVersionUID = 2;
+	
 	protected ArrayList<RulePair> rules;
 	protected ArrayList<RegionPair> regions;
 	protected GamejamMainScreenTheme screen;

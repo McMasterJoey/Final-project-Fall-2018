@@ -85,7 +85,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private GamejamMainScreenTheme initthemes;
 	private int initthemeinuseid = 0;
 	private BasicThemeCreator basicthemecreator;
-	private ThemeCreator advancedthemecreator;
 	private HBox emptythemecreator;
 	public GamejamMainScreen() {
 		super();
@@ -563,7 +562,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private GridPane initThemeMenu() {
 		this.basicthemecreator = this.initthemes.getBasicThemeCreator();
-		this.advancedthemecreator = this.initthemes.getThemeCreator();
 		this.emptythemecreator = new HBox();
 		
 		GridPane retval = new GridPane();
@@ -577,22 +575,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		backtosettings.setOnMouseClicked((click) -> {
 			this.setCenter(this.initUserSettingsMainMenu);
 		});
-		Button showBasicThemeEditorButton = new Button();
-		Button showAdvancedThemeEditorButton = new Button();
 		
-		showBasicThemeEditorButton.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/themeButtonSwitchToBasicThemeEditor.png"))));
-		showBasicThemeEditorButton.setOnMouseClicked((click) -> {
-			right.getChildren().set(0,this.basicthemecreator);
-			left.getChildren().set(1, showAdvancedThemeEditorButton);
-			
-		});
-		showAdvancedThemeEditorButton.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/themeButtonSwitchToAdvancedThemeEditor.png"))));
-		showAdvancedThemeEditorButton.setOnMouseClicked((click) -> {
-			right.getChildren().set(0,this.advancedthemecreator);
-			left.getChildren().set(1, showBasicThemeEditorButton);
-		});
-		
-		left.getChildren().addAll(backtosettings,showAdvancedThemeEditorButton);
+		left.getChildren().addAll(backtosettings);
 		
 		Button theme0 = new Button();
 		theme0.setGraphic(this.initthemes.getThemeIcon(0));
@@ -621,8 +605,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(221, left, "Theme Menu left side overall background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_TM, ThemeRegionProp.INT_REG));
 		this.initthemes.addRegion(222, right, "Theme Menu right side overall background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_TM, ThemeRegionProp.INT_REG));
 		this.initthemes.addRegion(223, backtosettings, "Theme Menu back to user settings menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
-		this.initthemes.addRegion(223.01, showBasicThemeEditorButton, "Theme Menu show basic theme editor menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
-		this.initthemes.addRegion(223.02, showAdvancedThemeEditorButton, "Theme Menu show advanced theme editor menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
+		//this.initthemes.addRegion(223.01, showBasicThemeEditorButton, "Theme Menu show basic theme editor menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
+		//this.initthemes.addRegion(223.02, showAdvancedThemeEditorButton, "Theme Menu show advanced theme editor menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(224, theme0, "Theme Menu Default Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(225, theme1, "Theme Menu Night Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(226, theme2, "Theme Menu USA Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
