@@ -1,5 +1,6 @@
 package Gamejam;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javafx.geometry.Insets;
@@ -23,12 +24,15 @@ import model.SanityCheckFailedException;
  * Represents a collection of Theme pair objects and other data that compose a theme.
  * @author Joey McMaster
  */
-public class Theme 
+public class Theme implements Serializable
 {
+	private static final long serialVersionUID = 3;
 	
 	protected String name;
 	protected ThemePair[] themedata;
 	protected ArrayList<Image> themeimg;
+	protected ArrayList<String> themeimgpaths;
+	protected String iconpath;
 	protected Image icon;
 	/**
 	 * The main constructor.
@@ -40,10 +44,12 @@ public class Theme
 		this.name = name;
 		this.themedata = new ThemePair[arraysize];
 		this.themeimg = new ArrayList<Image>();
+		this.themeimgpaths = new ArrayList<String>();
 	}
-	public void setIcon(Image icon)
+	public void setIcon(String path)
 	{
-		this.icon = icon;
+		this.iconpath = path;
+		this.icon = new Image(getClass().getResourceAsStream(path));
 	}
 	/**
 	 * Fetches the icon used by this theme
@@ -59,6 +65,7 @@ public class Theme
 	 */
 	public void addNewImage(String path) 
 	{
+		this.themeimgpaths.add(path);
 		this.themeimg.add(new Image(getClass().getResourceAsStream(path)));
 	}
 	/**
@@ -102,89 +109,54 @@ public class Theme
 	{
 		// Does nothing, is only implemented by the Dynamic Theme class
 	}
-	/**
-	 * Dumps this theme into a form that can put directly into project code.
-	 * @return The hard coded version of this theme.
-	 */
-	public String dumpThemeToCode() 
+	public void generateTheme(String path1, String path2)
 	{
-		String retval = "public static Theme createThemeGenerated() {\n";
-		retval += "    Theme retval = new Theme(" + "\"" + this.name + "\"" +"," + this.themedata.length + ");\n";
-		for(int x = 0; x < this.themedata.length;x++)
+		// Does nothing, is only implemented by the Dynamic Theme class
+	}
+	public void setNewImage(int index, String path) 
+	{
+		this.themeimgpaths.set(index,path);
+		this.themeimg.set(index,new Image(getClass().getResourceAsStream(path)));
+	}
+	public ThemeSerializable dumpCoreData()
+	{
+		
+		ArrayList<ThemePair> pairs = new ArrayList<ThemePair>();
+		for(int x = 0; x < this.themedata.length; x++) 
 		{
-			retval += "    " + dumpBorder(this.themedata[x],x) + "\n";
-			retval += "    " + dumpBackground(this.themedata[x],x) + "\n";
-			retval += "    Paint c" + x + " = " + paintToGenString(this.themedata[x].getColor()) + ";\n";
-			retval += "    ThemePair p" + x + " = new ThemePair(bg" + x + ",bo" + x + ",c" +  x + ");\n";
-			retval += "    retval.setThemeData("+ x + ", p" + x + ");\n";
+			pairs.add(this.themedata[x]);
 		}
-		retval += "    return retval;\n";
-		retval += "}";
+		ThemeSerializable retval =  new ThemeSerializable(name,pairs, this.themeimgpaths);
+		if (this.iconpath != null && !this.iconpath.equals(""))
+		{
+			retval.setIconPath(this.iconpath);
+		}
 		return retval;
 	}
-	/**
-	 * Takes a paint object that is either a Color or LinearGradient. Dumps it as a string so it can be made via code.
-	 * @param p The paint object
-	 * @return A string in the form of java code.
-	 */
-	public static String paintToGenString(Paint p)
+	public void importCoreData(ThemeSerializable data)
 	{
-		if (p instanceof Color)
+		if (data.isDynamic()) 
 		{
-			Color c = (Color) p;
-			return "new Color(" + c.getRed() + ", " + c.getGreen() + ", " + c.getBlue() + ", " + c.getOpacity() + ")";
+			throw new SanityCheckFailedException("Expected Static Theme Data, got Dyanmic Theme data");
 		}
-		else if (p instanceof LinearGradient)
+		ArrayList<ThemePair> pairs = data.getThemePairs();
+		if (pairs.size() != this.themedata.length) 
 		{
-			LinearGradient c = (LinearGradient) p;
-		
-			//new Stop[] { new Stop(0, c.getStops().get(0).getColor()), new Stop(1,  c.getStops().get(1).getColor()) };
-			//LinearGradient g = new LinearGradient(0,0,1,1,true,CycleMethod.NO_CYCLE,new Stop[] { new Stop(0, c.getStops().get(0).getColor()), new Stop(1,  c.getStops().get(1).getColor()) });
-			String stops = "new Stop[] { ";
-			for(int x = 0; x < c.getStops().size(); x++)
-			{
-				if (x != 0)
-				{
-					stops += ",";
-				}
-				stops += "new Stop(" + x + "," + paintToGenString(c.getStops().get(x).getColor()) + ")";
+			throw new SanityCheckFailedException("Static Theme Data theme pair count mismatch. Data is invalid!");
+		}
+		this.themeimgpaths = data.getFilePaths();
+		for(int x = 0; x < data.getFilePaths().size(); x++)
+		{
+			if (this.themeimg.size() >= x) {
+				this.themeimg.add(new Image(getClass().getResourceAsStream(this.themeimgpaths.get(x))));
+			} else {
+				this.themeimg.set(x,new Image(getClass().getResourceAsStream(this.themeimgpaths.get(x))));
 			}
-			stops += "}";
-			return "new LinearGradient(" + c.getStartX() + "," + c.getStartY() + "," + c.getEndX() + "," + c.getEndY() + ",true,CycleMethod.NO_CYCLE," + stops + ")";
 		}
-		return null;
-	}
-	protected String dumpBackground(ThemePair p, int x)
-	{
-		String color = paintToGenString(p.getBackground().getFills().get(0).getFill());
-		return "Background bg" + x + " = new Background(new BackgroundFill(" + color + ",CornerRadii.EMPTY, new Insets(0)));";
-	}
-	protected String dumpBorder(ThemePair p, int x)
-	{
-		String color = paintToGenString(p.getBorder().getStrokes().get(0).getTopStroke());
-		String style1 = _dumpBorderUtil(p.getBorder().getStrokes().get(0).getTopStyle());
-		String style3 = _dumpBorderUtil(p.getBorder().getStrokes().get(0).getBottomStyle());
-		String style4 = _dumpBorderUtil(p.getBorder().getStrokes().get(0).getLeftStyle());
-		String style2 = _dumpBorderUtil(p.getBorder().getStrokes().get(0).getRightStyle());
-		BorderStrokeStyle s = p.getBorder().getStrokes().get(0).getTopStyle();
 		
-		return "Border bo" + x + " = new Border(new BorderStroke(" + color + "," + color + "," + color + "," + color + "," + style1 + "," + style2 + "," + style3 + "," + style4 + "," + "CornerRadii.EMPTY, new BorderWidths(" + p.getBorder().getStrokes().get(0).getWidths().getTop() + "), new Insets(0)));";
-	}
-	protected String _dumpBorderUtil(BorderStrokeStyle s)
-	{
-		String style = "BorderStrokeStyle.SOLID";
-		if (s.equals(BorderStrokeStyle.NONE)) 
+		for(int x = 0; x < this.themedata.length; x++)
 		{
-			style = "BorderStrokeStyle.NONE";
+			this.themedata[x] = pairs.get(x);
 		}
-		else if (s.equals(BorderStrokeStyle.DASHED)) 
-		{
-			style = "BorderStrokeStyle.DASHED";
-		}
-		else if (s.equals(BorderStrokeStyle.DOTTED)) 
-		{
-			style = "BorderStrokeStyle.DOTTED";
-		}
-		return style;
 	}
 }

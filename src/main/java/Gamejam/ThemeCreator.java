@@ -1,5 +1,7 @@
 package Gamejam;
 
+import controller.AccountManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,9 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-
-import connectFour.ConnectFourModel;
-import controller.AccountManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -78,7 +77,7 @@ public class ThemeCreator extends GridPane
 	private VBox backgroundintermediatevbox;
 	private VBox borderintermediatevbox;
 	
-	private int workingthemeindex = 1;
+	private int workingthemeindex = 0;
 	
 	boolean debugger = true;
 	
@@ -352,6 +351,7 @@ public class ThemeCreator extends GridPane
 		b.setOnAction((click) -> 
 		{
 			this.customthemename = box.getText();
+			updateThemeData();
 			boolean result =  saveCustomDynamicTheme(this.customthemename);
 			if (!result)
 			{
@@ -363,7 +363,7 @@ public class ThemeCreator extends GridPane
 		debug_button.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		debug_button.setOnAction((click) -> 
 		{
-			boolean result =  loadCustomDynamicTheme("debugtheme","");
+			boolean result =  loadCustomDynamicTheme("debugtheme","/custom-theme/test-debugtheme.ct");
 			if (!result)
 			{
 				Gamejam.DPrint("[DEBUG]: Failed to load Custom debug Theme ");
@@ -373,7 +373,7 @@ public class ThemeCreator extends GridPane
 		return retval;
 	}
 	
-	private boolean saveCustomDynamicTheme(String themename)
+	public boolean saveCustomDynamicTheme(String themename)
 	{
 		if (themename == null)
 		{
@@ -393,25 +393,27 @@ public class ThemeCreator extends GridPane
 				new File(filepath).mkdir();
 			}
 			filepath += sep + fname;
+			System.out.println("Saving theme!");
 			fos = new FileOutputStream(filepath);			
 			oos = new ObjectOutputStream(fos);
-			oos.writeObject(this.workingtheme);
+			oos.writeObject(this.workingtheme.dumpCoreData());
 			oos.close();
 			
 			AccountManager.getInstance().addNewTheme(themename, filepath);
 		} catch (IOException e) {
+			e.printStackTrace();
 			return false;
 		}
 		return true;
 	}
 	
-	private boolean loadCustomDynamicTheme(String themename, String filepath)
+	public boolean loadCustomDynamicTheme(String themename, String filepath)
 	{
 		if (debugger)
 		{
 			String fname = AccountManager.getInstance().getCurUsername() + "-debugtheme.ct";
 			String sep = System.getProperty("file.separator");
-			filepath = System.getProperty("user.dir") + sep + "custom-theme" + fname;
+			filepath = System.getProperty("user.dir") + sep + "custom-theme" + sep + fname;
 		} 
 		
 		if (filepath == null) {
@@ -419,11 +421,15 @@ public class ThemeCreator extends GridPane
 		}
 		try {
 			File file = new File(filepath);
-			if(file.exists()) {
+			System.out.println("In loading try block!");
+			if (file.exists()) {
+				System.out.println("In If statment block");
 				FileInputStream fis = new FileInputStream(file);
 				ObjectInputStream ois = new ObjectInputStream(fis);
-				this.workingtheme = (ThemeDynamic) ois.readObject();
+				ThemeSerializable tse = (ThemeSerializable) ois.readObject();
+				this.workingtheme.importCoreData(tse);
 				this.customthemename = themename;
+				System.out.println("Loaded theme!");
 				ois.close();
 				file.delete();
 			}
@@ -431,7 +437,11 @@ public class ThemeCreator extends GridPane
 			e.printStackTrace();
 			return false;
 		}
-		doAutoUpdate();
+		System.out.println("Left loaded try block");
+		if (this.updateinrealtimecheckbox.isSelected())
+		{
+			this.screen.setCustomTheme(0,this.workingtheme);
+		}
 		return true;
 	}
 	private VBox setUpTextSetter()

@@ -35,7 +35,7 @@ public class GamejamMainScreenTheme
 	private ArrayList<PriorityPair> preInit;
 	private ThemeCreator basicthemecreator;
 	private boolean doneAddingRegions = false;
-	private ArrayList<Image> imagecache;
+	private ArrayList<String> imagecache;
 	private ArrayList<Theme> playerCustomThemes;
 	public GamejamMainScreenTheme() 
 	{
@@ -50,11 +50,10 @@ public class GamejamMainScreenTheme
 	}
 	private void cacheImages()
 	{
-		this.imagecache = new ArrayList<Image>();
-		//this.imagecache.add(new Image("/themeDefaultThemeMenuIcon.png"));
-		this.imagecache.add(new Image(GamejamMainScreenTheme.class.getResource("/themeDefaultThemeMenuIcon.png").toString()));
-		this.imagecache.add(new Image("/themeNightThemeMenuIcon.png"));
-		this.imagecache.add(new Image("/themeUSAThemeMenuIcon.png"));
+		this.imagecache = new ArrayList<String>();
+		this.imagecache.add("/themeDefaultThemeMenuIcon.png");
+		this.imagecache.add("/themeNightThemeMenuIcon.png");
+		this.imagecache.add("/themeUSAThemeMenuIcon.png");
 		
 		Theme t1 = new Theme("Default Theme", 10);
 		t1.setIcon(this.imagecache.get(0));
@@ -388,7 +387,23 @@ public class GamejamMainScreenTheme
 	{
 		return new Background(new BackgroundFill(color, CornerRadii.EMPTY, new Insets(0)));
 	}
-	
+	public static Border SimpleIntBorder(Paint color, String style, int widths)
+	{
+		BorderStrokeStyle stylee;
+		if (style.equals("Solid"))
+		{
+			stylee = BorderStrokeStyle.SOLID;
+		} 
+		else if (style.equals("Dashed"))
+		{
+			stylee = BorderStrokeStyle.DASHED;
+		}
+		else
+		{
+			stylee = BorderStrokeStyle.DOTTED;
+		}
+		return new Border(new BorderStroke(color, stylee, CornerRadii.EMPTY, new BorderWidths(widths)));
+	}
 	/**
 	 * Generates a border.
 	 * @param color The color of the border
@@ -425,6 +440,13 @@ public class GamejamMainScreenTheme
 		double blue = (double) b;
 		return new Background(new BackgroundFill(Color.color(red / 255.0, green / 255.0, blue / 255.0),
 				CornerRadii.EMPTY, new Insets(0)));
+	}
+	public static Color colorSetUpRBG(int r, int g, int b)
+	{
+		double red = (double) r;
+		double green = (double) g;
+		double blue = (double) b;
+		return new Color(red / 255, green / 255, blue / 255, 1);
 	}
 	/**
 	 * Acts as a temporary object to be used when initing the object.

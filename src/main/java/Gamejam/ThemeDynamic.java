@@ -6,21 +6,20 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Border;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import model.SanityCheckFailedException;
 
 /**
  * Represents an instance of a Theme that is generated at run time from a set of rules.
- * @author 16jmc
+ * @author Joey McMaster
  *
  */
-public class ThemeDynamic extends Theme implements Serializable
-{
-	private static final long serialVersionUID = 2;
+public class ThemeDynamic extends Theme {
 	
+	private static final long serialVersionUID = 1L;
 	protected ArrayList<RulePair> rules;
 	protected ArrayList<RegionPair> regions;
 	protected GamejamMainScreenTheme screen;
@@ -34,7 +33,14 @@ public class ThemeDynamic extends Theme implements Serializable
 		{
 			throw new SanityCheckFailedException("ThemeDynamic: Mismatch of Region list size and static theme pair array size!");
 		}
+		this.addNewImage("/usersettingsbuttonbackground.png");
+		this.addNewImage("/usersettingsbuttonbackground.png");
 		generateTheme();
+	}
+	public void generateTheme(String filepath1, String filepath2) {
+		generateTheme();
+		this.setNewImage(0,filepath1);
+		this.setNewImage(1,filepath2);
 	}
 	/**
 	 * Generates stored theme via the stored rules in the order they were inserted.
@@ -52,7 +58,8 @@ public class ThemeDynamic extends Theme implements Serializable
 				throw new SanityCheckFailedException("ThemeDynamic: Failed to reset the theme data back to default! Some values were null!");
 			}
 		}
-		
+		this.setNewImage(0,"/usersettingsbuttonbackground.png");
+		this.setNewImage(1,"/usersettingsbuttonbackground.png");
 		
 		Gamejam.DPrint("[DEBUG]: rules.size = " + this.rules.size());
 		
@@ -256,30 +263,6 @@ public class ThemeDynamic extends Theme implements Serializable
 		this.rules.clear();
 	}
 	
-	protected class RulePair
-	{
-		private HashSet<Integer> statements;
-		private ThemePair pair;
-		private boolean useAnd;
-		public RulePair(HashSet<Integer> statements, ThemePair pair, boolean useAnd)
-		{
-			this.statements = statements;
-			this.pair = pair;
-			this.useAnd = useAnd;
-		}
-		public ThemePair getPair()
-		{
-			return this.pair;
-		}
-		public HashSet<Integer> getStatements()
-		{
-			return this.statements;
-		}
-		public boolean getAnd()
-		{
-			return this.useAnd;
-		}
-	}
 	/**
 	 * Determines if an element exists within the collection
 	 * @param <T> The type of the elements in the collection
@@ -305,5 +288,39 @@ public class ThemeDynamic extends Theme implements Serializable
 	public boolean isStatic()
 	{
 		return false;
+	}
+	public ThemeSerializable dumpCoreData()
+	{
+		ArrayList<ThemePair> pairs = new ArrayList<ThemePair>();
+		for(int x = 0; x < this.themedata.length; x++) 
+		{
+			pairs.add(this.themedata[x]);
+		}
+		ThemeSerializable retval =  new ThemeSerializable(name,this.rules, pairs, this.themeimgpaths);
+		if (this.iconpath != null && !this.iconpath.equals(""))
+		{
+			retval.setIconPath(this.iconpath);
+		}
+		return retval;
+	}
+	public void importCoreData(ThemeSerializable data)
+	{
+		if (!data.isDynamic()) 
+		{
+			throw new SanityCheckFailedException("Expected Dynamic Theme Data, got Static Theme data");
+		}
+		
+		this.themeimgpaths = data.getFilePaths();
+		for(int x = 0; x < data.getFilePaths().size(); x++)
+		{
+			if (this.themeimg.size() >= x) {
+				this.themeimg.add(new Image(getClass().getResourceAsStream(this.themeimgpaths.get(x))));
+			} else {
+				this.themeimg.set(x,new Image(getClass().getResourceAsStream(this.themeimgpaths.get(x))));
+			}
+		}
+		
+		this.rules = data.getRules();
+		this.generateTheme();
 	}
 }
