@@ -24,10 +24,8 @@ import model.SanityCheckFailedException;
  * Represents a collection of Theme pair objects and other data that compose a theme.
  * @author Joey McMaster
  */
-public class Theme implements Serializable
+public class Theme
 {
-	private static final long serialVersionUID = 3;
-	
 	protected String name;
 	protected ThemePair[] themedata;
 	protected ArrayList<Image> themeimg;

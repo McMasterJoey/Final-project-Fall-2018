@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 
 /**
- * 
+ * A Rulepair that is formated to be serializable. 
  * @author Joey McMaster
  *
  */

@@ -79,7 +79,7 @@ public class ThemeCreator extends GridPane
 	
 	private int workingthemeindex = 0;
 	
-	boolean debugger = true;
+	boolean debugger = false;
 	
 	public ThemeCreator(GamejamMainScreenTheme screen)
 	{
@@ -204,7 +204,9 @@ public class ThemeCreator extends GridPane
 		this.screen.addRegion(450, this.returntomainmenubutton , "Basic Theme Editor: Return to Main Menu Button (Background Editor) Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
 		this.screen.addRegion(451, this.returntomainmenubutton1 , "Basic Theme Editor: Return to Main Menu Button (Text Editor) Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
 		this.screen.addRegion(452, this.returntomainmenubutton2 , "Basic Theme Editor: Return to Main Menu Button (Border Editor) Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(452.1, this.returntomainmenubutton3 , "Basic Theme Editor: Return to Main Menu Button (Other Editor) Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
 		this.screen.addRegion(453, updateScreen, "Basic Theme Editor: Update Screen Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(454, restartThemeButton, "Basic Theme Editor: Switch to Util Menu", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
 		//this.screen.addRegion(454, loadTextEditor, "Basic Theme Editor: Load Text Editor Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
 		//this.screen.addRegion(455, loadBackgroundEditor, "Basic Theme Editor: Load Background Editor Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
 		//this.screen.addRegion(456, loadBorderEditor, "Basic Theme Editor: Load Border Editor Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
@@ -369,7 +371,12 @@ public class ThemeCreator extends GridPane
 				Gamejam.DPrint("[DEBUG]: Failed to load Custom debug Theme ");
 			}
 		});
-		retval.getChildren().addAll(namefieldlabel, box, this.userThemeNames, b, debug_button, this.returntomainmenubutton3);
+		retval.getChildren().addAll(namefieldlabel, box, this.userThemeNames, b, this.returntomainmenubutton3);
+		
+		this.screen.addRegion(491, retval, "Basic Theme Editor: Other Theme Settings Menu HBox", new ThemeRegionProp(ThemeRegionProp.HBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
+		this.screen.addRegion(492, namefieldlabel, "Basic Theme Editor: Other Theme Settings Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(493, box, "Basic Theme Editor: Theme Name Input", new ThemeRegionProp(ThemeRegionProp.TEXTINPUT, ThemeRegionProp.LOC_MI_BTM));
+		this.screen.addRegion(494, this.userThemeNames, "Basic Theme Editor: Select Custom Theme Combo Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_BTM));
 		return retval;
 	}
 	

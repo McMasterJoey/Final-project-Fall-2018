@@ -16,10 +16,10 @@ import model.SanityCheckFailedException;
  * Represents an instance of a Theme that is generated at run time from a set of rules.
  * @author Joey McMaster
  *
+ * Not directly serializeable, but can be using its dumpCoreDate function and saving that.
  */
 public class ThemeDynamic extends Theme {
 	
-	private static final long serialVersionUID = 1L;
 	protected ArrayList<RulePair> rules;
 	protected ArrayList<RegionPair> regions;
 	protected GamejamMainScreenTheme screen;
