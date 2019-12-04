@@ -96,7 +96,7 @@ CREATE TABLE `achievements` (
   CONSTRAINT `achievements_gameid_FK` FOREIGN KEY (`gameid`) REFERENCES `games` (`gameid`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `achievements_chk_1` CHECK ((`condition` in (_utf8mb4'play',_utf8mb4'win',_utf8mb4'score'))),
   CONSTRAINT `achievements_chk_2` CHECK ((`exp` >= 0))
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -105,7 +105,7 @@ CREATE TABLE `achievements` (
 
 LOCK TABLES `achievements` WRITE;
 /*!40000 ALTER TABLE `achievements` DISABLE KEYS */;
-INSERT INTO `achievements` VALUES (1,1,'Play 5 games of Tic-Tac-Toe','play',5,0,'/TTTPlay5.png'),(2,1,'Win 5 games of Tic-Tac-Toe','win',5,0,'/TTTWin5.png'),(3,1,'Play 10 games of Tic-Tac-Toe','play',10,0,'/TTTPlay10.png'),(4,1,'Win 10 games of Tic-Tac-Toe','win',10,0,'/TTTWin10.png');
+INSERT INTO `achievements` VALUES (1,1,'Play 5 games of Tic-Tac-Toe','play',5,0,'/TTTPlay5.png'),(2,1,'Win 5 games of Tic-Tac-Toe','win',5,0,'/TTTWin5.png'),(3,1,'Play 10 games of Tic-Tac-Toe','play',10,0,'/TTTPlay10.png'),(4,1,'Win 10 games of Tic-Tac-Toe','win',10,0,'/TTTWin10.png'),(5,2,'Play 5 games of Connect-Four','play',5,0,'/connectFourPlay5.png'),(6,2,'Play 10 games of Connect-Four','play',10,0,'/connectFourPlay10.png'),(7,2,'Win 5 games of Connect-Four','win',5,0,'/connectFourWin5.png'),(8,2,'Win 10 games of Connect-Four','win',10,0,'/connectFourWin10.png'),(9,3,'Play 5 games of Battleship','play',5,0,'/battleshipPlay5.png'),(10,3,'Play 10 games of Battleship','play',10,0,'/battleshipPlay10.png'),(11,3,'Win 5 games of Battleship','win',5,0,'/battleshipWin5.png'),(12,3,'Win 10 games of Battleship','win',10,0,'/battleshipWin10.png'),(13,4,'Play 5 games of Space-Shooter','play',5,0,'/spaceShooterPlay5.png'),(14,4,'Play 10 games of Space-Shooter','play',10,0,'/spaceShooterPlay10.png');
 /*!40000 ALTER TABLE `achievements` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -239,4 +239,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-12-03 12:50:50
+-- Dump completed on 2019-12-04 14:14:45
