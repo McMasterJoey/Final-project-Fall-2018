@@ -233,6 +233,11 @@ public class ThemeCreator extends GridPane
 			themenames.add("Default Custom Theme");
 			this.customthemename = "Default Custom Theme";
 		}
+		else
+		{
+			this.userThemeNames.getItems().clear();
+			this.userThemeNames.getItems().addAll(themenames);
+		}
 		this.userThemeNames = new ComboBox<String>();
 		this.userThemeNames.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		this.userThemeNames.getItems().addAll(themenames);
