@@ -10,8 +10,11 @@ import java.sql.SQLException;
  * Establishes a connection to the jukebox436 database, and provides a getter
  * for other classes to use the connection.
  * 
- * @author Nicholas Fiegel, moving code from Rick Mercer's SongLibrary.java
- *
+ *  moving code from Rick Mercer's SongLibrary.java
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  */
 public class DBConnection {
 

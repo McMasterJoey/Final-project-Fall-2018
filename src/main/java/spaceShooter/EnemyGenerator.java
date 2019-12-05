@@ -4,7 +4,14 @@ import java.awt.Point;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public class EnemyGenerator implements Serializable{
 	/**
 	 * 

@@ -9,6 +9,9 @@ import java.util.Observable;
  * based on the TicTacToeGame class provided by Rick Mercer in his CSC436
  * course.
  * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
  * @author Wes Rodgers
  *
  */

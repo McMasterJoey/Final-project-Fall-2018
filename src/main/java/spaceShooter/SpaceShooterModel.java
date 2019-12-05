@@ -3,7 +3,14 @@ package spaceShooter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Observable;
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public class SpaceShooterModel extends Observable implements Serializable {
 	
 	/**

@@ -41,8 +41,9 @@ import ticTacToe.TicTacToeControllerView;
  * application Should be what is returned to after closing a game.
  * 
  * @author Joey McMaster
- * @author Wes Rodgers
+ * @author Linjie liu
  * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class GamejamMainScreen extends BorderPane implements Observer {

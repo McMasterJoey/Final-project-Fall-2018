@@ -2,7 +2,14 @@ package connectFour;
 
 import java.io.Serializable;
 import java.util.Observable;
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public class ConnectFourModel extends Observable implements Serializable {
 
 	/**

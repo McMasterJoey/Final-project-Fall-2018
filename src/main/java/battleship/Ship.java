@@ -6,6 +6,9 @@ import java.util.HashSet;
 
 /**
  * Ship class, holds all of the relevant model information for battleship Ships
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
  * @author Wes Rodgers
  *
  */

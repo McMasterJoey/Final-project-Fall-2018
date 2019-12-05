@@ -6,7 +6,10 @@ import java.time.format.DateTimeFormatter;
 /**
  * Provides information about a user's score for a game.
  *
- * @Author Nicholas Fiegel
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  */
 public class Score implements Comparable
 {

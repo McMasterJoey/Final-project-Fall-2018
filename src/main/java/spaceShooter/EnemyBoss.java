@@ -4,7 +4,14 @@ import java.awt.Point;
 import java.io.Serializable;
 
 import spaceShooter.SpaceShooterBuff.BuffType;
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public class EnemyBoss extends SpaceShooterEnemy implements Serializable{
 
 	/**

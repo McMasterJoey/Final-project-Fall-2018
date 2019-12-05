@@ -7,6 +7,21 @@ import javafx.stage.Stage;
 /**
  * Implementation of the Gamejam project. Acts as the Init class.
  * 
+ * A little final note here by Joey McMaster
+ * This hopefully will be my last edit before we turn this project in on 12/5/2019 at 3:30 PM 
+ * Its been a pleasure working with everyone, thanks to our efforts we created this monster of a project.
+ * I am aware that some of us will be graduating soon, I wish everyone good luck in your future projects.
+ * As Product owner of this awesome project, I say thank you for all your hard work that went into this. 
+ * This here is my stamp of approval
+ * [---------------------------------------]
+ * [  Good Job Good Job Good Job Good Job  ]
+ * [ {}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}  ]
+ * [  Good Job Good Job Good Job Good Job  ]
+ * [ {}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}  ]
+ * [---------------------------------------]
+ * Bear Down! We are almost done with the last semester of the decade!
+ * 
+ * 
  * @author Joey McMaster
  * @author Linjie liu
  * @author Nicholas Fiegel
@@ -15,7 +30,7 @@ import javafx.stage.Stage;
  */
 public class Gamejam extends Application {
 	// Print everything debug related.
-	public static final boolean ShowDebugOutput = true;
+	public static final boolean ShowDebugOutput = false;
 	private GamejamMainScreen screen;
 	public static void main(String args[]) {
 		launch(args);

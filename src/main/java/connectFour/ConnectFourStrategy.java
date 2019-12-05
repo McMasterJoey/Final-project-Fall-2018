@@ -6,6 +6,9 @@ package connectFour;
  * 
  * Adapted from Rick Mercer's TicTacToeStrategy
  * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
  * @author Wes Rodgers
  */
 

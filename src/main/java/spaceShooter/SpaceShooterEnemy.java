@@ -7,6 +7,9 @@ import java.util.Random;
 /**
  * Abstract class that has all of the fields and getters/setters that any
  * enemy will have.
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
  * @author Wes Rodgers
  *
  */

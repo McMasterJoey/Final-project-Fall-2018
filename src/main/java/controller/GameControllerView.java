@@ -10,7 +10,10 @@ import javafx.scene.layout.BorderPane;
 
 /**
  * 
- * @author
+  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public abstract class GameControllerView extends BorderPane implements Observer {

@@ -5,6 +5,9 @@ import java.io.Serializable;
 /**
  * A serializeable form of the Theme Pair
  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class ThemePairSerializable implements Serializable {

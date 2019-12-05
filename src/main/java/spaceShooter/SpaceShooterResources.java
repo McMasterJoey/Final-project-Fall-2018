@@ -1,7 +1,14 @@
 package spaceShooter;
 
 import javafx.scene.image.Image;
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public class SpaceShooterResources {
 	
 	// will need to add more images for different enemies and projectiles eventually 

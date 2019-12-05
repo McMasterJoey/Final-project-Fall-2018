@@ -5,7 +5,10 @@ import java.util.ArrayList;
 /**
  * Houses all critical data for a Theme or Dynamic Theme. 
  * This is only to be used as a medium between the disk and the program.
- * @author 16jmc
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class ThemeSerializable implements Serializable

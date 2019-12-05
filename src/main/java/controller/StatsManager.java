@@ -8,7 +8,10 @@ import java.time.LocalDateTime;
 /**
  * Class to unify updates to user statistics.
  *
+ * @author Joey McMaster
+ * @author Linjie liu
  * @author Nicholas Fiegel
+ * @author Wes Rodgers
  */
 public class StatsManager {
     private AccountManager acctMgr;

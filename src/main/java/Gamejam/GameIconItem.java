@@ -5,6 +5,9 @@ package Gamejam;
  * Public class, Holds needed data to produce each button that loads each game.
  * 
  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class GameIconItem implements Comparable<GameIconItem> {

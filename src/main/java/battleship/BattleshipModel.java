@@ -9,7 +9,10 @@ import java.util.Random;
 /**
  * Class representing the Model part of the M-V-C for Battleship
  * holds data about the ships, hits, and the boards.
- * @author Wes Rodgers, Linjieliu
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 

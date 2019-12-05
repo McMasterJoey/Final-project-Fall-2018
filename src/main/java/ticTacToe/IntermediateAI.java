@@ -13,6 +13,10 @@ import model.IGotNoWhereToGoException;
  * could be a win if luck prevails.
  * 
  * @author Rick Mercer
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  */
 public class IntermediateAI implements TicTacToeStrategy, Serializable {
 

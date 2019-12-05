@@ -4,7 +4,14 @@ import java.awt.Point;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public class BattleshipAI implements Serializable{
 
 	private static final long serialVersionUID = 1L;

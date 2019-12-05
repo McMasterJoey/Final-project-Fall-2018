@@ -5,7 +5,14 @@ import java.util.Random;
 import java.io.Serializable;
 
 import model.IGotNoWhereToGoException;
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public class ConnectFourHardAI implements ConnectFourStrategy, Serializable{
 	/**
 	 * 

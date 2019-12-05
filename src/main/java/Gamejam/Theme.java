@@ -23,6 +23,9 @@ import model.SanityCheckFailedException;
 /**
  * Represents a collection of Theme pair objects and other data that compose a theme.
  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  */
 public class Theme
 {

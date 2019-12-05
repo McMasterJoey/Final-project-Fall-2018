@@ -6,6 +6,10 @@ package model;
  * case where there are no more move from which to select
  *  
  * @author Rick Mercer
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  */
 public class IGotNoWhereToGoException extends RuntimeException {
 

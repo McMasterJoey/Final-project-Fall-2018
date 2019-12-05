@@ -4,6 +4,9 @@ import javafx.scene.control.Button;
 /**
  * The same as a button but with some meta data handling.
  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class GameButton extends Button {

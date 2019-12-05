@@ -2,7 +2,14 @@ package spaceShooter;
 
 import java.awt.Point;
 import java.io.Serializable;
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public class SpaceShooterBuff extends SpaceShooterObject implements Serializable {
 
 	/**

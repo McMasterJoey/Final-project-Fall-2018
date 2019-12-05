@@ -6,7 +6,10 @@ import java.time.format.DateTimeFormatter;
 /**
  * A Class providing a Java representation of a row in the account_achievements table.
  *
+ * @author Joey McMaster
+ * @author Linjie liu
  * @author Nicholas Fiegel
+ * @author Wes Rodgers
  */
 public class AccountAchievement
 {

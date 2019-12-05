@@ -2,6 +2,9 @@ package model;
 /**
  * An exception that is thrown when a sanity check is failed.
  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class SanityCheckFailedException extends RuntimeException {

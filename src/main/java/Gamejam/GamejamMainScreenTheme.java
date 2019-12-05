@@ -32,6 +32,9 @@ import model.SanityCheckFailedException;
 
 /**
  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class GamejamMainScreenTheme 

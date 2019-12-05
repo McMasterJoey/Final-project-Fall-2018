@@ -7,6 +7,9 @@ import java.io.Serializable;
  * This class lets a person choose from a variety of different AIs to play
  * against in Tic Tac Toe. Dependent on TODO insert tictactoe strategy name
  * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
  * @author Wes Rodgers
  *
  */

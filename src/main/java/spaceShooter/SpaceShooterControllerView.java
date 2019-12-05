@@ -28,7 +28,14 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import spaceShooter.SpaceShooterBuff.BuffType;
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public class SpaceShooterControllerView extends GameControllerView {
 
 	private final int WIDTH = 1090;

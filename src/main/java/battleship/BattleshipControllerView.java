@@ -40,6 +40,9 @@ import javafx.scene.paint.Color;
  * deal with human moves, and acts as a BorderPane that can be hosted anywhere
  * that wants to hold the game.
  * 
+  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
  * @author Wes Rodgers
  *
  */

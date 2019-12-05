@@ -22,8 +22,10 @@ import java.util.TreeSet;
  * Manager user accounts such as logging in, creating accounts, and updating user
  * statistics in the database.
  *
- * @Author Nicholas Fiegel
- * @Author Joey McMaster
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  */
 public class AccountManager extends Observable
 {

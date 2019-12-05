@@ -4,7 +4,14 @@ import Gamejam.Gamejam;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public class GameMenu extends MenuBar {
 	private Menu optmenu;
 	private MenuItem newgame;

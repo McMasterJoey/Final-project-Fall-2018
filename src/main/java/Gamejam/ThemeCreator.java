@@ -26,7 +26,16 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-
+/**
+ * Enables the user to create his/her own custom themes
+ * Used to be the basic theme creator.
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public class ThemeCreator extends GridPane
 {
 	public static final double BUTTON_PREF_X_SIZE = 250;

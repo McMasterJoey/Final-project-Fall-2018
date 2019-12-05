@@ -10,6 +10,9 @@ import java.util.Iterator;
  * 
  * Also uses an alternate Bracket formating to shut Nick up. Nick if you're reading this, YOU HAPPY NOW?!?!?!
  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class ThemeRegionProp implements Serializable

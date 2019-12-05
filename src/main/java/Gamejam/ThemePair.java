@@ -12,6 +12,9 @@ import javafx.scene.paint.Paint;
 /**
  * Represents theme coloration information for a single GUI Element.
  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class ThemePair

@@ -9,7 +9,11 @@ import model.IGotNoWhereToGoException;
 /**
  * This strategy selects the first available move at random. It is easy to beat.
  * 
- * @author Rick Mercer and Linjie Liu
+ * @author Rick Mercer
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  */
 public class EasyAI implements TicTacToeStrategy, Serializable {
 

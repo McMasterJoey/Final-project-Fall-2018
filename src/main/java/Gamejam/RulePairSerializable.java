@@ -6,6 +6,9 @@ import java.util.HashSet;
 /**
  * A Rulepair that is formated to be serializable. 
  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class RulePairSerializable implements Serializable

@@ -12,7 +12,14 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import Gamejam.Gamejam;
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public class Leaderboard {
     private ArrayList<Score> scores;
     private DBConnection conn;

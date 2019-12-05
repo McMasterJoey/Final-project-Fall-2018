@@ -2,7 +2,14 @@ package battleship;
 
 import java.awt.Point;
 import java.util.ArrayList;
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public interface BattleshipStrategy {
 	/**
 	   * Use Java's Point class to represent the row and column of a Battleship move

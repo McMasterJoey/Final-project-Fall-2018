@@ -11,8 +11,10 @@ import model.Achievement;
 
 /**
  * Interacts with the database on behalf of the Main GUI, Does any interaction that doesn't directly involve account management.
- * @author Joey McMaster
+  * @author Joey McMaster
+ * @author Linjie liu
  * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class DBGameManager

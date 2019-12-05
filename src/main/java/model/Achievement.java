@@ -3,7 +3,10 @@ package model;
 /**
  * A Class providing a Java representation of row in the achievements table.
  *
+ * @author Joey McMaster
+ * @author Linjie liu
  * @author Nicholas Fiegel
+ * @author Wes Rodgers
  */
 public class Achievement
 {

@@ -8,7 +8,14 @@ package ticTacToe;
  */
 
 import java.awt.Point;
-
+/**
+ * 
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
+ *
+ */
 public interface TicTacToeStrategy {
 
   /**

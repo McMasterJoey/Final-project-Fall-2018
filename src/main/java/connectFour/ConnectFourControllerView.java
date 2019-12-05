@@ -27,6 +27,9 @@ import ticTacToe.TicTacToeControllerView;
  * provide methods for controlling the game in a meta sense, saving/loading, new
  * game, etc.
  * 
+  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
  * @author Wes Rodgers
  *
  */

@@ -8,7 +8,10 @@ import ticTacToe.EasyAI;
 * This class lets a person choose from a variety of different AIs to play
 * against in Connect Four. Dependent on TODO insert connect four strategy name
 * 
-* @author Wes Rodgers
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
 *
 */
 public class ConnectFourAI implements Serializable{

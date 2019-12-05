@@ -2,6 +2,9 @@ package controller;
 /**
  * Defines a set of Log stats constants.
  * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class LogStatType {

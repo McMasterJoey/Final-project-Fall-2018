@@ -32,7 +32,10 @@ import javafx.scene.paint.Color;
  * Provides a GUI view and the listeners required for players to make Tic Tac
  * Toe moves with mouse clicks.
  * 
- * @author Wes Rodgers, Joey McMaster
+ * @author Joey McMaster
+ * @author Linjie liu
+ * @author Nicholas Fiegel
+ * @author Wes Rodgers
  *
  */
 public class TicTacToeControllerView extends GameControllerView {
