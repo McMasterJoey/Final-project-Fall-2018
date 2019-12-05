@@ -940,7 +940,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		updateLeftPane();
 		handleLeaderBoardSelectionChange();
 		handleStatsSelectionChange();
-		//achievementsScreen = initAchievementsScreen();
+		achievementsScreen = initAchievementsScreen();
 	}
 
 	/**

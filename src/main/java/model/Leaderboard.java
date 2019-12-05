@@ -76,6 +76,10 @@ public class Leaderboard {
                 LocalDateTime date = ts.toLocalDateTime();
                 String outcome = Score.determineOutcome(win, loss, tie, incomplete);
 
+                if (gameName.equals("Space-Shooter") && loss) {
+                    outcome = "Game Over";
+                }
+
                 scores.add(new Score(gameID, gameName, accountID, username, score, date, outcome));
             }
 
