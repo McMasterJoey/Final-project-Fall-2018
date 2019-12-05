@@ -238,7 +238,7 @@ public class ThemeCreator extends GridPane
 		{
 			this.userThemeNames.getItems().addAll(themenames);
 		}
-		this.userThemeNames.setValue(themenames.get(0));
+		//this.userThemeNames.setValue(themenames.get(0));
 		
 	}
 	private void updateMainScreenOnElementSelection(String element)
