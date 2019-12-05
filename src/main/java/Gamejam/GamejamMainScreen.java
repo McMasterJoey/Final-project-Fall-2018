@@ -802,9 +802,10 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Ever time I change initCreateAccountScreen, I need to update this function
 		VBox vvbox = (VBox) initCreateAccountMenu.getChildren().get(0);
 		Label info = (Label) vvbox.getChildren().get(0);
-		TextField username = (TextField) this.initCreateAccountMenu.getChildren().get(1);
-		PasswordField password = (PasswordField) this.initCreateAccountMenu.getChildren().get(2);
-		Button button = (Button) this.initCreateAccountMenu.getChildren().get(3);
+		TextField username = (TextField) vvbox.getChildren().get(1);
+		
+		PasswordField password = (PasswordField) vvbox.getChildren().get(2);
+		Button button = (Button) vvbox.getChildren().get(3);
 		int status = doCreateNewAccount(username.getText(), password.getText());
 		if (status == 1 || status == 0) {
 			userLoggedIn = true;
