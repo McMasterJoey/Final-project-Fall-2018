@@ -117,7 +117,6 @@ public class ThemeDynamic extends Theme {
 		retval.add("Left Bar Background");
 		retval.add("Middle Background");
 		retval.add("All Text Color");
-		retval.add("Progress Bars");
 		retval.add("Selection Boxes");
 		retval.add("Game Background");
 		retval.add("Everything");

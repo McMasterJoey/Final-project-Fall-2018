@@ -329,6 +329,12 @@ public class GamejamMainScreenTheme
 		}
 		return this.playerCustomThemes.get(id);
 	}
+	private Theme generateUSATheme() {
+		return null;
+	}
+	private Theme generateNightTheme() {
+		return null;
+	}
 	private void setUpThemes() 
 	{
 		if (!this.doneAddingRegions)
@@ -336,8 +342,8 @@ public class GamejamMainScreenTheme
 			throw new SanityCheckFailedException("Can't setup themes when we're still adding regions to the object.");
 		}
 		themes.set(0, generateDefaultTheme());
-		themes.set(1,ThemeGenerate.createThemeGenerated_Night());
-		themes.set(2, ThemeGenerate.createThemeGenerated_USA());
+		themes.set(1, generateNightTheme());
+		themes.set(2, generateUSATheme());
 	}
 	public Theme generateDefaultTheme() 
 	{
@@ -370,7 +376,7 @@ public class GamejamMainScreenTheme
 			}
 			else if (this.regions.get(x).getProperties().isAllTrue(check3))
 			{
-				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), noBorder(), Color.RED);
+				p = new ThemePair(linGrdSimpleBackgroundSetUp(Color.LIGHTGRAY,Color.GRAY, false), noBorder(), Color.BLACK);
 				t1.setThemeData(x, p);
 			}
 			else
