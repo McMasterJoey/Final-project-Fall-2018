@@ -867,6 +867,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 * 	Handles when the leaderboard button is clicked by the user.
 	 */
 	private void viewLeaderboardClick() {
+		handleLeaderBoardSelectionChange();
 		this.setCenter(this.leaderScreen);
 		this.gameInUseIndex = -1;
 		this.agamewasloaded = false;

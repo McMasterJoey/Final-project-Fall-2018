@@ -41,7 +41,7 @@ CREATE TABLE `account_achievements` (
 
 LOCK TABLES `account_achievements` WRITE;
 /*!40000 ALTER TABLE `account_achievements` DISABLE KEYS */;
-INSERT INTO `account_achievements` VALUES (3,1,'2019-11-18 18:09:33'),(3,3,'2019-11-18 18:10:57');
+INSERT INTO `account_achievements` VALUES (3,1,'2019-11-18 18:09:33'),(3,2,'2019-12-05 10:18:23'),(3,3,'2019-11-18 18:10:57'),(3,5,'2019-12-05 10:40:50');
 /*!40000 ALTER TABLE `account_achievements` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -63,7 +63,7 @@ CREATE TABLE `accounts` (
   PRIMARY KEY (`accountid`),
   UNIQUE KEY `username_UNIQUE` (`username`),
   CONSTRAINT `accounts_chk_1` CHECK ((`exp` >= 0))
-) ENGINE=InnoDB AUTO_INCREMENT=174 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=186 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -72,7 +72,7 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` VALUES (1,'admin','admin',0,1,1,0),(2,'guest','guest',0,1,0,1),(3,'test','test',358,2,0,0);
+INSERT INTO `accounts` VALUES (1,'admin','admin',0,1,1,0),(2,'guest','guest',0,1,0,1),(3,'test','test',678,7,0,0);
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -129,7 +129,7 @@ CREATE TABLE `gamelog` (
   PRIMARY KEY (`logid`),
   KEY `accountid_idx` (`statsid`),
   CONSTRAINT `statsid` FOREIGN KEY (`statsid`) REFERENCES `statistics` (`statsid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=93 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -138,7 +138,7 @@ CREATE TABLE `gamelog` (
 
 LOCK TABLES `gamelog` WRITE;
 /*!40000 ALTER TABLE `gamelog` DISABLE KEYS */;
-INSERT INTO `gamelog` VALUES (80,1,1,0,0,0,'00:00:01',108,'2019-11-14 10:27:10'),(81,1,0,0,1,0,'00:00:00',52,'2019-11-15 11:02:13'),(82,1,1,0,0,0,'00:00:01',108,'2019-11-15 11:06:41'),(83,2,0,1,0,0,'00:00:00',104,'2019-11-15 11:14:56'),(86,1,0,0,1,0,'00:00:00',52,'2019-11-18 17:40:10'),(87,1,1,0,0,0,'00:00:01',108,'2019-11-18 17:40:23'),(88,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:05'),(89,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:21'),(90,1,1,0,0,0,'00:00:01',108,'2019-11-18 18:10:34'),(91,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:49'),(92,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:57');
+INSERT INTO `gamelog` VALUES (80,1,1,0,0,0,'00:00:01',108,'2019-11-14 10:27:10'),(81,1,0,0,1,0,'00:00:00',52,'2019-11-15 11:02:13'),(82,1,1,0,0,0,'00:00:01',108,'2019-11-15 11:06:41'),(83,2,0,1,0,0,'00:00:00',104,'2019-11-15 11:14:56'),(86,1,0,0,1,0,'00:00:00',52,'2019-11-18 17:40:10'),(87,1,1,0,0,0,'00:00:01',108,'2019-11-18 17:40:23'),(88,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:05'),(89,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:21'),(90,1,1,0,0,0,'00:00:01',108,'2019-11-18 18:10:34'),(91,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:49'),(92,1,0,0,1,0,'00:00:00',52,'2019-11-18 18:10:57'),(93,289,0,1,0,0,'00:00:01',2500,'2019-12-05 09:54:51'),(94,1,1,0,0,0,'00:00:01',100,'2019-12-05 10:18:23'),(95,2,1,0,0,0,'00:00:00',200,'2019-12-05 10:36:14'),(96,2,0,1,0,0,'00:00:00',184,'2019-12-05 10:38:02'),(97,2,0,1,0,0,'00:00:00',124,'2019-12-05 10:40:08'),(98,2,0,1,0,0,'00:00:00',104,'2019-12-05 10:40:50'),(99,276,0,1,0,0,'00:00:01',285,'2019-12-05 11:15:18'),(100,276,0,0,0,1,'00:00:01',0,'2019-12-05 11:35:43'),(101,276,1,0,0,0,'00:00:01',2245,'2019-12-05 11:37:34'),(102,276,0,1,0,0,'00:00:01',445,'2019-12-05 11:40:20');
 /*!40000 ALTER TABLE `gamelog` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -188,7 +188,7 @@ CREATE TABLE `statistics` (
   KEY `gameid_idx` (`gameid`),
   CONSTRAINT `accountid` FOREIGN KEY (`accountid`) REFERENCES `accounts` (`accountid`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `gameid` FOREIGN KEY (`gameid`) REFERENCES `games` (`gameid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=314 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=350 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -197,7 +197,7 @@ CREATE TABLE `statistics` (
 
 LOCK TABLES `statistics` WRITE;
 /*!40000 ALTER TABLE `statistics` DISABLE KEYS */;
-INSERT INTO `statistics` VALUES (1,3,1,4,0,6,0,'00:00:00'),(2,3,2,0,1,0,0,'00:00:00'),(276,3,3,0,0,0,0,'00:00:00'),(289,3,4,0,0,0,0,'00:00:00');
+INSERT INTO `statistics` VALUES (1,3,1,5,0,6,0,'00:00:00'),(2,3,2,1,4,0,0,'00:00:00'),(276,3,3,1,2,0,1,'00:00:00'),(289,3,4,0,1,0,0,'00:00:00');
 /*!40000 ALTER TABLE `statistics` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -214,11 +214,10 @@ CREATE TABLE `themes` (
   `themename` varchar(256) NOT NULL,
   `themepath` varchar(128) NOT NULL,
   PRIMARY KEY (`themeid`),
-  UNIQUE KEY `themename_UNIQUE` (`themename`),
   UNIQUE KEY `themepath_UNIQUE` (`themepath`),
   KEY `accountid_themes_FK_idx` (`accountid`),
   CONSTRAINT `accountid_themes_FK` FOREIGN KEY (`accountid`) REFERENCES `accounts` (`accountid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -227,6 +226,7 @@ CREATE TABLE `themes` (
 
 LOCK TABLES `themes` WRITE;
 /*!40000 ALTER TABLE `themes` DISABLE KEYS */;
+INSERT INTO `themes` VALUES (2,3,'Custom Theme 1','C:\\Users\\Nick\\OneDrive\\UA\\CSC 436\\Repos\\starter-team-gamejam\\custom-theme\\test-Custom Theme 1.ct');
 /*!40000 ALTER TABLE `themes` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -239,4 +239,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-12-05  9:42:12
+-- Dump completed on 2019-12-05 11:46:52
