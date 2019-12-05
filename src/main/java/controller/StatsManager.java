@@ -51,7 +51,7 @@ public class StatsManager {
     public void logGameStat(String game, boolean win, boolean loss, boolean tie, boolean incomplete, int time, int score) {
         String outcome = Score.determineOutcome(win, loss, tie, incomplete);
 
-        if (game.equals("Space Shooter") && loss) {
+        if (game.equals("Space-Shooter") && loss) {
             outcome = "Game Over";
         }
 
