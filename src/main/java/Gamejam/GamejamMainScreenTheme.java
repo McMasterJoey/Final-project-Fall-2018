@@ -136,8 +136,6 @@ public class GamejamMainScreenTheme
 			}
 			this.basicthemecreator.finishConstructing();
 			
-			this.playerCustomThemes.add(generateDefaultTheme());
-			this.playerCustomThemes.add(generateDefaultTheme());
 			setUpThemes();
 			updateTheme(0);
 			
