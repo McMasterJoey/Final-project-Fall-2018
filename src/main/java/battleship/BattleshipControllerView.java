@@ -522,7 +522,7 @@ public class BattleshipControllerView extends GameControllerView {
 
 		// Don't save if the game was completed
 		if (!gameModel.isStillRunning()) {
-			gameModel.clearBoard();
+			newGame();
 		}
 
 		FileOutputStream fos;
@@ -725,12 +725,8 @@ public class BattleshipControllerView extends GameControllerView {
 		double difficultyModifier = gameModel.getBattleshipAI().getStrategy() instanceof BattleshipEasyAI ? 1.0 : 1.5;
 		int temp = gameModel.maxMovesRemaining();
 		int winModifier = 1 * (gameModel.won(true) ? 1 : -1);
-		System.out.println(temp);
-		System.out.println(winModifier);
 		temp = temp * winModifier + 83;
-		System.out.println(temp);
 		baseScore = temp * 15 + 10;
-		System.out.println(baseScore);
 		return (int) (baseScore * difficultyModifier);
 	}
 
