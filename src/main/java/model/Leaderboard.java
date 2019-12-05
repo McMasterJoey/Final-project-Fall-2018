@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import Gamejam.Gamejam;
+
 public class Leaderboard {
     private ArrayList<Score> scores;
     private DBConnection conn;
@@ -113,7 +115,7 @@ public class Leaderboard {
                 Collections.sort(scores);
                 Collections.reverse(scores);
             } else {
-                System.err.println("accountid " + accountID + " not found in the database");
+            	Gamejam.DPrint("accountid " + accountID + " not found in the database");
             }
         } catch (SQLException se) {
             se.printStackTrace();

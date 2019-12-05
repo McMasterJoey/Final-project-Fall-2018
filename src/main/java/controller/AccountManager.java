@@ -122,7 +122,7 @@ public class AccountManager extends Observable
                     }
                     // END TESTING: REMOVE COMMENT ON MERGE
 
-                    System.out.println("Login: " + curUsername + " " + isAdmin + " " + isGuest);
+                    Gamejam.DPrint("Login: " + curUsername + " " + isAdmin + " " + isGuest);
 
                     setChanged();
                     notifyObservers();

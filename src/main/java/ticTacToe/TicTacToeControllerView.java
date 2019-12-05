@@ -272,20 +272,17 @@ public class TicTacToeControllerView extends GameControllerView {
 		Gamejam.DPrint(gameModel.toString());
 		Gamejam.DPrint("----------");
 		if(!gameModel.isStillRunning()) {
-			System.out.println("Score is " + getScore());
+			Gamejam.DPrint("Score is " + getScore());
 			showEndScreen();
 		}
 		if (gameModel.tied()) {
-			//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.TIE, 1);
 			statsManager.logGameStat("Tic-Tac-Toe", LogStatType.TIE, 0, getScore());
 			tieSound.play();
 		} else if (gameModel.won('X') || gameModel.won('O')) {
 			if (gameModel.won('X')) {
-				//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.WIN, 1);
 				statsManager.logGameStat("Tic-Tac-Toe",  LogStatType.WIN, 1, getScore());
 				winSound.play();
 			} else {
-				//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.LOSS, 1);
 				statsManager.logGameStat("Tic-Tac-Toe", LogStatType.LOSS, 1, getScore());
 				loseSound.play();
 			}
@@ -406,7 +403,6 @@ public class TicTacToeControllerView extends GameControllerView {
 	@Override
 	protected void updateStatistics() {
 		if (!(gameModel.won('X') || gameModel.won('O')) && gameModel.maxMovesRemaining() > 0) {
-			//accountManager.logGlobalStat(true, "Tic-Tac-Toe", logStatType.INCOMPLETE, 1);
 			statsManager.logGameStat("Tic-Tac-Toe", LogStatType.INCOMPLETE, 1, getScore());
 		}
 	}
@@ -430,6 +426,11 @@ public class TicTacToeControllerView extends GameControllerView {
 
 	@Override
 	protected String wonString() {
-		return gameModel.won('X') ? "won" : "lost";
+		if (gameModel.won('X')) {
+			return "won";
+		} else if (gameModel.won('O')) {
+			return "lost";
+		}
+		return "tied";
 	}
 }
