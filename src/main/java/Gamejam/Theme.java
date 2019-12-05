@@ -73,6 +73,10 @@ public class Theme
 	 */
 	public ImageView getImage(int index) 
 	{
+		if (this.themeimg.size() >= index) {
+			Gamejam.DPrint("[DEBUG] Theme: Error: No image was in, resorting to defaults!");
+			return new ImageView(new Image(getClass().getResourceAsStream("/usersettingsbuttonbackground.png")));
+		}
 		return new ImageView(this.themeimg.get(index));
 	}
 	/**

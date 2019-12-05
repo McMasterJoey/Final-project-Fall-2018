@@ -1,6 +1,7 @@
 package Gamejam;
 
 import controller.AccountManager;
+import controller.ThemeDataBasePair;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,9 +10,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -25,7 +23,6 @@ import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -78,7 +75,7 @@ public class ThemeCreator extends GridPane
 	private VBox borderintermediatevbox;
 	
 	private int workingthemeindex = 0;
-	
+	private ArrayList<ThemeDataBasePair> db_theme_data;
 	boolean debugger = false;
 	
 	public ThemeCreator(GamejamMainScreenTheme screen)
@@ -145,9 +142,7 @@ public class ThemeCreator extends GridPane
 		updateScreen.setOnAction((click) -> 
 		{
 			updateThemeData();
-			this.workingtheme.generateTheme();
-			this.screen.updateTheme(-1);
-			printCurrentTheme();
+			saveCustomDynamicTheme(this.customthemename);
 		});
 		loadTextEditor.setOnAction((click) -> 
 		{
@@ -207,9 +202,7 @@ public class ThemeCreator extends GridPane
 		this.screen.addRegion(452.1, this.returntomainmenubutton3 , "Basic Theme Editor: Return to Main Menu Button (Other Editor) Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
 		this.screen.addRegion(453, updateScreen, "Basic Theme Editor: Update Screen Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
 		this.screen.addRegion(454, restartThemeButton, "Basic Theme Editor: Switch to Util Menu", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
-		//this.screen.addRegion(454, loadTextEditor, "Basic Theme Editor: Load Text Editor Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
-		//this.screen.addRegion(455, loadBackgroundEditor, "Basic Theme Editor: Load Background Editor Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
-		//this.screen.addRegion(456, loadBorderEditor, "Basic Theme Editor: Load Border Editor Button", new ThemeRegionProp(ThemeRegionProp.BUTTON_WT, ThemeRegionProp.LOC_MI_BTM));
+		
 		this.screen.addRegion(457, this.mainarea, "Basic Theme Editor: Main Section VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
 		this.screen.addRegion(457.01, this.textintermediatevbox, "Basic Theme Editor: Text Editor Intermediate VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
 		this.screen.addRegion(457.02, this.backgroundintermediatevbox, "Basic Theme Editor: Background Editor Intermediate VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_BTM, ThemeRegionProp.INT_REG));
@@ -226,8 +219,17 @@ public class ThemeCreator extends GridPane
 	 * Should be called everytime a new user logs in.
 	 */
 	public void updateObjectOnUserChange()
-	{
-		ArrayList<String> themenames = AccountManager.getInstance().getThemeNames();
+	{	
+		ArrayList<String> themenames =  new ArrayList<String>();
+		updateOnThemeDataChange();
+		for(int x = 0; x < this.db_theme_data.size(); x++)
+		{
+			if (this.db_theme_data.get(x).geIsUser()) 
+			{
+				themenames.add(this.db_theme_data.get(x).getThemeName());
+			}
+		}
+		this.userThemeNames.getItems().clear();
 		if (themenames.size() == 0)
 		{
 			themenames.add("Default Custom Theme");
@@ -235,13 +237,10 @@ public class ThemeCreator extends GridPane
 		}
 		else
 		{
-			this.userThemeNames.getItems().clear();
 			this.userThemeNames.getItems().addAll(themenames);
 		}
-		this.userThemeNames = new ComboBox<String>();
-		this.userThemeNames.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
-		this.userThemeNames.getItems().addAll(themenames);
 		this.userThemeNames.setValue(themenames.get(0));
+		
 	}
 	private void updateMainScreenOnElementSelection(String element)
 	{
@@ -309,6 +308,7 @@ public class ThemeCreator extends GridPane
 		this.workingtheme = new ThemeDynamic(this.customthemename, screen.getRegionCount(), screen.getAllRegions(),this.screen);
 		updateMainScreenOnElementSelection("Button");
 		this.setPrefHeight(9999);
+		updateOnThemeDataChange();
 	}
 	private VBox setUpBackgroundSetter()
 	{
@@ -342,17 +342,20 @@ public class ThemeCreator extends GridPane
 		Label namefieldlabel = new Label("Input your desired theme name");
 		TextField box = new TextField(this.customthemename);
 		box.setPrefSize(100, BUTTON_PREF_Y_SIZE);
-		updateObjectOnUserChange();
+		this.userThemeNames = new ComboBox<String>();
 		this.userThemeNames.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		this.userThemeNames.setOnAction((click) -> 
 		{
-			boolean result = loadCustomDynamicTheme(this.userThemeNames.getValue(),AccountManager.getInstance().getThemePath(this.userThemeNames.getValue()));
+			String n = this.userThemeNames.getValue();
+			Gamejam.DPrint("(1) Selected "+ n + " from UserThemeNames");
+			boolean result = loadCustomDynamicTheme(n,AccountManager.getInstance().getThemePath(n));
 			if (!result)
 			{
 				Gamejam.DPrint("[DEBUG]: Failed to load Custom Theme " + this.userThemeNames.getValue());
 			}
 		});
 		
+		updateObjectOnUserChange();
 		Button b = new Button("Save Current Theme");
 		b.setPrefSize(BUTTON_PREF_X_SIZE, BUTTON_PREF_Y_SIZE);
 		b.setOnAction((click) -> 
@@ -363,6 +366,10 @@ public class ThemeCreator extends GridPane
 			if (!result)
 			{
 				Gamejam.DPrint("[DEBUG]: Failed to save Custom Theme " + this.userThemeNames.getValue());
+			}
+			else
+			{
+				updateObjectOnUserChange();
 			}
 		});
 		
@@ -384,10 +391,44 @@ public class ThemeCreator extends GridPane
 		this.screen.addRegion(494, this.userThemeNames, "Basic Theme Editor: Select Custom Theme Combo Box", new ThemeRegionProp(ThemeRegionProp.COMBOBOX, ThemeRegionProp.LOC_MI_BTM));
 		return retval;
 	}
-	
+	public void updateOnThemeDataChange()
+	{
+		this.db_theme_data = AccountManager.getInstance().getAllThemeData();
+	}
+	private boolean hasThemeName(String name)
+	{
+		updateOnThemeDataChange();
+		for(int x = 0; x < this.db_theme_data.size(); x++)
+		{
+			if (this.db_theme_data.get(x).geIsUser() && this.db_theme_data.get(x).getThemeName().equals(name)) 
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	private int getInternalThemeIdFromName(String name)
+	{
+		updateOnThemeDataChange();
+		Gamejam.DPrint("[Debug]: GITIDFN name = " + name);
+		for(int x = 0; x < this.db_theme_data.size(); x++)
+		{
+			if (this.db_theme_data.get(x).geIsUser() && this.db_theme_data.get(x).getThemeName().equals(name)) 
+			{
+				Gamejam.DPrint("[DEBUG] gITIDFN: x = " + x);
+				return x;
+			}
+		}
+		Gamejam.DPrint("[DEBUG]: InternalThemeIDLook up failed!");
+		return 0;
+	}
 	public boolean saveCustomDynamicTheme(String themename)
 	{
 		if (themename == null)
+		{
+			return false;
+		}
+		if (hasThemeName(themename)) // Assumption: Once a user saves a theme, it can only be loaded! 
 		{
 			return false;
 		}
@@ -395,64 +436,58 @@ public class ThemeCreator extends GridPane
 		ObjectOutputStream oos;
 		try {
 			String fname = AccountManager.getInstance().getCurUsername() + "-" + themename + ".ct";
-			if (debugger)
-			{
-				fname = AccountManager.getInstance().getCurUsername() + "-debugtheme.ct";
-			}
 			String sep = System.getProperty("file.separator");
 			String filepath = System.getProperty("user.dir") + sep + "custom-theme";
 			if(!new File(filepath).exists()) {
 				new File(filepath).mkdir();
 			}
 			filepath += sep + fname;
-			System.out.println("Saving theme!");
+			//System.out.println("Saving theme!");
 			fos = new FileOutputStream(filepath);			
 			oos = new ObjectOutputStream(fos);
 			oos.writeObject(this.workingtheme.dumpCoreData());
 			oos.close();
+			fos.close();
 			
 			AccountManager.getInstance().addNewTheme(themename, filepath);
+			updateOnThemeDataChange();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
+		this.userThemeNames.getItems().add(this.customthemename);
+		this.screen.addCustomTheme(this.workingtheme);
 		return true;
 	}
 	
 	public boolean loadCustomDynamicTheme(String themename, String filepath)
 	{
-		if (debugger)
-		{
-			String fname = AccountManager.getInstance().getCurUsername() + "-debugtheme.ct";
-			String sep = System.getProperty("file.separator");
-			filepath = System.getProperty("user.dir") + sep + "custom-theme" + sep + fname;
-		} 
-		
 		if (filepath == null) {
 			return false; // Tried to load a non-existant theme
 		}
 		try {
 			File file = new File(filepath);
-			System.out.println("In loading try block!");
+			//System.out.println("In loading try block!");
 			if (file.exists()) {
-				System.out.println("In If statment block");
+				//System.out.println("In If statment block");
 				FileInputStream fis = new FileInputStream(file);
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				ThemeSerializable tse = (ThemeSerializable) ois.readObject();
 				this.workingtheme.importCoreData(tse);
 				this.customthemename = themename;
-				System.out.println("Loaded theme!");
+				//System.out.println("Loaded theme!");
 				ois.close();
-				file.delete();
 			}
 		} catch(IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 			return false;
 		}
-		System.out.println("Left loaded try block");
+		//System.out.println("Left loaded try block");
 		if (this.updateinrealtimecheckbox.isSelected())
 		{
-			this.screen.setCustomTheme(0,this.workingtheme);
+			this.workingthemeindex = getInternalThemeIdFromName(themename);
+			this.screen.displayCustomTheme(this.getInternalThemeIdFromName(themename));
 		}
 		return true;
 	}
@@ -589,7 +624,6 @@ public class ThemeCreator extends GridPane
 	{
 		this.brodergen = GamejamMainScreenTheme.simpleBorder(this.borderPaint,this.borderstyle,this.borderthickness);
 		this.borderPreview.setBorder(this.brodergen);
-		printCurrentTheme();
 	}
 	private void doAutoUpdate()
 	{
@@ -597,15 +631,13 @@ public class ThemeCreator extends GridPane
 		{
 			this.workingtheme.removeLastRule();
 			this.workingtheme.addRule(new ThemePair(this.backgroundgen, this.brodergen, this.textPaint), ThemeDynamic.englishToRuleSet(this.elementStr), (this.elementStr.equals("Button") || this.elementStr.equals("Selection Boxes"))) ;
-			this.screen.setCustomTheme(0,this.workingtheme);
+			this.screen.displayCustomTheme(getInternalThemeIdFromName(this.customthemename));
 		}
 	}
 	private void updateThemeData()
 	{
 		this.workingtheme.addRule(new ThemePair(this.backgroundgen, this.brodergen, this.textPaint), ThemeDynamic.englishToRuleSet(this.elementStr), (this.elementStr.equals("Button") || this.elementStr.equals("Selection Boxes"))) ;
-		this.screen.setCustomTheme(this.workingthemeindex,this.workingtheme);
-	}
-	private void printCurrentTheme()
-	{
+		this.workingthemeindex = getInternalThemeIdFromName(this.customthemename);
+		this.screen.displayCustomTheme(getInternalThemeIdFromName(this.customthemename));
 	}
 }

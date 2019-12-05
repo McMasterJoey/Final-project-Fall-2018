@@ -9,9 +9,11 @@ import model.Score;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.TreeSet;
@@ -907,7 +909,28 @@ public class AccountManager extends Observable
         }
         return gameid;
     }
+    
+    public ArrayList<ThemeDataBasePair> getAllThemeData() {
+    	ArrayList<ThemeDataBasePair> retval = new ArrayList<ThemeDataBasePair>();
+    	ResultSet rs = null;
 
+        try
+        {
+            rs = conn.executeQuery("SELECT * FROM themes");
+
+            while (rs.next())
+            {
+            	
+                retval.add(new ThemeDataBasePair(rs.getInt(1),rs.getInt(2) == this.getAccountID(),rs.getString(3),rs.getString(4)));
+            }
+            Collections.sort(retval);
+        }
+        catch (SQLException se)
+        {
+            se.printStackTrace();
+        }
+    	return retval;
+    }
     /**
      * TODO: Prior to using this function, all themes should be loaded into the GamejamMainScreenTheme Object. 
      * This then returns a list of names of the themes the user has stored within the data base. 
@@ -976,6 +999,7 @@ public class AccountManager extends Observable
      */
     public void addNewTheme(String themename, String path)
     {
+    	ResultSet rs = null;
     	try
         {
             conn.execute("INSERT INTO themes(accountid, themename, themepath) VALUES(?, ?, ?)", accountID, themename, path);

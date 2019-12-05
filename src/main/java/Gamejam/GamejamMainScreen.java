@@ -90,7 +90,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		super();
 		init();
 	}
-
 ////////////////////////View Init Functions go here /////////////////////////////////////////////
 	/**
 	 * Inits the Object
@@ -732,7 +731,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Gamejam.DPrint("Logout!");
 		this.setTop(this.initTopBar);
 		this.setCenter(this.initGameselectonboxarea);
-		//updateLeftPane();
 	}
 
 	/**
@@ -771,6 +769,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			handleStatsSelectionChange();
 			basicthemecreator.updateObjectOnUserChange();
 			this.setTop(this.initLoggedInBar);
+			this.basicthemecreator.updateObjectOnUserChange();
 			username.setText("");
 			password.setText("");
 		} else {
@@ -778,8 +777,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			username.setText("");
 			password.setText("");
 		}
-		
-		//updateLeftPane();
 	}
 
 	/**
@@ -795,6 +792,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		// Set it
 		this.setTop(initCreateAccountMenuBar);
 		this.setCenter(this.initCreateAccountMenu);
+		this.basicthemecreator.updateObjectOnUserChange();
 	}
 
 	/**
@@ -802,7 +800,8 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	 */
 	private void createNewAccountButtonOnFinishedClick() {
 		// Ever time I change initCreateAccountScreen, I need to update this function
-		Label info = (Label) initCreateAccountMenu.getChildren().get(0);
+		VBox vvbox = (VBox) initCreateAccountMenu.getChildren().get(0);
+		Label info = (Label) vvbox.getChildren().get(0);
 		TextField username = (TextField) this.initCreateAccountMenu.getChildren().get(1);
 		PasswordField password = (PasswordField) this.initCreateAccountMenu.getChildren().get(2);
 		Button button = (Button) this.initCreateAccountMenu.getChildren().get(3);

@@ -1,9 +1,15 @@
 package Gamejam;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
+import controller.AccountManager;
+import controller.ThemeDataBasePair;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Labeled;
@@ -37,6 +43,7 @@ public class GamejamMainScreenTheme
 	private boolean doneAddingRegions = false;
 	private ArrayList<String> imagecache;
 	private ArrayList<Theme> playerCustomThemes;
+	private ArrayList<ThemeDataBasePair> databasethemes;
 	public GamejamMainScreenTheme() 
 	{
 		this.themes = new ArrayList<Theme>(25);
@@ -46,7 +53,35 @@ public class GamejamMainScreenTheme
 		this.basicthemecreator = new ThemeCreator(this);
 		addRegion(228.001, this.basicthemecreator, "Theme Menu Basic Theme Creator", new ThemeRegionProp(ThemeRegionProp.BORDERPANE, ThemeRegionProp.LOC_MI_TM, ThemeRegionProp.INT_REG));
 		cacheImages();
+		this.databasethemes = AccountManager.getInstance().getAllThemeData();
 		
+	}
+	public void addCustomTheme(ThemeDynamic theme) 
+	{
+		this.playerCustomThemes.add(theme);
+	}
+	public ThemeDynamic loadCustomDynamicTheme(String themename, String filepath)
+	{
+		Gamejam.DPrint("Loaded theme: " + themename + " from disk in main object!");
+		ThemeDynamic t = new ThemeDynamic("d", this.regions.size(), this.regions,this);
+		if (filepath == null) {
+			return null; // Tried to load a non-existant theme
+		}
+		try {
+			File file = new File(filepath);
+			if (file.exists()) {
+				FileInputStream fis = new FileInputStream(file);
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				ThemeSerializable tse = (ThemeSerializable) ois.readObject();
+				t.importCoreData(tse);
+				ois.close();
+			}
+		} catch(IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+		this.playerCustomThemes.add(t);
+		return t;
 	}
 	private void cacheImages()
 	{
@@ -104,8 +139,11 @@ public class GamejamMainScreenTheme
 			this.playerCustomThemes.add(generateDefaultTheme());
 			setUpThemes();
 			updateTheme(0);
-			// Undefine so it gets garbage collected
-			//this.preInit = null;
+			
+			for(int x = 0; x < this.databasethemes.size(); x++) 
+			{
+				loadCustomDynamicTheme(this.databasethemes.get(x).getThemeName(),this.databasethemes.get(x).getFilePath());
+			}
 		}
 	}
 	public Theme getBufferTheme()
@@ -176,13 +214,14 @@ public class GamejamMainScreenTheme
 			throw new SanityCheckFailedException("Can't update theme while we're still adding regions to the object.");
 		}
 		ThemePair[] themedata;
-		
+		boolean isCustomTheme = false;
 		if (themeid < 0)
 		{
 			themeid++;
 			themeid = Math.abs(themeid);
 			Gamejam.DPrint("[DEBUG]: Custom theme with a custom theme id of " + themeid + " being set!");
 			themedata = this.playerCustomThemes.get(themeid).getTheme();
+			isCustomTheme = true;
 		}
 		else 
 		{
@@ -229,7 +268,14 @@ public class GamejamMainScreenTheme
 			if (this.regions.get(x).getProperties().isTrue(28))
 			{
 				Button b = (Button) this.regions.get(x).getRegion();
-				b.setGraphic(getTheme(themeid).getImage(themeimageid));
+				if (isCustomTheme)
+				{
+					b.setGraphic(getCustomTheme(themeid).getImage(themeimageid));
+				}
+				else 
+				{
+					b.setGraphic(getTheme(themeid).getImage(themeimageid));
+				}
 			}
 		}
 	}
@@ -315,8 +361,14 @@ public class GamejamMainScreenTheme
 	{
 		this.playerCustomThemes.add(t);
 	}
+	public void displayCustomTheme(int id) 
+	{
+		Gamejam.DPrint("SCT: id = " + id);
+		this.updateTheme((id + 1) * -1); 
+	}
 	public void setCustomTheme(int id, Theme t)
 	{
+		Gamejam.DPrint("SCT: id = " + id);
 		this.playerCustomThemes.set(id, t);
 		this.playerCustomThemes.get(id).generateTheme();
 		this.updateTheme((id + 1) * -1); 
