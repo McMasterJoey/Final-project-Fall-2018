@@ -623,10 +623,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		thememenu.setOnMouseClicked((click) -> {
 			swapToThemeMenuButtonClick();
 		});
-		Button stats = new Button("View\nMore\nStatistics");
-		stats.setOnAction( (ae) -> { statisticsClick(); });
 		grid.add(thememenu,0,0);
-		grid.add(stats, 1, 0);
 		pane.getChildren().addAll(info,grid);
 		this.initthemes.addRegion(209, pane, "User Settings main screen background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_USM));
 		this.initthemes.addRegion(210, info, "User Settings main label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_USM));
