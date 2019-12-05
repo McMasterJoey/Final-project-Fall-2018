@@ -97,7 +97,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 	private void init() {
 		// Init themes
 		this.initthemes = new GamejamMainScreenTheme();
-		this.initthemes.addRegion(200, this, "Default Center Area", new ThemeRegionProp(ThemeRegionProp.GRIDPANE,ThemeRegionProp.LOC_MI_SG));
+		this.initthemes.addRegion(200, this, "Default Center Area", new ThemeRegionProp(ThemeRegionProp.GRIDPANE,ThemeRegionProp.LOC_MI_OV));
 		
 		// Get the references to the database connector classes
 		// KEEP THESE AT TOP OR YOU WILL HAVE FUN WITH NULL POINTER EXECPTIONS!

@@ -61,7 +61,7 @@ public class ThemeDynamic extends Theme {
 		this.setNewImage(0,"/usersettingsbuttonbackground.png");
 		this.setNewImage(1,"/usersettingsbuttonbackground.png");
 		
-		//Gamejam.DPrint("[DEBUG]: rules.size = " + this.rules.size());
+		Gamejam.DPrint("[DEBUG]: rules.size = " + this.rules.size());
 		
 		for(int x = 0; x < this.rules.size(); x++)
 		{
@@ -81,7 +81,7 @@ public class ThemeDynamic extends Theme {
 					debug_countapplies++;
 				}
 			}
-			//Gamejam.DPrint("[DEBUG]: Rule " + x + " applied theme settings to " +  debug_countapplies + " pairs! ");
+			Gamejam.DPrint("[DEBUG]: Rule " + x + " applied theme settings to " +  debug_countapplies + " pairs! ");
 		}
 	}
 	private ThemePair processBasicThemeEditorThemePair(ThemePair p, int intendedindex)

@@ -142,7 +142,6 @@ public class ThemeCreator extends GridPane
 		updateScreen.setOnAction((click) -> 
 		{
 			updateThemeData();
-			saveCustomDynamicTheme(this.customthemename);
 		});
 		loadTextEditor.setOnAction((click) -> 
 		{
@@ -410,12 +409,12 @@ public class ThemeCreator extends GridPane
 	private int getInternalThemeIdFromName(String name)
 	{
 		updateOnThemeDataChange();
-		Gamejam.DPrint("[Debug]: GITIDFN name = " + name);
+		//Gamejam.DPrint("[Debug]: GITIDFN name = " + name);
 		for(int x = 0; x < this.db_theme_data.size(); x++)
 		{
 			if (this.db_theme_data.get(x).geIsUser() && this.db_theme_data.get(x).getThemeName().equals(name)) 
 			{
-				Gamejam.DPrint("[DEBUG] gITIDFN: x = " + x);
+				//Gamejam.DPrint("[DEBUG] gITIDFN: x = " + x);
 				return x;
 			}
 		}
@@ -424,11 +423,7 @@ public class ThemeCreator extends GridPane
 	}
 	public boolean saveCustomDynamicTheme(String themename)
 	{
-		if (themename == null)
-		{
-			return false;
-		}
-		if (hasThemeName(themename)) // Assumption: Once a user saves a theme, it can only be loaded! 
+		if (themename == null || hasThemeName(themename))
 		{
 			return false;
 		}
@@ -470,7 +465,7 @@ public class ThemeCreator extends GridPane
 			File file = new File(filepath);
 			//System.out.println("In loading try block!");
 			if (file.exists()) {
-				//System.out.println("In If statment block");
+				//System.out.println("In If statement block");
 				FileInputStream fis = new FileInputStream(file);
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				ThemeSerializable tse = (ThemeSerializable) ois.readObject();
@@ -630,14 +625,13 @@ public class ThemeCreator extends GridPane
 		if (this.updateinrealtimecheckbox.isSelected())
 		{
 			this.workingtheme.removeLastRule();
-			this.workingtheme.addRule(new ThemePair(this.backgroundgen, this.brodergen, this.textPaint), ThemeDynamic.englishToRuleSet(this.elementStr), (this.elementStr.equals("Button") || this.elementStr.equals("Selection Boxes"))) ;
-			this.screen.displayCustomTheme(getInternalThemeIdFromName(this.customthemename));
+			this.workingtheme.addRule(new ThemePair(this.backgroundgen, this.brodergen, this.textPaint), ThemeDynamic.englishToRuleSet(this.elementStr), !((this.elementStr.equals("Buttons") || this.elementStr.equals("Selection Boxes"))));
+			this.screen.setThempTheme(this.workingtheme);
 		}
 	}
 	private void updateThemeData()
 	{
-		this.workingtheme.addRule(new ThemePair(this.backgroundgen, this.brodergen, this.textPaint), ThemeDynamic.englishToRuleSet(this.elementStr), (this.elementStr.equals("Button") || this.elementStr.equals("Selection Boxes"))) ;
-		this.workingthemeindex = getInternalThemeIdFromName(this.customthemename);
-		this.screen.displayCustomTheme(getInternalThemeIdFromName(this.customthemename));
+		this.workingtheme.addRule(new ThemePair(this.backgroundgen, this.brodergen, this.textPaint), ThemeDynamic.englishToRuleSet(this.elementStr), !((this.elementStr.equals("Buttons") || this.elementStr.equals("Selection Boxes"))));
+		this.screen.setThempTheme(this.workingtheme);
 	}
 }

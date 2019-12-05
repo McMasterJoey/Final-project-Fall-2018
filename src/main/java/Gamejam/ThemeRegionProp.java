@@ -56,7 +56,7 @@ public class ThemeRegionProp implements Serializable
 	public static final byte LOC_MI_ATM = -15;
 	public static final byte LOC_MI_LB = -16;
 	public static final byte LOC_MI_GH = -17;
-	
+	public static final byte LOC_MI_OV = -18;
 	// Miss Properties
 	public static final byte INT_REG = -100; // The element merely holds another and might not theme well.
 	
@@ -117,6 +117,7 @@ public class ThemeRegionProp implements Serializable
 		this.nameToIndex.put("NotIntermediateArea",35);
 		this.nameToIndex.put("ColorPicker",36);
 		this.nameToIndex.put("TreatAsButton",37);
+		this.nameToIndex.put("OverallPane",38);
 		
 		this.bol_array = new boolean[this.nameToIndex.size()];
 		for(int x = 0; x < this.bol_array.length; x++)
@@ -134,6 +135,12 @@ public class ThemeRegionProp implements Serializable
 			this.bol_array[this.nameToIndex.get("GameHistoryMenu")] = true;
 			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
 			this.bol_array[this.nameToIndex.get("UsedWhileLoggedIn")] = true;
+		}
+		if (locationid == LOC_MI_OV)
+		{
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
+			this.bol_array[this.nameToIndex.get("OverallPane")] = true;
+			this.bol_array[this.nameToIndex.get("HasGeneralLocationInfo")] = true;
 		}
 		if (locationid == LOC_TB)
 		{

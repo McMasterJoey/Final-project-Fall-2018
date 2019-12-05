@@ -44,6 +44,7 @@ public class GamejamMainScreenTheme
 	private ArrayList<String> imagecache;
 	private ArrayList<Theme> playerCustomThemes;
 	private ArrayList<ThemeDataBasePair> databasethemes;
+	private ThemeDynamic temptheme;
 	public GamejamMainScreenTheme() 
 	{
 		this.themes = new ArrayList<Theme>(25);
@@ -146,6 +147,12 @@ public class GamejamMainScreenTheme
 			}
 		}
 	}
+	public void setThempTheme(ThemeDynamic theme)
+	{
+		this.temptheme = theme;
+		this.temptheme.generateTheme();
+		this.updateTheme(Integer.MIN_VALUE);
+	}
 	public Theme getBufferTheme()
 	{
 		return this.playerCustomThemes.get(0);
@@ -181,7 +188,11 @@ public class GamejamMainScreenTheme
 		{
 			throw new SanityCheckFailedException("Can't get Themes while we're still adding regions to the object.");
 		}
-		if (themeid < 0)
+		if (themeid == Integer.MIN_VALUE) 
+		{
+			return this.temptheme;
+		}
+		else if (themeid < 0)
 		{
 			themeid++;
 			themeid = Math.abs(themeid);
@@ -215,13 +226,23 @@ public class GamejamMainScreenTheme
 		}
 		ThemePair[] themedata;
 		boolean isCustomTheme = false;
+		boolean themptheme = false;
 		if (themeid < 0)
 		{
-			themeid++;
-			themeid = Math.abs(themeid);
-			Gamejam.DPrint("[DEBUG]: Custom theme with a custom theme id of " + themeid + " being set!");
-			themedata = this.playerCustomThemes.get(themeid).getTheme();
-			isCustomTheme = true;
+			if (themeid == Integer.MIN_VALUE) 
+			{
+				themptheme = true;
+				Gamejam.DPrint("[DEBUG]: Temp theme being set!");
+				themedata = this.temptheme.getTheme();
+			}
+			else 
+			{
+				themeid++;
+				themeid = Math.abs(themeid);
+				Gamejam.DPrint("[DEBUG]: Custom theme with a custom theme id of " + themeid + " being set!");
+				themedata = this.playerCustomThemes.get(themeid).getTheme();
+				isCustomTheme = true;
+			}
 		}
 		else 
 		{
@@ -271,6 +292,10 @@ public class GamejamMainScreenTheme
 				if (isCustomTheme)
 				{
 					b.setGraphic(getCustomTheme(themeid).getImage(themeimageid));
+				}
+				else if (themptheme)
+				{
+					b.setGraphic(this.temptheme.getImage(themeimageid));
 				}
 				else 
 				{
