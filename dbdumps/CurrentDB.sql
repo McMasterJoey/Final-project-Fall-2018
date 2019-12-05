@@ -63,7 +63,7 @@ CREATE TABLE `accounts` (
   PRIMARY KEY (`accountid`),
   UNIQUE KEY `username_UNIQUE` (`username`),
   CONSTRAINT `accounts_chk_1` CHECK ((`exp` >= 0))
-) ENGINE=InnoDB AUTO_INCREMENT=166 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=174 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -163,7 +163,7 @@ CREATE TABLE `games` (
 
 LOCK TABLES `games` WRITE;
 /*!40000 ALTER TABLE `games` DISABLE KEYS */;
-INSERT INTO `games` VALUES (1,'Tic-Tac-Toe','/tictactoeicon.png'),(2,'Connect-Four','/connectFourIcon.png'),(3,'Battleship','/battleshipIcon.png'),(4,'Space Shooter','/spaceShooterIcon.png');
+INSERT INTO `games` VALUES (1,'Tic-Tac-Toe','/tictactoeicon.png'),(2,'Connect-Four','/connectFourIcon.png'),(3,'Battleship','/battleshipIcon.png'),(4,'Space-Shooter','/spaceShooterIcon.png');
 /*!40000 ALTER TABLE `games` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -188,7 +188,7 @@ CREATE TABLE `statistics` (
   KEY `gameid_idx` (`gameid`),
   CONSTRAINT `accountid` FOREIGN KEY (`accountid`) REFERENCES `accounts` (`accountid`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `gameid` FOREIGN KEY (`gameid`) REFERENCES `games` (`gameid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=290 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=314 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -239,4 +239,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-12-04 14:14:45
+-- Dump completed on 2019-12-05  9:42:12
