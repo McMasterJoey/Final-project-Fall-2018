@@ -117,6 +117,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initLoggedInBar = initLoggedInBar();
 		this.initCreateAccountMenuBar = initCreateAccountMenuBar();
 		this.initLoggedInInGameBar = initLoggedInInGameBar();
+		this.achievementsScreen = initAchievementsScreen();
 		
 		// Set up Game Views
 		this.tictactoegameview = new TicTacToeControllerView();
@@ -618,7 +619,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(224, theme0, "Theme Menu Default Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(225, theme1, "Theme Menu Night Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(226, theme2, "Theme Menu USA Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
-		//this.initthemes.addRegion(227, theme3, "Theme Menu Experimental Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON));
 		return retval;
 	}
 	/**
@@ -663,14 +663,29 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		Label title = new Label(acctMgr.getCurUsername() + "'s Achievements");
 		title.setFont(new Font(42));
 		grid.getColumnConstraints().add(new ColumnConstraints(140));
+
+		screen.getChildren().addAll(title, grid);
+		
+		this.initthemes.addRegion(288.001, screen, "Achievements Screen: VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_USM, ThemeRegionProp.INT_REG));
+		this.initthemes.addRegion(288.002, grid, "Achievements Screen: Gridpane", new ThemeRegionProp(ThemeRegionProp.GRIDPANE, ThemeRegionProp.LOC_MI_USM, ThemeRegionProp.INT_REG));
+		this.initthemes.addRegion(288.003, title, "Achievements Screen: Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_USM));
+		return screen;
+	}
+
+//////////////////////// Button Click Handlers go here  /////////////////////////////////////////////
+	private void updateAchievementsScreen() {
+		Label title = (Label) this.achievementsScreen.getChildren().get(0);
+		GridPane grid = (GridPane) this.achievementsScreen.getChildren().get(1);
+		grid.getChildren().clear();
+		
 		int row, col;
 		row = col = 0;
-
-		if (acctMgr.isGuest() || acctMgr.isAdmin()) {
-			screen.getChildren().add(title);
-			return screen;
+		if (acctMgr.isGuest()) {
+			title.setText("Guest's Achievements");
+			return;
+		} else {
+			title.setText(acctMgr.getCurUsername() + "'s Achievements");
 		}
-
 		for (AccountAchievement cur : acctMgr.getUserAchievements()) {
 			Image icon = new Image(dbGameManager.getAchievementIconPath(cur.getAchieveID()));
 			ImageView view = new ImageView(icon);
@@ -683,16 +698,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 				row++;
 			}
 		}
-
-		screen.getChildren().addAll(title, grid);
-		
-		this.initthemes.addRegion(288.001, screen, "Achievements Screen: VBox", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_USM, ThemeRegionProp.INT_REG));
-		this.initthemes.addRegion(288.002, grid, "Achievements Screen: Gridpane", new ThemeRegionProp(ThemeRegionProp.GRIDPANE, ThemeRegionProp.LOC_MI_USM, ThemeRegionProp.INT_REG));
-		this.initthemes.addRegion(288.003, title, "Achievements Screen: Label", new ThemeRegionProp(ThemeRegionProp.LABEL, ThemeRegionProp.LOC_MI_USM));
-		return screen;
 	}
-
-//////////////////////// Button Click Handlers go here  /////////////////////////////////////////////
 	/**
 	 * Handles the event where the user who is logged in is at the user settings menu and clicks the Theme Menu Button.
 	 */
@@ -940,7 +946,7 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		updateLeftPane();
 		handleLeaderBoardSelectionChange();
 		handleStatsSelectionChange();
-		//achievementsScreen = initAchievementsScreen();
+		updateAchievementsScreen();
 	}
 
 	/**
