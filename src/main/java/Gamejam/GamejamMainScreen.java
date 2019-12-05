@@ -689,13 +689,14 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		for (AccountAchievement cur : acctMgr.getUserAchievements()) {
 			Image icon = new Image(dbGameManager.getAchievementIconPath(cur.getAchieveID()));
 			ImageView view = new ImageView(icon);
-			grid.add(view, row, col);
+			grid.getColumnConstraints().add(new ColumnConstraints(140));
+			grid.add(view, col, row);
 
-			if (row > 7) {
-				row = 0;
-				col++;
-			} else {
+			if (col > 7) {
+				col = 0;
 				row++;
+			} else {
+				col++;
 			}
 		}
 	}
