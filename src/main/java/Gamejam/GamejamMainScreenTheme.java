@@ -327,12 +327,6 @@ public class GamejamMainScreenTheme
 		}
 		return this.playerCustomThemes.get(id);
 	}
-	private Theme generateUSATheme() {
-		return null;
-	}
-	private Theme generateNightTheme() {
-		return null;
-	}
 	private void setUpThemes() 
 	{
 		if (!this.doneAddingRegions)
@@ -340,8 +334,6 @@ public class GamejamMainScreenTheme
 			throw new SanityCheckFailedException("Can't setup themes when we're still adding regions to the object.");
 		}
 		themes.set(0, generateDefaultTheme());
-		themes.set(1, generateNightTheme());
-		themes.set(2, generateUSATheme());
 	}
 	public Theme generateDefaultTheme() 
 	{

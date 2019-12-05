@@ -587,27 +587,12 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 			this.setCenter(this.initUserSettingsMainMenu);
 		});
 		
-		left.getChildren().addAll(backtosettings);
-		
 		Button theme0 = new Button();
 		theme0.setGraphic(this.initthemes.getThemeIcon(0));
 		theme0.setOnMouseClicked((click) -> {
 			this.initthemes.updateTheme(0);
 		});
-		left.getChildren().add(theme0);
-		Button theme1 = new Button();
-		theme1.setGraphic(this.initthemes.getThemeIcon(1));
-		theme1.setOnMouseClicked((click) -> {
-			//this.initthemes.updateTheme(1);
-		});
-		left.getChildren().add(theme1);
-		Button theme2 = new Button();
-		theme2.setGraphic(this.initthemes.getThemeIcon(2));
-		theme2.setOnMouseClicked((click) -> {
-			//this.initthemes.updateTheme(2);
-		});
-		left.getChildren().add(theme2);
-		
+		left.getChildren().addAll(backtosettings,theme0);
 		retval.add(left, 0, 0);
 		// Custom Theme Setter
 		right.getChildren().add(this.initthemes.getBasicThemeCreator());
@@ -617,8 +602,6 @@ public class GamejamMainScreen extends BorderPane implements Observer {
 		this.initthemes.addRegion(222, right, "Theme Menu right side overall background", new ThemeRegionProp(ThemeRegionProp.VBOX, ThemeRegionProp.LOC_MI_TM, ThemeRegionProp.INT_REG));
 		this.initthemes.addRegion(223, backtosettings, "Theme Menu back to user settings menu button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		this.initthemes.addRegion(224, theme0, "Theme Menu Default Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
-		this.initthemes.addRegion(225, theme1, "Theme Menu Night Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
-		this.initthemes.addRegion(226, theme2, "Theme Menu USA Theme button", new ThemeRegionProp(ThemeRegionProp.BUTTON, ThemeRegionProp.LOC_MI_TM));
 		return retval;
 	}
 	/**
