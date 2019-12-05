@@ -328,6 +328,7 @@ public class AccountManager extends Observable
 			level = 1;
 			accountID = rs.getInt("accountid");
 			createStatisticsEntries();
+			fillUserAchievements();
 			setChanged();
 			notifyObservers();
 		}
