@@ -133,9 +133,10 @@ public class SpaceShooterControllerView extends GameControllerView {
 			}
 		});
 		gameScreen.setOnMouseClicked((click) -> {
-			if(click.getButton().equals(MouseButton.PRIMARY)) {
+			//if check commented out for demo purposes.
+			//if(click.getButton().equals(MouseButton.PRIMARY)) {
 				playerAttack();
-			}
+			//}
 		});
 	}
 
@@ -449,6 +450,17 @@ public class SpaceShooterControllerView extends GameControllerView {
 	}
 
 	private boolean collisionExists(SpaceShooterObject obj, SpaceShooterObject obj2) {
+		if(obj == player) {
+			obj = new SpaceShooterPlayer();
+			obj.setLocation(player.getLocation());
+			obj.setHitboxHeight(player.getHitboxHeight());
+			obj.setHitboxWidth(player.getCurrentHP() == player.getMaxHP() ? player.getHitboxWidth()*2 : player.getHitboxWidth());
+		} else if(obj2 == player) {
+			obj2 = new SpaceShooterPlayer();
+			obj2.setLocation(player.getLocation());
+			obj2.setHitboxHeight(player.getHitboxHeight());
+			obj2.setHitboxWidth(player.getCurrentHP() == player.getMaxHP() ? player.getHitboxWidth()*2 : player.getHitboxWidth());
+		}
 		return obj.getLocation().x < obj2.getLocation().x + obj2.getHitboxWidth()
 				&& obj.getLocation().x + obj.getHitboxWidth() > obj2.getLocation().x
 				&& obj.getLocation().y < obj2.getLocation().y + obj2.getHitboxHeight()
